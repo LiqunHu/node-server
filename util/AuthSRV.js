@@ -242,7 +242,6 @@ async function loginInit(user, session_token, type) {
                             auth_flag: '1',
                             show_flag: '1'
                         })
-
                     }
 
                     authApis.push({
@@ -254,7 +253,7 @@ async function loginInit(user, session_token, type) {
                     })
 
                     authApis.push({
-                        api_name: '角色设置',
+                        api_name: '角色组维护',
                         api_path: '/common/system/DomainGroupControl',
                         api_function: 'DOMAINGROUPCONTROL',
                         auth_flag: '1',
@@ -262,24 +261,9 @@ async function loginInit(user, session_token, type) {
                     })
 
                     authApis.push({
-                        api_name: '员工信息管理',
-                        api_path: '/nca/baseconfig/NCAEmployeeInformationControl',
-                        api_function: 'NCAEMPLOYEEINFORMATIONCONTROL',
-                        auth_flag: '1',
-                        show_flag: '1'
-                    })
-
-                    authApis.push({
-                        api_name: '部门维护',
-                        api_path: '/nca/baseconfig/NCADepartmentControl',
-                        api_function: 'NCADEPARTMENTCONTROL',
-                        auth_flag: '1',
-                        show_flag: '1'
-                    })
-                    authApis.push({
-                        api_name: '岗位维护',
-                        api_path: '/nca/baseconfig/NCAUsergroupControl',
-                        api_function: 'NCAUSERGROUPCONTROL',
+                        api_name: '员工维护',
+                        api_path: '/common/system/OperatorControl',
+                        api_function: 'OPERATORCONTROL',
                         auth_flag: '1',
                         show_flag: '1'
                     })
@@ -404,7 +388,7 @@ async function iterationMenu(user, domain, GroupID, parent_id, m_list, actGroups
 
         return_list[0].sub_menu.push({
             menu_type: GLBConfig.MTYPE_LEAF,
-            menu_name: '角色设置',
+            menu_name: '角色组维护',
             show_flag: '1',
             menu_path: '/common/system/DomainGroupControl',
             sub_menu: []
@@ -412,25 +396,9 @@ async function iterationMenu(user, domain, GroupID, parent_id, m_list, actGroups
 
         return_list[0].sub_menu.push({
             menu_type: GLBConfig.MTYPE_LEAF,
-            menu_name: '员工信息管理',
+            menu_name: '员工维护',
             show_flag: '1',
-            menu_path: '/nca/baseconfig/NCAEmployeeInformationControl',
-            sub_menu: []
-        })
-
-        return_list[0].sub_menu.push({
-            menu_type: GLBConfig.MTYPE_LEAF,
-            menu_name: '部门维护',
-            show_flag: '1',
-            menu_path: '/nca/baseconfig/NCADepartmentControl',
-            sub_menu: []
-        })
-
-        return_list[0].sub_menu.push({
-            menu_type: GLBConfig.MTYPE_LEAF,
-            menu_name: '岗位维护',
-            show_flag: '1',
-            menu_path: '/nca/baseconfig/NCAUsergroupControl',
+            menu_path: '/common/system/OperatorControl',
             sub_menu: []
         })
 
