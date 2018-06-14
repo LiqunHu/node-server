@@ -19,7 +19,7 @@ const tb_common_domainmenu = model.common_domainmenu;
 const tb_common_usergroup = model.common_usergroup;
 
 exports.AuthResource = async (req, res) => {
-  try {
+    try {
         let doc = common.docTrim(req.body);
         if (!('username' in doc)) {
             return common.sendError(res, 'auth_02');
@@ -37,8 +37,8 @@ exports.AuthResource = async (req, res) => {
             return common.sendError(res, 'auth_19');
         }
 
-        let replacements=[];
-        let userQueryStr = 'select * from tbl_common_user t where t.user_username=? and t.state='+GLBConfig.ENABLE;
+        let replacements = [];
+        let userQueryStr = 'select * from tbl_common_user t where t.user_username=? and t.state=' + GLBConfig.ENABLE;
         replacements.push(doc.username)
         let user = await sequelize.query(userQueryStr, {
             replacements: replacements,
@@ -48,7 +48,7 @@ exports.AuthResource = async (req, res) => {
         if (user.length === 0) {
             return common.sendError(res, 'auth_05');
         }
-        user=user[0];
+        user = user[0];
 
         let decrypted = Security.aesDecryptModeCFB(doc.identifyCode, user.user_password, doc.magicNo)
 

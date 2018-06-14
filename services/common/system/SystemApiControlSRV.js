@@ -104,6 +104,22 @@ async function addFolderAct(req, res) {
         let doc = common.docTrim(req.body);
         let user = req.user;
 
+        let afolder = await tb_common_systemmenu.findOne({
+            where: {
+                systemmenu_name: doc.systemmenu_name
+            }
+        })
+
+        let aapi = await tb_common_api.findOne({
+            where: {
+                api_name: doc.systemmenu_name
+            }
+        })
+
+        if (afolder || aapi) {
+            return common.sendError(res, 'common_api_01');
+        }
+
         let folder = await tb_common_systemmenu.create({
             systemmenu_name: doc.systemmenu_name,
             node_type: '00', //NODETYPEINFO
@@ -120,6 +136,22 @@ async function modifyFolderAct(req, res) {
     try {
         let doc = common.docTrim(req.body);
         let user = req.user;
+
+        let afolder = await tb_common_systemmenu.findOne({
+            where: {
+                systemmenu_name: doc.systemmenu_name
+            }
+        })
+
+        let aapi = await tb_common_api.findOne({
+            where: {
+                api_name: doc.systemmenu_name
+            }
+        })
+
+        if (afolder || aapi) {
+            return common.sendError(res, 'common_api_01');
+        }
 
         let folder = await tb_common_systemmenu.findOne({
             where: {
@@ -145,12 +177,24 @@ async function addMenuAct(req, res) {
         let doc = common.docTrim(req.body);
         let user = req.user;
 
+        let afolder = await tb_common_systemmenu.findOne({
+            where: {
+                systemmenu_name: doc.systemmenu_name
+            }
+        })
+
+        let aapi = await tb_common_api.findOne({
+            where: {
+                api_name: doc.systemmenu_name
+            }
+        })
+
         let tapi = await tb_common_api.findOne({
             where: {
                 api_function: common.getApiName(doc.api_path)
             }
         })
-        if (tapi) {
+        if (afolder || aapi || tapi) {
             return common.sendError(res, 'common_api_01')
         } else {
             let api = await tb_common_api.create({
@@ -193,6 +237,23 @@ async function modifyMenuAct(req, res) {
                     api_id: menum.api_id
                 }
             })
+
+            if (api.api_name != doc.systemmenu_name) {
+                let afolder = await tb_common_systemmenu.findOne({
+                    where: {
+                        systemmenu_name: doc.systemmenu_name
+                    }
+                })
+
+                let aapi = await tb_common_api.findOne({
+                    where: {
+                        api_name: doc.systemmenu_name
+                    }
+                })
+                if (afolder || aapi) {
+                    return common.sendError(res, 'common_api_01')
+                }
+            }
 
             if (api.api_function != common.getApiName(doc.api_path)) {
                 let tapi = await tb_common_api.findOne({

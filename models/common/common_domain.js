@@ -11,6 +11,11 @@ module.exports = db.defineModel('tbl_common_domain', {
         type: db.STRING(100),
         unique: true
     },
+    domain_type: {
+        type: db.STRING(3),
+        defaultValue: '',
+        allowNull: true
+    },
     domaintemplate_id: {
         type: db.IDNO,
         allowNull: true

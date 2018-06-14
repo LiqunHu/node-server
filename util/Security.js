@@ -50,7 +50,7 @@ exports.token2user = async (req) => {
                 return -2;
             }
 
-            let idf = aesEncryptModeCFB(user.username, user.password, magicNo)
+            let idf = aesEncryptModeCFB(user.user_username, user.user_password, magicNo)
             let s = [type, uid, idf, expires, config.SECRET_KEY].join('-')
             if (sha1 != CryptoJS.SHA1(s).toString()) {
                 logger.error('invalid sha1');
