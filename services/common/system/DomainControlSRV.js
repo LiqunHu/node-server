@@ -47,22 +47,13 @@ async function initAct(req, res) {
             user = req.user,
             returnData = {};
         let templates = await tb_common_domaintemplate.findAll()
-        let domain_name = await tb_common_domain.findAll()
         returnData.templateInfo = []
-        returnData.updomainInfo = []
         for (let t of templates) {
             returnData.templateInfo.push({
                 id: t.domaintemplate_id,
                 text: t.domaintemplate_name
             });
         }
-        for (let t of domain_name) {
-            returnData.updomainInfo.push({
-                id: t.domain_id,
-                text: t.domain_name
-            });
-        }
-
         returnData.sysmenus = [{
             systemmenu_id: 0,
             name: '根目录',
@@ -167,11 +158,6 @@ async function addAct(req, res) {
             common.sendError(res, 'domain_01');
             return
         } else {
-            let updomain_id = null;
-            if (doc.updomain_id != null) {
-                updomain_id = doc.updomain_id
-            }
-
             domain = await tb_common_domain.create({
                 domain: doc.domain,
                 domaintemplate_id: doc.domaintemplate_id,
@@ -183,8 +169,7 @@ async function addAct(req, res) {
                 domain_coordinate: domain_coordinate,
                 domain_contact: doc.domain_contact,
                 domain_phone: doc.domain_phone,
-                domain_description: doc.domain_description,
-                updomain_id: updomain_id
+                domain_description: doc.domain_description
             })
 
             let usergroup = await tb_usergroup.create({
