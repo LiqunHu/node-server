@@ -11,7 +11,7 @@ const tb_common_domainmenu = model.common_domainmenu;
 
 let groups = []
 
-exports.SysGroupApiControlResource = (req, res) => {
+exports.DomainGroupApiControlResource = (req, res) => {
     let method = req.query.method
     if (method === 'init') {
         initAct(req, res);

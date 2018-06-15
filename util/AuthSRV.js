@@ -237,8 +237,8 @@ async function loginInit(user, session_token, type) {
                         })
                         authApis.push({
                             api_name: '系统组权限维护',
-                            api_path: '/common/system/SysGroupApiControl',
-                            api_function: 'SYSGROUPAPICONTROL',
+                            api_path: '/common/system/DomainGroupApiControl',
+                            api_function: 'DOMAINGROUPAPICONTROL',
                             auth_flag: '1',
                             show_flag: '1'
                         })
@@ -381,7 +381,7 @@ async function iterationMenu(user, domain, GroupID, parent_id, m_list, actGroups
                 menu_type: GLBConfig.MTYPE_LEAF,
                 menu_name: '系统组权限维护',
                 show_flag: '1',
-                menu_path: '/common/system/SysGroupApiControl',
+                menu_path: '/common/system/DomainGroupApiControl',
                 sub_menu: []
             })
         }

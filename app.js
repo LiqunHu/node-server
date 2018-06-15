@@ -77,7 +77,7 @@ app.post('/api/common/system/SystemApiControl', services.SystemApiControlSRV.Sys
 app.post('/api/common/system/DomainTemplateControl', services.DomainTemplateControlSRV.DomainTemplateControlResource);
 app.post('/api/common/system/DomainControl', services.DomainControlSRV.DomainControlResource);
 app.post('/api/common/system/DomainGroupControl', services.DomainGroupControlSRV.DomainGroupControlResource);
-app.post('/api/common/system/SysGroupApiControl', services.SysGroupApiControlSRV.SysGroupApiControlResource);
+app.post('/api/common/system/DomainGroupApiControl', services.DomainGroupApiControlSRV.DomainGroupApiControlResource);
 app.post('/api/common/system/OperatorControl', services.OperatorControlSRV.OperatorControlResource);
 app.post('/api/common/system/UserSetting', services.UserSettingSRV.UserSettingResource);
 app.post('/api/common/system/ResetPassword', services.UserResetPasswordSRV.UserResetPasswordResource);
