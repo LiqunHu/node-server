@@ -1,6 +1,6 @@
-
 const common = require('../util/CommonUtil.js');
 const model = require('../model');
+
 const sequelize = model.sequelize;
 
 function generateNonceString(length) {
@@ -13,4 +13,6 @@ function generateNonceString(length) {
     return noceStr;
 };
 
-console.log(generateNonceString(32));
+exports.test = () => {
+  console.log(generateNonceString(32));
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-
 const app = require('../app');
+const schedule = require('../schedule');
 const debug = require('debug')('demo:server');
 const http = require('http');
 const url = require('url');
@@ -62,8 +62,11 @@ const interval = setInterval(function ping() {
 /**
  * Listen on provided port, on all network interfaces.
  */
-
-server.listen(port);
+server.listen(port, function () {
+  console.log("App started, gathering monitors");
+  let jobs = schedule.scheduleJob()
+  console.log("Timed task has been turned on!");
+});
 server.on('error', onError);
 server.on('listening', onListening);
 

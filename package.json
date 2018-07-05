@@ -39,6 +39,7 @@
     "wkhtmltoimage": "^0.1.5",
     "wkhtmltopdf": "^0.3.4",
     "xml2js": "^0.4.17",
-    "send-sms": "https://github.com/mpinc/send-sms.js.git#master"
+    "send-sms": "https://github.com/mpinc/send-sms.js.git#master",
+    "node-schedule": "^1.3.0"
   }
 }
