@@ -488,87 +488,90 @@ function getUUIDByTime(offset) {
 }
 
 function ejs2File(templateFile, renderData, options, outputType, res) {
-    return new Promise(function(resolve, reject) {
-        try {
-            let data = JSON.parse(JSON.stringify(renderData))
-            if (!data) {
-                data = {}
-            }
+  return new Promise(function(resolve, reject) {
+      try {
+          let data = JSON.parse(JSON.stringify(renderData))
+          if (!data) {
+              data = {}
+          }
 
-            let zoom = 1,
-                pageSize = 'A4',
-                orientation = 'Portrait',
-                tempName = uuid.v4().replace(/-/g, '')
+          let zoom = 1,
+              pageSize = 'A4',
+              orientation = 'Portrait',
+              tempName = uuid.v4().replace(/-/g, '')
 
-            if (options) {
-                if (options.zoom) {
-                    zoom = options.zoom
-                }
-                if (options.pageSize) {
-                    pageSize = options.pageSize
-                }
-                if (options.orientation) {
-                    orientation = options.orientation
-                }
-                if (options.name) {
-                    tempName = options.name
-                }
-            }
+          if (options) {
+              if (options.zoom) {
+                  zoom = options.zoom
+              }
+              if (options.pageSize) {
+                  pageSize = options.pageSize
+              }
+              if (options.orientation) {
+                  orientation = options.orientation
+              }
+              if (options.name) {
+                  tempName = options.name
+              }
+          }
 
-            data.basedir = path.join(__dirname, '../printTemplate')
-            let ejsFile = fs.readFileSync(path.join(__dirname, '../printTemplate/' + templateFile), 'utf8')
-            let html = ejs.render(ejsFile, data)
+          data.basedir = path.join(__dirname, '../printTemplate')
+          let ejsFile = fs.readFileSync(path.join(__dirname, '../printTemplate/' + templateFile), 'utf8')
+          let html = ejs.render(ejsFile, data)
 
-            if (options.htmlFlag || outputType === 'html') {
-                let htmlData = data
-                fs.writeFileSync(path.join(__dirname, '../', config.tempDir, tempName + '.html'), html)
-            }
+          if (options.htmlFlag || outputType === 'htmlurl') {
+              let htmlData = data
+              fs.writeFileSync(path.join(__dirname, '../', config.tempDir, tempName + '.html'), html)
+          }
 
-            if (outputType === 'html') {
-                resolve(config.tmpUrlBase + tempName + '.html')
-            } else if (outputType === 'image') {
-                let outSteam = wkhtmltoimage.generate(html, {})
-                if (res) {
-                    res.type('jpg')
-                    res.set({
-                        'Content-Disposition': 'attachment; filename=' + tempName + '.jpg'
-                    })
-                    outSteam.pipe(res)
-                    resolve()
-                } else {
-                    let tempFile = tempName + '.jpg'
-                    outSteam.pipe(fs.createWriteStream(path.join(__dirname, '../', config.tempDir, tempFile)))
-                    outSteam.on('end', function() {
-                        resolve(config.tmpUrlBase + tempFile)
-                    })
-                }
-            } else if (outputType === 'pdf') {
-                let outSteam = wkhtmltopdf(html, {
-                    zoom: zoom,
-                    pageSize: pageSize,
-                    orientation: orientation
-                })
-                if (res) {
-                    res.type('pdf')
-                    res.set({
-                        'Content-Disposition': 'attachment; filename=' + tempName + '.pdf'
-                    })
-                    outSteam.pipe(res)
-                    resolve()
-                } else {
-                    let tempFile = tempName + '.pdf'
-                    outSteam.pipe(fs.createWriteStream(path.join(__dirname, '../', config.tempDir, tempFile)))
-                    outSteam.on('end', function() {
-                        resolve(config.tmpUrlBase + tempFile)
-                    })
-                }
-            } else {
-                reject("outputType error")
-            }
-        } catch (error) {
-            reject(error)
-        }
-    })
+          if (outputType === 'htmlurl') {
+              resolve(config.tmpUrlBase + tempName + '.html')
+          } else if (outputType === 'html') {
+            res.type('html')
+            res.send(html)
+          } else if (outputType === 'image') {
+              let outSteam = wkhtmltoimage.generate(html, {})
+              if (res) {
+                  res.type('jpg')
+                  res.set({
+                      'Content-Disposition': 'attachment; filename=' + tempName + '.jpg'
+                  })
+                  outSteam.pipe(res)
+                  resolve()
+              } else {
+                  let tempFile = tempName + '.jpg'
+                  outSteam.pipe(fs.createWriteStream(path.join(__dirname, '../', config.tempDir, tempFile)))
+                  outSteam.on('end', function() {
+                      resolve(config.tmpUrlBase + tempFile)
+                  })
+              }
+          } else if (outputType === 'pdf') {
+              let outSteam = wkhtmltopdf(html, {
+                  zoom: zoom,
+                  pageSize: pageSize,
+                  orientation: orientation
+              })
+              if (res) {
+                  res.type('pdf')
+                  res.set({
+                      'Content-Disposition': 'attachment; filename=' + tempName + '.pdf'
+                  })
+                  outSteam.pipe(res)
+                  resolve()
+              } else {
+                  let tempFile = tempName + '.pdf'
+                  outSteam.pipe(fs.createWriteStream(path.join(__dirname, '../', config.tempDir, tempFile)))
+                  outSteam.on('end', function() {
+                      resolve(config.tmpUrlBase + tempFile)
+                  })
+              }
+          } else {
+              reject("outputType error")
+          }
+      } catch (error) {
+          reject(error)
+      }
+  })
 }
 
 function ejs2xlsx(templateFile, renderData, res) {
