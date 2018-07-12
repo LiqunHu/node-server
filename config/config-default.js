@@ -44,6 +44,7 @@ const config = {
           }
         }
     },
+    syslogFlag: true,
     uploadOptions: {
         uploadDir: '../public/temp',
         maxFileSize: 2 * 1024 * 1024,

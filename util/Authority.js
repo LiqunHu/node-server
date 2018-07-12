@@ -6,7 +6,7 @@ const Security = require('./Security');
 const GLBConfig = require('../util/GLBConfig');
 
 // table
-const tb_common_api = model.common_api;;
+const tb_common_api = model.common_api;
 
 exports.AuthMiddleware = async (req, res, next) => {
     try {

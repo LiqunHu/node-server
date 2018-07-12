@@ -5,5 +5,4 @@ node_modules
 mongodb
 .DS_Store
 .DS_Store?
-frontEnd/dist
 log
