@@ -5,7 +5,7 @@ const debug = require('debug')('demo:server');
 const http = require('http');
 const url = require('url');
 const WebSocket = require('ws');
-let port = 9093;
+let port = 9090;
 
 /**
  * Get port from environment and store in Express.
