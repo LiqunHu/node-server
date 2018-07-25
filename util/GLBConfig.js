@@ -26,35 +26,10 @@ module.exports = {
             'text': '叶子'
         }
     ],
-    MGROUPINFO: [{
-            'id': '00',
-            'value': '00',
-            'text': '全部'
-        },
-        {
-            'id': '01',
-            'value': '01',
-            'text': '总部'
-        },
-        {
-            'id': '02',
-            'value': '02',
-            'text': '门店'
-        },
-        {
-            'id': '03',
-            'value': '03',
-            'text': '供应商'
-        },
-        {
-            'id': '04',
-            'value': '04',
-            'text': '集团客户'
-        }
-
-    ],
-    TYPE_ADMINISTRATOR: '00',
-    TYPE_OPERATOR: '01',
+    DOMAIN_ADMINISTRATOR: '0',
+    TYPE_DEFAULT: '00', 
+    TYPE_ADMINISTRATOR: '01',
+    TYPE_OPERATOR: '02',
     AUTH: '1',
     NOAUTH: '0',
     AUTHINFO: [{
