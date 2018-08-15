@@ -51,8 +51,14 @@ exports.token2user = async (req) => {
         return -2;
       }
 
-      let idf = aesEncryptModeCFB(user.user_username, user.user_password, magicNo)
-      let s = [type, uid, idf, expires, config.SECRET_KEY].join('-')
+      let s = ''
+      if (type === 'WEB' || type === 'MOBILE') {
+        let idf = aesEncryptModeCFB(user.user_username, user.user_password, magicNo)
+        s = [type, uid, idf, expires, config.SECRET_KEY].join('-')
+      } else if (type === 'WEIXIN') {
+        s = [type, uid, user.user_wx_openid, expires, config.SECRET_KEY].join('-')
+      }
+
       if (sha1 != CryptoJS.SHA1(s).toString()) {
         logger.error('invalid sha1');
         return -1;
@@ -130,7 +136,7 @@ exports.aesDecryptModeCFB = (msg, pwd, magicNo) => {
 exports.user2token = (type, user, identifyCode, magicNo) => {
   try {
     let expires = ''
-    if (type === 'MOBILE') {
+    if (type === 'MOBILE' || type === 'WEIXIN') {
       expires = Date.now() + config.MOBILE_TOKEN_AGE;
     } else {
       expires = Date.now() + config.TOKEN_AGE;

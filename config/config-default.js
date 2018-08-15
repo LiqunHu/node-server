@@ -44,6 +44,10 @@ const config = {
           }
         }
     },
+    weixin: {
+      appid: 'wx1bf0976923162a6b',
+      app_secret: 'f03e63ca1aca1c007b5915b54b6ec8c7'
+    },
     syslogFlag: true,
     uploadOptions: {
         uploadDir: '../public/temp',
