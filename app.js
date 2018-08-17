@@ -82,6 +82,5 @@ app.post('/api/common/system/OperatorControl', services.OperatorControlSRV.Opera
 app.post('/api/common/system/UserSetting', services.UserSettingSRV.UserSettingResource);
 app.post('/api/common/system/ResetPassword', services.UserResetPasswordSRV.UserResetPasswordResource);
 
-// farmerbuy
-app.post('/api/farmerbuy/farmerbuyMPControl', services.FarmerbuyMPSRV.FarmerbuyMPResource);
+// todo
 module.exports = app;
