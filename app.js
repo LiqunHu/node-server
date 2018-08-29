@@ -28,8 +28,8 @@ app.use(cors());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/temp', express.static(path.join(__dirname, '../public/temp')))
-if (config.mongoFlag == false) {
-    app.use('/files', express.static(path.join(__dirname, 'public/files')))
+if (config.mongoFileFlag === false) {
+    app.use('/files', express.static(path.join(__dirname, '../public/files')))
 }
 app.use(log4js.connectLogger(log4js.getLogger("http"), {
     level: 'auto',
@@ -57,7 +57,9 @@ app.get('/', (req, res) => {
     res.redirect('index.html');
 });
 
-app.get('/files/:filetag', FileSRV.FileResource);
+if (config.mongoFileFlag) {
+  app.get('/files/:filetag', FileSRV.FileResource);
+}
 
 app.post('/api/auth', AuthSRV.AuthResource);
 app.post('/api/signout', AuthSRV.SignOutResource);

@@ -61,12 +61,7 @@ async function modifyAct(req, res) {
         });
 
         if (modiuser) {
-            if (doc.avatar) {
-                if (doc.user_avatar != modiuser.user_avatar) {
-                    modiuser.avatar = await common.fileMove(doc.avatar, 'avatar')
-                }
-            }
-
+            modiuser.avatar = doc.user_avatar
             modiuser.user_name = doc.user_name
             modiuser.user_phone = doc.user_phone
             await modiuser.save()

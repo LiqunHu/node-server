@@ -118,21 +118,37 @@ function fileSave(req) {
     return new Promise(function(resolve, reject) {
         if (req.is('multipart/*')) {
             try {
+              if (config.mongoFileFlag) {
+                
+              } else {
                 let form = new formidable.IncomingForm(config.uploadOptions);
                 form.parse(req, (err, fields, files) => {
                     if (err) {
                         reject(err);
                     }
+                    let relPath = ''
+                    let today = new Date()
+                    if (files.avatar_file) {
+                        relPath = 'avatar/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
+                    } else {
+                        relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
+                    } 
+
+                    let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath);
+
+                    if (!fs.existsSync(svPath)) {
+                        mkdirssync(svPath)
+                    }
+
                     if (files.avatar_file) {
                         let filename = uuid.v4() + '.jpg'
-                        let tmpFile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + filename)
                         let avatar_data = JSON.parse(fields.avatar_data);
                         gm(files.avatar_file.path)
                             .setFormat("jpeg")
                             .crop(avatar_data.width, avatar_data.height, avatar_data.x, avatar_data.y)
                             .rotate('white', fields.avatar_data.rotate)
-                            .write(tmpFile, function(err) {
-                                if (!err) resolve(config.tmpUrlBase + filename);
+                            .write(path.join(svPath, filename), function(err) {
+                                if (!err) resolve(config.fileUrlBase + relPath + filename);
                                 reject(err);
                             })
                     } else if (files.file) {
@@ -141,16 +157,15 @@ function fileSave(req) {
                         if (ext) {
                             if (imageExt.indexOf(ext.toUpperCase()) >= 0) {
                                 let filename = uuid.v4() + '.jpg'
-                                let tmpFile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + filename)
                                 gm(files.file.path)
                                     .compress("jpeg")
-                                    .write(tmpFile, function(err) {
+                                    .write(path.join(svPath, filename), function(err) {
                                         if (!err) {
                                             fs.unlinkSync(files.file.path)
                                             resolve({
                                                 name: files.file.name,
                                                 ext: path.extname(filename),
-                                                url: config.tmpUrlBase + filename,
+                                                url: config.fileUrlBase + relPath + filename,
                                                 type: mime.lookup(path.extname(filename))
                                             })
                                         } else {
@@ -158,10 +173,11 @@ function fileSave(req) {
                                         }
                                     })
                             } else {
+                                fs.renameSync(files.file.path, path.join(svPath, fileName))
                                 resolve({
                                     name: files.file.name,
                                     ext: path.extname(files.file.name),
-                                    url: config.tmpUrlBase + path.basename(files.file.path),
+                                    url: config.fileUrlBase + relPath + path.basename(files.file.path),
                                     type: files.file.type,
                                 })
                             }
@@ -170,6 +186,7 @@ function fileSave(req) {
                         reject('no files');
                     }
                 })
+              } 
             } catch (error) {
                 reject(error);
             }
@@ -200,7 +217,7 @@ function fileMove(url, mode) {
             }
 
             let tempfile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName);
-            if (config.mongoFlag) {
+            if (config.mongoFileFlag) {
                 let connectStr = ''
                 if (config.mongo.auth) {
                     connectStr = format(config.mongo.connect,
@@ -282,7 +299,7 @@ function fileGet(url) {
 function fileRemove(url) {
     return new Promise(async function(resolve, reject) {
         if (url) {
-            if (config.mongoFlag) {
+            if (config.mongoFileFlag) {
                 let connectStr = ''
                 if (config.mongo.auth) {
                     connectStr = format(config.mongo.connect,
