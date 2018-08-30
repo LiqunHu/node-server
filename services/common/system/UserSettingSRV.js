@@ -80,7 +80,7 @@ async function modifyAct(req, res) {
 
 async function uploadAct(req, res) {
     try {
-        let uploadurl = await common.fileSave(req)
+        let uploadurl = await common.ImageCropperSave(req)
         common.sendData(res, {
             uploadurl: uploadurl
         })

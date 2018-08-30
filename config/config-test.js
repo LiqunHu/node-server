@@ -18,7 +18,9 @@ const config = {
   // for mongo
   mongoFileFlag: true,
   mongo: {
-    connect: 'mongodb://127.0.0.1:27017/mvnndata'
+    connect: 'mongodb://127.0.0.1:27017',
+    dbName: 'mvnndata',
+    bucketName: 'gridfsmvnn'
   },
   // for elasticsearch
   elasticsearchFlag: false,
