@@ -70,6 +70,7 @@ const config = {
   filesDir: '../public/files',
   tmpUrlBase: '/temp/',
   fileUrlBase: '/files/',
+  fsUrlBase: '/filesys/',
   // SECRET_KEY
   SECRET_KEY: 'zc7#_66#g%u2n$j_)j$-r(swt63d(2l%wc2y=wqt_m8kpy%04*',
   TOKEN_AGE: 43200000, // 12 * 60 * 60 * 10000

@@ -61,7 +61,7 @@ async function modifyAct(req, res) {
         });
 
         if (modiuser) {
-            modiuser.avatar = doc.user_avatar
+            modiuser.user_avatar = doc.user_avatar
             modiuser.user_name = doc.user_name
             modiuser.user_phone = doc.user_phone
             await modiuser.save()

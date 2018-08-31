@@ -5,7 +5,6 @@ const gm = require('gm').subClass({
 const uuid = require('uuid');
 const path = require('path');
 const fs = require('fs');
-const mongodb = require('mongodb');
 const mime = require('mime-types');
 const ejs = require('ejs');
 const wkhtmltopdf = require('wkhtmltopdf');
@@ -128,15 +127,21 @@ function ImageCropperSave(req) {
             let filename = uuid.v4() + '.jpg'
             let cropper_data = JSON.parse(fields.cropper_data[0]);
             if (config.mongoFileFlag) {
-              let bucket = new GridFSBucket(db, { bucketName: config.mongo.bucketName });
-              let uploadStream = bucket.openUploadStream(filename);
-              let id = uploadStream.id
-              gm(files.cropper_file[0].path)
-                .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
-                .rotate('white', cropper_data.rotate)
-                .stream('.jpg')
-                .pipe(uploadStream);
-              resolve(config.fileUrlBase + id);
+              MongoCli.getBucket().then(bucket => {
+                let uploadStream = bucket.openUploadStream(filename);
+                let outStream = gm(files.cropper_file[0].path)
+                  .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
+                  .rotate('white', cropper_data.rotate)
+                  .stream('.jpg')
+                outStream.on('end', function () {
+                  resolve(config.fsUrlBase + filename)
+                })
+
+                outStream.on('error', function (err) {
+                  reject(err)
+                })
+                outStream.pipe(uploadStream)
+              })
             } else {
               let today = new Date()
               let relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
@@ -324,80 +329,80 @@ function fileMove(url, mode) {
   })
 }
 
-function fileGet(url) {
-  return new Promise(async function (resolve, reject) {
-    if (url) {
-      let connectStr = ''
-      if (config.mongo.auth) {
-        connectStr = format(config.mongo.connect,
-          config.mongo.auth.username, config.mongo.auth.password);
-      } else {
-        connectStr = config.mongo.connect
-      }
-      mongodb.MongoClient.connect(connectStr, async function (err, db) {
-        if (err) reject(err)
-        try {
-          let fileName = path.basename(url)
-          let gridStore = new mongodb.GridStore(db, fileName, 'r')
-          gridStore.open(function (err, gs) {
-            if (err) {
-              reject(err);
-            }
-            gridStore.seek(0, function () {
-              gridStore.read(function (err, data) {
-                if (err) {
-                  reject(err);
-                }
-                db.close();
-                resolve(data)
-              });
-            })
-          })
-        } catch (error) {
-          db.close()
-          reject(error);
-        }
-      });
-    } else {
-      reject('url error');
-    }
-  })
-}
+// function fileGet(url) {
+//   return new Promise(async function (resolve, reject) {
+//     if (url) {
+//       let connectStr = ''
+//       if (config.mongo.auth) {
+//         connectStr = format(config.mongo.connect,
+//           config.mongo.auth.username, config.mongo.auth.password);
+//       } else {
+//         connectStr = config.mongo.connect
+//       }
+//       mongodb.MongoClient.connect(connectStr, async function (err, db) {
+//         if (err) reject(err)
+//         try {
+//           let fileName = path.basename(url)
+//           let gridStore = new mongodb.GridStore(db, fileName, 'r')
+//           gridStore.open(function (err, gs) {
+//             if (err) {
+//               reject(err);
+//             }
+//             gridStore.seek(0, function () {
+//               gridStore.read(function (err, data) {
+//                 if (err) {
+//                   reject(err);
+//                 }
+//                 db.close();
+//                 resolve(data)
+//               });
+//             })
+//           })
+//         } catch (error) {
+//           db.close()
+//           reject(error);
+//         }
+//       });
+//     } else {
+//       reject('url error');
+//     }
+//   })
+// }
 
-function fileRemove(url) {
-  return new Promise(async function (resolve, reject) {
-    if (url) {
-      if (config.mongoFileFlag) {
-        let connectStr = ''
-        if (config.mongo.auth) {
-          connectStr = format(config.mongo.connect,
-            config.mongo.auth.username, config.mongo.auth.password);
-        } else {
-          connectStr = config.mongo.connect
-        }
-        mongodb.MongoClient.connect(connectStr, async function (err, db) {
-          if (err) reject(err)
-          try {
-            let fileName = path.basename(url)
-            // Our file ID
-            mongodb.GridStore.unlink(db, fileName, function (err) {
-              if (err) reject(err)
-              db.close()
-              resolve('ok')
-            })
-          } catch (error) {
-            db.close()
-            reject(error);
-          }
-        });
-      } else {
-        resolve(config.fileUrlBase + relPath + fileName);
-      }
-    } else {
-      reject('url error');
-    }
-  })
-}
+// function fileRemove(url) {
+//   return new Promise(async function (resolve, reject) {
+//     if (url) {
+//       if (config.mongoFileFlag) {
+//         let connectStr = ''
+//         if (config.mongo.auth) {
+//           connectStr = format(config.mongo.connect,
+//             config.mongo.auth.username, config.mongo.auth.password);
+//         } else {
+//           connectStr = config.mongo.connect
+//         }
+//         mongodb.MongoClient.connect(connectStr, async function (err, db) {
+//           if (err) reject(err)
+//           try {
+//             let fileName = path.basename(url)
+//             // Our file ID
+//             mongodb.GridStore.unlink(db, fileName, function (err) {
+//               if (err) reject(err)
+//               db.close()
+//               resolve('ok')
+//             })
+//           } catch (error) {
+//             db.close()
+//             reject(error);
+//           }
+//         });
+//       } else {
+//         resolve(config.fileUrlBase + relPath + fileName);
+//       }
+//     } else {
+//       reject('url error');
+//     }
+//   })
+// }
 
 function mkdirssync(dirpath) {
   try {
@@ -725,9 +730,6 @@ module.exports = {
   sendError: sendError,
   sendFault: sendFault,
   ImageCropperSave: ImageCropperSave,
-  fileMove: fileMove,
-  fileGet: fileGet,
-  fileRemove: fileRemove,
   getUploadTempPath: getUploadTempPath,
   generateRandomAlphaNum: generateRandomAlphaNum,
   simpleSelect: simpleSelect,

@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 });
 
 if (config.mongoFileFlag) {
-  app.get('/files/:filetag', FileSRV.FileResource);
+  app.get('/filesys/:filetag', FileSRV.FileResource);
 }
 
 app.post('/api/auth', AuthSRV.AuthResource);
