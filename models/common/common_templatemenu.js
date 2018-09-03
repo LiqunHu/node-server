@@ -36,5 +36,9 @@ module.exports = db.defineModel('tbl_common_templatemenu', {
     parent_id: {
         type: db.ID,
         allowNull: true
+    },
+    root_show_flag: {
+      type: db.STRING(2),
+      defaultValue: GLBConfig.TRUE // 1 need auth, 0 not
     }
 });

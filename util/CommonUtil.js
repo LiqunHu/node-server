@@ -175,6 +175,48 @@ function fileSave(req) {
   return new Promise(function (resolve, reject) {
     if (req.is('multipart/*')) {
       try {
+        let form = new multiparty.Form(config.uploadOptions);
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            reject(err);
+          }
+          if (files.file) {
+            let filename = uuid.v4() + '.jpg'
+            let cropper_data = JSON.parse(fields.cropper_data[0]);
+            if (config.mongoFileFlag) {
+              MongoCli.getBucket().then(bucket => {
+                let uploadStream = bucket.openUploadStream(filename);
+                let outStream = gm(files.cropper_file[0].path)
+                  .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
+                  .rotate('white', cropper_data.rotate)
+                  .stream('.jpg')
+                outStream.on('end', function () {
+                  resolve(config.fsUrlBase + filename)
+                })
+
+                outStream.on('error', function (err) {
+                  reject(err)
+                })
+                outStream.pipe(uploadStream)
+              })
+            } else {
+              let today = new Date()
+              let relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
+              let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
+              if (!fs.existsSync(svPath)) {
+                mkdirssync(svPath)
+              }
+              
+            }
+          } else {
+            reject('no cropper file');
+          }
+        })
+      } catch (error) {
+        reject(error);
+      }
+
+      try {
         if (config.mongoFileFlag) {
           let form = new multiparty.Form(),
             fileids = [],

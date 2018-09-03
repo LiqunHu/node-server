@@ -74,16 +74,16 @@ exports.AuthResource = async (req, res) => {
         return common.sendError(res, 'auth_20');
       }
 
-      let wxAuthjs 
-      if(!('wxAuthjs' in doc)) {
+      let wxAuthjs
+      if (!('wxAuthjs' in doc)) {
         let url = 'https://api.weixin.qq.com/sns/jscode2session?appid=' + config.weixin.appid + '&secret=' + config.weixin.app_secret + '&js_code=' + doc.wxCode + '&grant_type=authorization_code'
         let wxAuth = await rp(url)
         logger.info(wxAuth)
         wxAuthjs = JSON.parse(wxAuth)
       } else {
-        wxAuthjs = doc.wxAuthjs 
+        wxAuthjs = doc.wxAuthjs
       }
-      
+
       if (wxAuthjs.openid) {
         user = await tb_common_user.findOne({
           where: {
@@ -465,7 +465,7 @@ async function iterationMenu(user, domain, GroupID, parent_id, m_list, actGroups
     for (let m of menus) {
       let sub_menu = [];
 
-      if (m.node_type === GLBConfig.MTYPE_ROOT) {
+      if (m.node_type === GLBConfig.MTYPE_ROOT && m.root_show_flag === '1') {
         if (m.api_kind === '3') {
           sub_menu = await iterationMenu(user, domain, GroupID, m.domainmenu_id, return_list, actGroups);
         } else {
@@ -499,7 +499,7 @@ async function iterationMenu(user, domain, GroupID, parent_id, m_list, actGroups
             show_flag: m.show_flag,
             sub_menu: sub_menu
           })
-        } else if (m.node_type === GLBConfig.MTYPE_ROOT && sub_menu.length > 0) {
+        } else if (m.node_type === GLBConfig.MTYPE_ROOT && sub_menu.length > 0 && m.root_show_flag === '1') {
           let i
           for (i = 0; i < return_list.length; i++) {
             if (return_list[i].menu_id === m.domainmenu_id) {
