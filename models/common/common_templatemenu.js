@@ -20,6 +20,11 @@ module.exports = db.defineModel('tbl_common_templatemenu', {
         defaultValue: '',
         allowNull: false
     },
+    templatemenu_index: {
+      type: db.INTEGER,
+      defaultValue: '0',
+      allowNull: false
+    },
     api_id: {
         type: db.IDNO,
         allowNull: true

@@ -36,6 +36,8 @@ exports.DomainControlResource = (req, res) => {
     deleteSelectAct(req, res)
   } else if (method === 'addMenus') {
     addMenusAct(req, res)
+  } else if (method === 'changeOrder') {
+    changeOrderAct(req, res)
   } else {
     common.sendError(res, 'common_01');
   }
@@ -206,6 +208,7 @@ async function addAct(req, res) {
               domain_id: domain.domain_id,
               domainmenu_name: m.templatemenu_name,
               domainmenu_icon: m.templatemenu_icon,
+              domainmenu_index: m.templatemenu_index,
               api_id: m.api_id,
               api_function: m.api_function,
               node_type: m.node_type,
@@ -218,6 +221,7 @@ async function addAct(req, res) {
               domain_id: domain.domain_id,
               domainmenu_name: m.templatemenu_name,
               domainmenu_icon: m.templatemenu_icon,
+              domainmenu_index: m.templatemenu_index,
               api_id: m.api_id,
               api_function: m.api_function,
               node_type: m.node_type,
@@ -287,7 +291,10 @@ async function genDomainMenu(domain_id, parentId) {
     where: {
       domain_id: domain_id,
       parent_id: parentId
-    }
+    },
+    order: [
+      ['domainmenu_index']
+    ]
   })
   for (let m of menus) {
     let sub_menus = [];
@@ -324,13 +331,25 @@ async function addFolderAct(req, res) {
     let doc = common.docTrim(req.body);
     let user = req.user;
 
+    let nextIndex = await tb_common_domainmenu.max('domainmenu_index', {
+      where: {
+        parent_id: doc.parent_id
+      }
+    })
+    if (!nextIndex) {
+      nextIndex = 0
+    } else {
+      nextIndex += 1
+    }
+
     let folder = await tb_common_domainmenu.create({
       domain_id: doc.domain_id,
       domainmenu_name: doc.domainmenu_name,
       domainmenu_icon: doc.domainmenu_icon,
       node_type: '00', //NODETYPEINFO
       parent_id: doc.parent_id,
-      root_show_flag: doc.root_show_flag
+      root_show_flag: doc.root_show_flag,
+      domainmenu_index: nextIndex
     })
 
     common.sendData(res);
@@ -432,15 +451,49 @@ async function addMenusAct(req, res) {
       }
     }
 
+    let nextIndex = await tb_common_domainmenu.max('domainmenu_index', {
+      where: {
+        parent_id: doc.parent_id
+      }
+    })
+
+    if (!nextIndex) {
+      nextIndex = 0
+    }
+
     for (let am of addMenus) {
+      nextIndex += 1
       await tb_common_domainmenu.create({
         domain_id: doc.domain_id,
         domainmenu_name: am.systemmenu_name,
         api_id: am.api_id,
         api_function: am.api_function,
         node_type: '01', //NODETYPEINFO
-        parent_id: doc.parent_id
+        parent_id: doc.parent_id,
+        domainmenu_index: nextIndex
       })
+    }
+
+    common.sendData(res);
+  } catch (error) {
+    common.sendFault(res, error);
+  }
+}
+
+
+async function changeOrderAct(req, res) {
+  try {
+    let doc = common.docTrim(req.body);
+    let user = req.user;
+
+    for (let i = 0; i < doc.menus.length; i++) {
+      let dmenu = await tb_common_domainmenu.findOne({
+        where: {
+          domainmenu_id: doc.menus[i].domainmenu_id
+        }
+      })
+      dmenu.domainmenu_index = i
+      await dmenu.save()
     }
 
     common.sendData(res);

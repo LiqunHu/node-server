@@ -30,6 +30,8 @@ exports.DomainTemplateControlResource = (req, res) => {
     deleteSelectAct(req, res)
   } else if (method === 'addMenus') {
     addMenusAct(req, res)
+  } else if (method === 'changeOrder') {
+    changeOrderAct(req, res)
   } else {
     common.sendError(res, 'common_01');
   }
@@ -180,6 +182,7 @@ async function genTemplateMenu(domaintemplate_id, parentId) {
       parent_id: parentId
     },
     order: [
+      ['templatemenu_index'],
       ['created_at', 'DESC']
     ]
   });
@@ -219,13 +222,25 @@ async function addFolderAct(req, res) {
     let doc = common.docTrim(req.body);
     let user = req.user;
 
+    let nextIndex = await tb_common_templatemenu.max('templatemenu_index', {
+      where: {
+        parent_id: doc.parent_id
+      }
+    })
+    if (!nextIndex) {
+      nextIndex = 0
+    } else {
+      nextIndex += 1
+    }
+
     let folder = await tb_common_templatemenu.create({
       domaintemplate_id: doc.domaintemplate_id,
       templatemenu_name: doc.templatemenu_name,
       templatemenu_icon: doc.templatemenu_icon,
       node_type: '00', //NODETYPEINFO
       parent_id: doc.parent_id,
-      root_show_flag: doc.root_show_flag
+      root_show_flag: doc.root_show_flag,
+      templatemenu_index: nextIndex
     })
 
     common.sendData(res);
@@ -327,6 +342,16 @@ async function addMenusAct(req, res) {
       }
     }
 
+    let nextIndex = await tb_common_templatemenu.max('templatemenu_index', {
+      where: {
+        parent_id: doc.parent_id
+      }
+    })
+
+    if (!nextIndex) {
+      nextIndex = 0
+    }
+
     for (let am of addMenus) {
       await tb_common_templatemenu.create({
         domaintemplate_id: doc.domaintemplate_id,
@@ -334,8 +359,30 @@ async function addMenusAct(req, res) {
         api_id: am.api_id,
         api_function: am.api_function,
         node_type: '01', //NODETYPEINFO
-        parent_id: doc.parent_id
+        parent_id: doc.parent_id,
+        templatemenu_index: nextIndex
       })
+    }
+
+    common.sendData(res);
+  } catch (error) {
+    common.sendFault(res, error);
+  }
+}
+
+async function changeOrderAct(req, res) {
+  try {
+    let doc = common.docTrim(req.body);
+    let user = req.user;
+
+    for (let i = 0; i < doc.menus.length; i++) {
+      let tmenu = await tb_common_templatemenu.findOne({
+        where: {
+          templatemenu_id: doc.menus[i].templatemenu_id
+        }
+      })
+      tmenu.templatemenu_index = i
+      await tmenu.save()
     }
 
     common.sendData(res);

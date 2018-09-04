@@ -55,7 +55,10 @@ async function genDomainMenu(domain_id, parentId) {
         where: {
             domain_id: domain_id,
             parent_id: parentId
-        }
+        },
+        order: [
+          ['domainmenu_index']
+        ]
     });
     for (let m of menus) {
         let sub_menus = [];

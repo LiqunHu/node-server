@@ -454,7 +454,8 @@ async function iterationMenu(user, domain, GroupID, parent_id, m_list, actGroups
           left join tbl_common_api c on b.api_id = c.api_id
           where a.domainmenu_id = b.domainmenu_id
           and a.usergroup_id = ?
-          and b.parent_id = ?`;
+          and b.parent_id = ?
+          order by b.domainmenu_index`;
 
     let replacements = [GroupID, parent_id];
     let menus = await sequelize.query(queryStr, {
