@@ -5,6 +5,8 @@ const gm = require('gm').subClass({
   imageMagick: true
 });
 const uuid = require('uuid');
+const mime = require('mime-types');
+const moment = require('moment');
 
 const common = require('../util/CommonUtil.js');
 const logger = require('./Logger').createLogger('FileSRV.js');
@@ -56,7 +58,7 @@ function ImageCropperSave(req) {
               })
             } else {
               let today = new Date()
-              let relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
+              let relPath = 'upload/' + moment().format('YYYY/MM/DD/')
               let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
               if (!fs.existsSync(svPath)) {
                 mkdirssync(svPath)
@@ -83,7 +85,92 @@ function ImageCropperSave(req) {
   })
 }
 
+function fileSave(req) {
+  return new Promise(function (resolve, reject) {
+    if (req.is('multipart/*')) {
+      try {
+        let form = new multiparty.Form(config.uploadOptions);
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            reject(err);
+          }
+          if (files.file) {
+            let ext = path.extname(files.file[0].path)
+            let filename = uuid.v4() + ext
+            if (config.mongoFileFlag) {
+              MongoCli.getBucket().then(bucket => {
+                let uploadStream = bucket.openUploadStream(filename);
+                let readStream = fs.createReadStream(files.file[0].path);
+                readStream.on('end', function () {
+                  fs.unlinkSync(files.file[0].path)
+                  resolve({
+                    name: files.file[0].originalFilename,
+                    ext: ext,
+                    url: config.fsUrlBase + filename,
+                    type: mime.lookup(path.extname(files.file[0].path))
+                  })
+                })
+
+                readStream.on('error', function (err) {
+                  reject(err)
+                })
+                readStream.pipe(uploadStream)
+              })
+            } else {
+              let relPath = 'upload/' + moment().format('YYYY/MM/DD/')
+              let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
+              if (!fs.existsSync(svPath)) {
+                mkdirssync(svPath)
+              }
+              fs.renameSync(files.file[0].path, path.join(svPath, filename))
+              resolve({
+                name: files.file[0].originalFilename,
+                ext: ext,
+                url: config.fileUrlBase + relPath + filename,
+                type: mime.lookup(path.extname(files.file[0].path))
+              })
+            }
+          } else {
+            reject('no file');
+          }
+        })
+      } catch (error) {
+        reject(error);
+      }
+    } else {
+      reject('content-type error');
+    }
+  })
+}
+
+function mkdirssync(dirpath) {
+  try {
+    if (!fs.existsSync(dirpath)) {
+      let pathtmp;
+      dirpath.split(/[/\\]/).forEach(function (dirname) { //这里指用/ 或\ 都可以分隔目录  如  linux的/usr/local/services   和windows的 d:\temp\aaaa
+        if (dirname) {
+          if (pathtmp) {
+            pathtmp = path.join(pathtmp, dirname);
+          } else {
+            pathtmp = '/' + dirname;
+          }
+          if (!fs.existsSync(pathtmp)) {
+            if (!fs.mkdirSync(pathtmp)) {
+              return false;
+            }
+          }
+        }
+      });
+    }
+    return true;
+  } catch (e) {
+    logger.error("create director fail! path=" + dirpath + " errorMsg:" + e);
+    return false;
+  }
+}
+
 module.exports = {
   FileResource: FileResource,
   ImageCropperSave: ImageCropperSave,
+  fileSave: fileSave
 }

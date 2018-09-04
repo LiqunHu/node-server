@@ -1,7 +1,6 @@
 const uuid = require('uuid');
 const path = require('path');
 const fs = require('fs');
-const mime = require('mime-types');
 const ejs = require('ejs');
 const wkhtmltopdf = require('wkhtmltopdf');
 const wkhtmltoimage = require('wkhtmltoimage');
@@ -110,206 +109,65 @@ let transaction = function (callback) {
   })
 };
 
+// function fileMove(url, mode) {
+//   return new Promise(async function (resolve, reject) {
+//     if (url) {
+//       let fileName = path.basename(url)
+//       let relPath = ''
+//       let today = new Date()
+//       if (mode == 'avatar') {
+//         relPath = 'avatar/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
+//       } else if (mode == 'upload') {
+//         relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
+//       } else {
+//         reject('mode error');
+//       }
 
-function fileSave(req) {
-  return new Promise(function (resolve, reject) {
-    if (req.is('multipart/*')) {
-      try {
-        let form = new multiparty.Form(config.uploadOptions);
-        form.parse(req, (err, fields, files) => {
-          if (err) {
-            reject(err);
-          }
-          if (files.file) {
-            let filename = uuid.v4() + '.jpg'
-            let cropper_data = JSON.parse(fields.cropper_data[0]);
-            if (config.mongoFileFlag) {
-              MongoCli.getBucket().then(bucket => {
-                let uploadStream = bucket.openUploadStream(filename);
-                let outStream = gm(files.cropper_file[0].path)
-                  .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
-                  .rotate('white', cropper_data.rotate)
-                  .stream('.jpg')
-                outStream.on('end', function () {
-                  resolve(config.fsUrlBase + filename)
-                })
+//       let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath);
 
-                outStream.on('error', function (err) {
-                  reject(err)
-                })
-                outStream.pipe(uploadStream)
-              })
-            } else {
-              let today = new Date()
-              let relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-              let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
-              if (!fs.existsSync(svPath)) {
-                mkdirssync(svPath)
-              }
-              
-            }
-          } else {
-            reject('no cropper file');
-          }
-        })
-      } catch (error) {
-        reject(error);
-      }
+//       if (!fs.existsSync(svPath)) {
+//         mkdirssync(svPath)
+//       }
 
-      try {
-        if (config.mongoFileFlag) {
-          let form = new multiparty.Form(),
-            fileids = [],
-            currentFile = '',
-            fields = {};
-
-          form.on('field', function (name, value) {
-            fields[name] = value
-          });
-
-          form.on('part', function (part) {
-
-          });
-
-          form.on('error', function (err) {
-            reject(err);
-          });
-          form.parse(req);
-        } else {
-          let form = new multiparty.Form(config.uploadOptions);
-          form.parse(req, (err, fields, files) => {
-            if (err) {
-              reject(err);
-            }
-            let relPath = ''
-            let today = new Date()
-            if (files.avatar_file) {
-              relPath = 'avatar/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-            } else {
-              relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-            }
-
-            let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath);
-
-            if (!fs.existsSync(svPath)) {
-              mkdirssync(svPath)
-            }
-
-            if (files.avatar_file) {
-              let filename = uuid.v4() + '.jpg'
-              let avatar_data = JSON.parse(fields.avatar_data[0]);
-              gm(files.avatar_file[0].path)
-                .setFormat("jpeg")
-                .crop(avatar_data.width, avatar_data.height, avatar_data.x, avatar_data.y)
-                .rotate('white', avatar_data.rotate)
-                .write(path.join(svPath, filename), function (err) {
-                  if (!err) resolve(config.fileUrlBase + relPath + filename);
-                  reject(err);
-                })
-            } else if (files.file) {
-              let ext = path.extname(files.file[0].name)
-              let imageExt = ['.BMP', '.JPG', '.JPEG', '.GIF', '.PNG']
-              if (ext) {
-                if (imageExt.indexOf(ext.toUpperCase()) >= 0) {
-                  let filename = uuid.v4() + '.jpg'
-                  gm(files.file[0].path)
-                    .compress("jpeg")
-                    .write(path.join(svPath, filename), function (err) {
-                      if (!err) {
-                        fs.unlinkSync(files.file[0].path)
-                        resolve({
-                          name: files.file[0].name,
-                          ext: path.extname(filename),
-                          url: config.fileUrlBase + relPath + filename,
-                          type: mime.lookup(path.extname(filename))
-                        })
-                      } else {
-                        reject(err);
-                      }
-                    })
-                } else {
-                  fs.renameSync(files.file[0].path, path.join(svPath, fileName))
-                  resolve({
-                    name: files.file[0].name,
-                    ext: path.extname(files.file[0].name),
-                    url: config.fileUrlBase + relPath + path.basename(files.file.path),
-                    type: files.file.type,
-                  })
-                }
-              }
-            } else {
-              reject('no files');
-            }
-          })
-        }
-      } catch (error) {
-        reject(error);
-      }
-    } else {
-      reject('content-type error');
-    }
-  })
-}
-
-function fileMove(url, mode) {
-  return new Promise(async function (resolve, reject) {
-    if (url) {
-      let fileName = path.basename(url)
-      let relPath = ''
-      let today = new Date()
-      if (mode == 'avatar') {
-        relPath = 'avatar/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-      } else if (mode == 'upload') {
-        relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-      } else {
-        reject('mode error');
-      }
-
-      let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath);
-
-      if (!fs.existsSync(svPath)) {
-        mkdirssync(svPath)
-      }
-
-      let tempfile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName);
-      if (config.mongoFileFlag) {
-        let connectStr = ''
-        if (config.mongo.auth) {
-          connectStr = format(config.mongo.connect,
-            config.mongo.auth.username, config.mongo.auth.password);
-        } else {
-          connectStr = config.mongo.connect
-        }
-        mongodb.MongoClient.connect(connectStr, async function (err, db) {
-          if (err) reject(err)
-          try {
-            // Our file ID
-            let fileId = new mongodb.ObjectID();
-            let mongoName = fileId + path.extname(fileName)
-            let gridStore = new mongodb.GridStore(db, fileId, mongoName, 'w', {
-              content_type: mime.lookup(fileName)
-            })
-            let gs = await gridStore.open()
-            let fileData = fs.readFileSync(tempfile);
-            await gs.write(fileData)
-            await gs.close()
-            fs.unlinkSync(tempfile)
-            db.close()
-            resolve(config.fileUrlBase + mongoName)
-          } catch (error) {
-            db.close()
-            reject(error);
-          }
-        });
-      } else {
-        fs.renameSync(tempfile, path.join(svPath, fileName))
-        resolve(config.fileUrlBase + relPath + fileName);
-      }
-    } else {
-      reject('url error');
-    }
-  })
-}
+//       let tempfile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName);
+//       if (config.mongoFileFlag) {
+//         let connectStr = ''
+//         if (config.mongo.auth) {
+//           connectStr = format(config.mongo.connect,
+//             config.mongo.auth.username, config.mongo.auth.password);
+//         } else {
+//           connectStr = config.mongo.connect
+//         }
+//         mongodb.MongoClient.connect(connectStr, async function (err, db) {
+//           if (err) reject(err)
+//           try {
+//             // Our file ID
+//             let fileId = new mongodb.ObjectID();
+//             let mongoName = fileId + path.extname(fileName)
+//             let gridStore = new mongodb.GridStore(db, fileId, mongoName, 'w', {
+//               content_type: mime.lookup(fileName)
+//             })
+//             let gs = await gridStore.open()
+//             let fileData = fs.readFileSync(tempfile);
+//             await gs.write(fileData)
+//             await gs.close()
+//             fs.unlinkSync(tempfile)
+//             db.close()
+//             resolve(config.fileUrlBase + mongoName)
+//           } catch (error) {
+//             db.close()
+//             reject(error);
+//           }
+//         });
+//       } else {
+//         fs.renameSync(tempfile, path.join(svPath, fileName))
+//         resolve(config.fileUrlBase + relPath + fileName);
+//       }
+//     } else {
+//       reject('url error');
+//     }
+//   })
+// }
 
 // function fileGet(url) {
 //   return new Promise(async function (resolve, reject) {
@@ -385,32 +243,6 @@ function fileMove(url, mode) {
 //     }
 //   })
 // }
-
-function mkdirssync(dirpath) {
-  try {
-    if (!fs.existsSync(dirpath)) {
-      let pathtmp;
-      dirpath.split(/[/\\]/).forEach(function (dirname) { //这里指用/ 或\ 都可以分隔目录  如  linux的/usr/local/services   和windows的 d:\temp\aaaa
-        if (dirname) {
-          if (pathtmp) {
-            pathtmp = path.join(pathtmp, dirname);
-          } else {
-            pathtmp = '/' + dirname;
-          }
-          if (!fs.existsSync(pathtmp)) {
-            if (!fs.mkdirSync(pathtmp)) {
-              return false;
-            }
-          }
-        }
-      });
-    }
-    return true;
-  } catch (e) {
-    logger.error("create director fail! path=" + dirpath + " errorMsg:" + e);
-    return false;
-  }
-}
 
 function generateRandomAlphaNum(len) {
   let charSet = '0123456789';

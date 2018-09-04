@@ -16,7 +16,7 @@ const config = {
     opts: {}
   },
   // for mongo
-  mongoFileFlag: true,
+  mongoFileFlag: false,
   mongo: {
     connect: 'mongodb://127.0.0.1:27017',
     dbName: 'mvnndata',
