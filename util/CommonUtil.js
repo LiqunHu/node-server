@@ -1,7 +1,3 @@
-const multiparty = require('multiparty');
-const gm = require('gm').subClass({
-  imageMagick: true
-});
 const uuid = require('uuid');
 const path = require('path');
 const fs = require('fs');
@@ -114,62 +110,6 @@ let transaction = function (callback) {
   })
 };
 
-function ImageCropperSave(req) {
-  return new Promise(function (resolve, reject) {
-    if (req.is('multipart/*')) {
-      try {
-        let form = new multiparty.Form(config.uploadOptions);
-        form.parse(req, (err, fields, files) => {
-          if (err) {
-            reject(err);
-          }
-          if (files.cropper_file) {
-            let filename = uuid.v4() + '.jpg'
-            let cropper_data = JSON.parse(fields.cropper_data[0]);
-            if (config.mongoFileFlag) {
-              MongoCli.getBucket().then(bucket => {
-                let uploadStream = bucket.openUploadStream(filename);
-                let outStream = gm(files.cropper_file[0].path)
-                  .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
-                  .rotate('white', cropper_data.rotate)
-                  .stream('.jpg')
-                outStream.on('end', function () {
-                  resolve(config.fsUrlBase + filename)
-                })
-
-                outStream.on('error', function (err) {
-                  reject(err)
-                })
-                outStream.pipe(uploadStream)
-              })
-            } else {
-              let today = new Date()
-              let relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-              let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
-              if (!fs.existsSync(svPath)) {
-                mkdirssync(svPath)
-              }
-              gm(files.cropper_file[0].path)
-                .setFormat("jpeg")
-                .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
-                .rotate('white', cropper_data.rotate)
-                .write(path.join(svPath, filename), function (err) {
-                  if (!err) resolve(config.fileUrlBase + relPath + filename);
-                  reject(err);
-                })
-            }
-          } else {
-            reject('no cropper file');
-          }
-        })
-      } catch (error) {
-        reject(error);
-      }
-    } else {
-      reject('content-type error');
-    }
-  })
-}
 
 function fileSave(req) {
   return new Promise(function (resolve, reject) {
@@ -771,7 +711,6 @@ module.exports = {
   sendData: sendData,
   sendError: sendError,
   sendFault: sendFault,
-  ImageCropperSave: ImageCropperSave,
   getUploadTempPath: getUploadTempPath,
   generateRandomAlphaNum: generateRandomAlphaNum,
   simpleSelect: simpleSelect,

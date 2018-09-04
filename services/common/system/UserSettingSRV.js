@@ -1,5 +1,5 @@
-const fs = require('fs');
 const common = require('../../../util/CommonUtil');
+const FileSRV = require('../../../util/FileSRV');
 const GLBConfig = require('../../../util/GLBConfig');
 const logger = require('../../../util/Logger').createLogger('UserSettingSRV');
 const model = require('../../../model');
@@ -80,7 +80,7 @@ async function modifyAct(req, res) {
 
 async function uploadAct(req, res) {
     try {
-        let uploadurl = await common.ImageCropperSave(req)
+        let uploadurl = await FileSRV.ImageCropperSave(req)
         common.sendData(res, {
             uploadurl: uploadurl
         })
