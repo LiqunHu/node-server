@@ -1,16 +1,16 @@
-const common = require('./util/CommonUtil');
-const Sequence = require('./util/Sequence');
-const GLBConfig = require('./util/GLBConfig');
-const logger = require('./util/Logger').createLogger('init-data');
-const model = require('./model.js');
+const common = require('./util/CommonUtil')
+const Sequence = require('./util/Sequence')
+const GLBConfig = require('./util/GLBConfig')
+const logger = require('./util/Logger').createLogger('init-data')
+const model = require('./model.js')
 
-let tb_common_domain = model.common_domain;
-let tb_common_user = model.common_user;
-let tb_common_usergroup = model.common_usergroup;
-let tb_common_api = model.common_api;
-let tb_common_systemmenu = model.common_systemmenu;
+let tb_common_domain = model.common_domain
+let tb_common_user = model.common_user
+let tb_common_usergroup = model.common_usergroup
+let tb_common_api = model.common_api
+let tb_common_systemmenu = model.common_systemmenu
 
-(async () => {
+;(async () => {
   try {
     let menu = null
     let fmenuID1 = null
@@ -23,7 +23,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       domain_type: GLBConfig.DOMAIN_ADMINISTRATOR,
       domain_name: 'administratorGroup',
       domain_description: 'admin'
-    });
+    })
 
     usergroup = await tb_common_usergroup.create({
       domain_id: domain.domain_id,
@@ -31,7 +31,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       usergroup_type: GLBConfig.TYPE_DEFAULT,
       node_type: '01',
       parent_id: 0
-    });
+    })
 
     usergroup = await tb_common_usergroup.create({
       domain_id: domain.domain_id,
@@ -39,7 +39,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       usergroup_type: GLBConfig.TYPE_ADMINISTRATOR,
       node_type: '01',
       parent_id: 0
-    });
+    })
 
     let user = await tb_common_user.create({
       user_id: await Sequence.genUserID(),
@@ -49,21 +49,21 @@ let tb_common_systemmenu = model.common_systemmenu;
       user_username: 'admin',
       user_name: 'admin',
       user_password: 'admin'
-    });
+    })
 
     // common
     menu = await tb_common_systemmenu.create({
       systemmenu_name: 'common',
       node_type: '00',
       parent_id: '0'
-    });
+    })
     fmenuID1 = menu.systemmenu_id
 
     menu = await tb_common_systemmenu.create({
       systemmenu_name: 'components',
       node_type: '00',
       parent_id: fmenuID1
-    });
+    })
     fmenuID2 = menu.systemmenu_id
     api = await tb_common_api.create({
       api_name: '机构选择组件',
@@ -79,7 +79,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '操作员选择组件',
       api_path: '/common/components/userSelectDialogControl',
@@ -94,13 +94,13 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
 
     menu = await tb_common_systemmenu.create({
       systemmenu_name: 'baseconfig',
       node_type: '00',
       parent_id: fmenuID1
-    });
+    })
     fmenuID2 = menu.systemmenu_id
     api = await tb_common_api.create({
       api_name: '关注审核',
@@ -116,13 +116,13 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
 
     menu = await tb_common_systemmenu.create({
       systemmenu_name: 'system',
       node_type: '00',
       parent_id: fmenuID1
-    });
+    })
     fmenuID2 = menu.systemmenu_id
     api = await tb_common_api.create({
       api_name: '系统菜单维护',
@@ -138,7 +138,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '机构模板维护',
       api_path: '/common/system/DomainTemplateControl',
@@ -153,7 +153,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '机构维护',
       api_path: '/common/system/DomainControl',
@@ -168,7 +168,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '系统组权限维护',
       api_path: '/common/system/DomainGroupApiControl',
@@ -183,7 +183,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '用户设置',
       api_path: '/common/system/UserSetting',
@@ -198,7 +198,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '角色设置',
       api_path: '/common/system/DomainGroupControl',
@@ -213,7 +213,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '员工维护',
       api_path: '/common/system/OperatorControl',
@@ -228,7 +228,7 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
     api = await tb_common_api.create({
       api_name: '重置密码',
       api_path: '/common/system/ResetPassword',
@@ -243,11 +243,11 @@ let tb_common_systemmenu = model.common_systemmenu;
       api_function: api.api_function,
       node_type: '01',
       parent_id: fmenuID2
-    });
+    })
 
     process.exit(0)
   } catch (error) {
-    console.log(error);
+    console.log(error)
     process.exit(0)
   }
-})();
+})()
