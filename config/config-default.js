@@ -23,7 +23,7 @@ const config = {
     bucketName: 'gridfsmvnn'
   },
   // for elasticsearch
-  elasticsearchFlag: false,
+  elasticsearchFlag: true,
   elasticsearch: {
     index: 'mvnn',
     host: 'localhost:9200',
