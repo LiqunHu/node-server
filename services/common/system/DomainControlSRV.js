@@ -133,7 +133,7 @@ async function genMenu(parentId) {
  *
  * @apiHeader {String} Authorization                Authorization token.
  *
- * @apiParam {String} search_text                 Type, optional 查询条件.
+ * @apiParam {String} search_text                   Type, optional 查询条件.
  */
 async function searchAct(req, res) {
   try {
@@ -178,7 +178,7 @@ async function searchAct(req, res) {
  * @apiHeader {String} Authorization                Authorization token.
  *
  * @apiParam {String} domain                        Type, parameter and Domain编号.
- * @apiParam {Number{1-9999}} domaintemplate_id     Type, parameter and Domain模板id.
+ * @apiParam {Number} domaintemplate_id             Type, parameter and Domain模板id.
  * @apiParam {String} domain_name                   Type, parameter and Domain名称.
  * @apiParam {String} domain_province               Type, parameter and 省.
  * @apiParam {String} domain_city                   Type, parameter and 市.
@@ -333,7 +333,7 @@ async function modifyAct(req, res) {
  *
  * @apiHeader {String} Authorization                Authorization token.
  *
- * @apiParam {Number{1-9999}} domain_id             查询domain id.
+ * @apiParam {Number} domain_id                     查询domain id.
  */
 async function searchDomainMenuAct(req, res) {
   try {
@@ -406,8 +406,8 @@ async function genDomainMenu(domain_id, parentId) {
  *
  * @apiHeader {String} Authorization                Authorization token.
  *
- * @apiParam {Number{1-9999}} parent_id             上级id.
- * @apiParam {Number{1-9999}} domain_id             机构id.
+ * @apiParam {Number} parent_id                     上级id.
+ * @apiParam {Number} domain_id                     机构id.
  * @apiParam {String} domainmenu_name               目录名称.
  * @apiParam {String} domainmenu_name               目录图标.
  * @apiParam {String} root_show_flag                是否显示表示.
@@ -489,7 +489,7 @@ async function modifyFolderAct(req, res) {
  *
  * @apiHeader {String} Authorization                Authorization token.
  *
- * @apiParam {Number{1-9999}} domainmenu_id         删除对象id.
+ * @apiParam {Number} domainmenu_id                 删除对象id.
  */
 async function deleteSelectAct(req, res) {
   try {
@@ -538,8 +538,8 @@ async function folderDelete(domainmenu_id) {
  *
  * @apiHeader {String} Authorization                Authorization token.
  *
- * @apiParam {Number{1-9999}} domain_id             机构id.
- * @apiParam {Number{1-9999}} parent_id             目标目录id.
+ * @apiParam {Number} domain_id                     机构id.
+ * @apiParam {Number} parent_id                     目标目录id.
  * @apiParam {Object[]} menus                       增加的菜单.
  */
 async function addMenusAct(req, res) {
