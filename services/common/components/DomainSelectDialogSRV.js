@@ -60,7 +60,7 @@ async function searchAct(req, res) {
 
     let dequeryStr = `select *, b.domain_id bdomain_id, a.state state from tbl_common_apidomain a, tbl_common_domain b
                       where a.follow_domain_id = b.domain_id
-                      and (a.effect_state = '0' and a.state = '1' )
+                      and (a.effect_state = '0' and a.state = '1')
                       and a.api_name = ?
                       and a.domain_id = ?
                       `

@@ -8,6 +8,15 @@ const config = {
     host: 'localhost',
     port: 33306
   },
+  // for sequelize Query`
+  sequelizeQuery: {
+    dialect: 'mysql',
+    database: 'mvnndata',
+    username: 'root',
+    password: '123456',
+    host: 'localhost',
+    port: 33306
+  },
   // for redis
   redisCache: true,
   redis: {
