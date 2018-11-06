@@ -46,6 +46,7 @@ exports.DomainControlResource = (req, res) => {
  * @api {post} /api/common/system/DomainControl?method=init 获取机构数据字典
  * @apiName DomainControl init
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 获取机构数据字典
  *
  * @apiHeader {String} Authorization                 Authorization token.
@@ -129,6 +130,7 @@ async function genMenu(parentId) {
  * @api {post} /api/common/system/DomainControl?method=search 机构查询
  * @apiName Domain search
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 机构查询
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -173,6 +175,7 @@ async function searchAct(req, res) {
  * @api {post} /api/common/system/DomainControl?method=add 机构增加
  * @apiName Domain add
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 机构增加
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -293,6 +296,7 @@ async function addAct(req, res) {
  * @api {post} /api/common/system/DomainControl?method=modify 机构修改
  * @apiName Domain modify
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 机构修改
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -329,6 +333,7 @@ async function modifyAct(req, res) {
  * @api {post} /api/common/system/DomainControl?method=searchDomainMenu 查询机构菜单
  * @apiName Domain searchDomainMenu
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 查询机构菜单
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -402,6 +407,7 @@ async function genDomainMenu(domain_id, parentId) {
  * @api {post} /api/common/system/DomainControl?method=addFolder 增加目录
  * @apiName Domain addFolder
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription Domain 增加目录
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -448,6 +454,7 @@ async function addFolderAct(req, res) {
  * @api {post} /api/common/system/DomainControl?method=modifyFolder 修改目录
  * @apiName Domain modifyFolder
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription Domain 目录修改
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -485,6 +492,7 @@ async function modifyFolderAct(req, res) {
  * @api {post} /api/common/system/DomainControl?method=deleteSelect 删除选定项
  * @apiName Domain deleteSelect
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription Domain 删除选定项
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -534,6 +542,7 @@ async function folderDelete(domainmenu_id) {
  * @api {post} /api/common/system/DomainControl?method=addMenus 目录增加菜单
  * @apiName Domain addMenus
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 向选定目录增加菜单
  *
  * @apiHeader {String} Authorization                Authorization token.
@@ -601,6 +610,7 @@ async function addMenusAct(req, res) {
  * @api {post} /api/common/system/DomainControl?method=changeOrder 修改菜单顺序
  * @apiName Domain changeOrder
  * @apiGroup DomainControl
+ * @apiVersion 1.0.0
  * @apiDescription 修改菜单顺序
  *
  * @apiHeader {String} Authorization                Authorization token.
