@@ -10,9 +10,6 @@ const format = require('util').format
 const config = require('../config')
 const Error = require('./Error')
 const logger = require('./Logger').createLogger('CommonUtil.js')
-const model = require('../model')
-const sequelize = model.sequelize
-const MongoCli = require('./MongoClient')
 const WebSocket = require('ws')
 
 // String trim
@@ -79,39 +76,6 @@ function sendFault(res, msg) {
     }
   }
   res.status(500).send(sendData)
-}
-
-/**
- * 事务方法
- * @param options
- * @param autoCallback
- * @returns {*}
- */
-let transaction = function(callback) {
-  return new Promise(function(resolve, reject) {
-    if (Object.prototype.toString.call(callback) === '[object AsyncFunction]') {
-      sequelize
-        .transaction(function(t) {
-          // chain all your queries here. make sure you return them.
-          return Promise.all([callback(t)])
-        })
-        .then(function(result) {
-          resolve()
-        })
-        .catch(function(err) {
-          reject(err)
-        })
-    } else {
-      sequelize
-        .transaction(callback)
-        .then(function(result) {
-          resolve()
-        })
-        .catch(function(err) {
-          reject(err)
-        })
-    }
-  })
 }
 
 // function fileMove(url, mode) {
@@ -257,90 +221,6 @@ function generateRandomAlphaNum(len) {
     randomString += charSet.substring(randomPoz, randomPoz + 1)
   }
   return randomString
-}
-
-//列表分页查询，查询语句queryStr传完整的sql语句
-async function queryWithCount(db, req, queryStr, replacements) {
-  let doc = req.body
-
-  let cnt = queryStr.indexOf('from') + 5
-  let queryStrCnt = queryStr.substr(cnt)
-
-  let count = await db.query('select count(*) num from ' + queryStrCnt, {
-    replacements: replacements,
-    type: db.QueryTypes.SELECT
-  })
-
-  let rep = replacements
-  rep.push(doc.offset || 0)
-  rep.push(doc.limit || 100)
-
-  let queryRst = await db.query(queryStr + ' LIMIT ?,?', {
-    replacements: rep,
-    type: db.QueryTypes.SELECT
-  })
-
-  return {
-    count: count[0].num,
-    data: queryRst
-  }
-}
-
-async function queryWithDocCount(db, doc, queryStr, replacements) {
-  let cnt = queryStr.indexOf('from') + 5
-  let queryStrCnt = queryStr.substr(cnt)
-
-  let count = await db.query('select count(*) num from ' + queryStrCnt, {
-    replacements: replacements,
-    type: db.QueryTypes.SELECT
-  })
-
-  let rep = replacements
-  rep.push(doc.offset || 0)
-  rep.push(doc.limit || 100)
-
-  let queryRst = await db.query(queryStr + ' LIMIT ?,?', {
-    replacements: rep,
-    type: db.QueryTypes.SELECT
-  })
-
-  return {
-    count: count[0].num,
-    data: queryRst
-  }
-}
-
-async function queryWithGroupByCount(db, req, queryStr, replacements) {
-  let doc = req.body
-
-  let count = await db.query(
-    'select count(*) num from (' + queryStr + ') as count',
-    {
-      replacements: replacements,
-      type: db.QueryTypes.SELECT
-    }
-  )
-
-  let rep = replacements
-  rep.push(doc.offset || 0)
-  rep.push(doc.limit || 100)
-
-  let queryRst = await db.query(queryStr + ' LIMIT ?,?', {
-    replacements: rep,
-    type: db.QueryTypes.SELECT
-  })
-
-  return {
-    count: count[0].num,
-    data: queryRst
-  }
-}
-
-async function simpleSelect(db, queryStr, replacements) {
-  return await db.query(queryStr, {
-    replacements: replacements,
-    type: db.QueryTypes.SELECT
-  })
 }
 
 function getApiName(path) {
@@ -582,12 +462,7 @@ module.exports = {
   sendFault: sendFault,
   getUploadTempPath: getUploadTempPath,
   generateRandomAlphaNum: generateRandomAlphaNum,
-  simpleSelect: simpleSelect,
-  queryWithCount: queryWithCount,
-  queryWithDocCount: queryWithDocCount,
-  queryWithGroupByCount: queryWithGroupByCount,
   getApiName: getApiName,
-  transaction: transaction,
   buildXML: buildXML,
   parseXML: parseXML,
   generateNonceString: generateNonceString,

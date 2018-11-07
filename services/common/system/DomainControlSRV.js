@@ -5,7 +5,6 @@ const Sequence = require('../../../util/Sequence')
 const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 
-const sequelize = model.sequelize
 const tb_common_domain = model.common_domain
 const tb_common_domaintemplate = model.common_domaintemplate
 const tb_usergroup = model.common_usergroup
@@ -155,9 +154,8 @@ async function searchAct(req, res) {
       replacements.push(search_text)
     }
 
-    let result = await common.queryWithCount(
-      sequelize,
-      req,
+    let result = await model.queryWithCount(
+      doc,
       queryStr,
       replacements
     )

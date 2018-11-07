@@ -6,7 +6,6 @@ const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 
 // tables
-const sequelize = model.sequelize
 const tb_common_domain = model.common_domain
 const tb_common_apidomain = model.common_apidomain
 
@@ -36,7 +35,7 @@ async function searchAct(req, res) {
                       `
     let replacements = [doc.api_name, user.domain_id]
 
-    let result = await common.simpleSelect(sequelize, queryStr, replacements)
+    let result = await model.simpleSelect(queryStr, replacements)
 
     for (let r of result) {
       let row = JSON.parse(JSON.stringify(r))
@@ -66,8 +65,7 @@ async function searchAct(req, res) {
                       `
     let dereplacements = [doc.api_name, user.domain_id]
 
-    let deresult = await common.simpleSelect(
-      sequelize,
+    let deresult = await model.simpleSelect(
       dequeryStr,
       dereplacements
     )

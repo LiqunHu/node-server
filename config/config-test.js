@@ -8,6 +8,7 @@ const config = {
     host: 'localhost',
     port: 33306
   },
+  RWSeperateFlag: false, // 读写分离标识
   // for sequelize Query`
   sequelizeQuery: {
     dialect: 'mysql',

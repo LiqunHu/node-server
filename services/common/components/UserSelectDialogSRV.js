@@ -6,7 +6,6 @@ const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 
 // tables
-const sequelize = model.sequelize
 const tb_usergroup = model.common_usergroup
 const tb_user = model.common_user
 

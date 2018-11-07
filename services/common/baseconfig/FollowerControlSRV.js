@@ -6,7 +6,6 @@ const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 
 // tables
-const sequelize = model.sequelize
 const tb_domain = model.common_domain
 const tb_common_apidomain = model.common_apidomain
 
@@ -40,7 +39,7 @@ async function initAct(req, res) {
                           `
     let replacements = [user.domain_id]
 
-    let result = await common.simpleSelect(sequelize, queryStr, replacements)
+    let result = await model.simpleSelect(queryStr, replacements)
 
     returnData.domains = []
     for (let r of result) {
@@ -76,9 +75,8 @@ async function searchAct(req, res) {
       queryStr += " and a.effect_state = '0'"
     }
 
-    let result = await common.queryWithCount(
-      sequelize,
-      req,
+    let result = await model.queryWithCount(
+      doc,
       queryStr,
       replacements
     )

@@ -6,7 +6,6 @@ const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 const RedisClient = require('../../../util/RedisClient')
 
-const sequelize = model.sequelize
 const tb_usergroup = model.common_usergroup
 const tb_user = model.common_user
 
@@ -67,8 +66,7 @@ async function searchAct(req, res) {
       replacements.push(search_text)
     }
 
-    let result = await common.queryWithCount(
-      sequelize,
+    let result = await model.queryWithCount(
       req,
       queryStr,
       replacements

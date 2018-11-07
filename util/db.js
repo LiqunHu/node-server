@@ -32,30 +32,6 @@ let sequelize = new Sequelize(
   }
 )
 
-let sequelizeQuery = new Sequelize(
-  config.sequelizeQuery.database,
-  config.sequelizeQuery.username,
-  config.sequelizeQuery.password,
-  {
-    host: config.sequelizeQuery.host,
-    port: config.sequelizeQuery.port,
-    dialect: config.sequelizeQuery.dialect,
-    timezone: '+08:00', //东八时区
-    pool: {
-      max: 5, // max
-      min: 0, // min
-      idle: 10000 //10 seconds
-    },
-    retry: {
-      match: 'getaddrinfo ENOTFOUND',
-      max: 3
-    },
-    logging: function(sql) {
-      logger.debug(sql)
-    }
-  }
-)
-
 const ID_TYPE = Sequelize.STRING(30)
 const IDNO_TYPE = Sequelize.BIGINT
 
@@ -251,6 +227,32 @@ for (let type of TYPES) {
 exp.ID = ID_TYPE
 exp.IDNO = IDNO_TYPE
 exp.sequelize = sequelize
-exp.sequelizeQuery = sequelizeQuery
+
+if (config.RWSeperateFlag) {
+  let sequelizeQuery = new Sequelize(
+    config.sequelizeQuery.database,
+    config.sequelizeQuery.username,
+    config.sequelizeQuery.password,
+    {
+      host: config.sequelizeQuery.host,
+      port: config.sequelizeQuery.port,
+      dialect: config.sequelizeQuery.dialect,
+      timezone: '+08:00', //东八时区
+      pool: {
+        max: 5, // max
+        min: 0, // min
+        idle: 10000 //10 seconds
+      },
+      retry: {
+        match: 'getaddrinfo ENOTFOUND',
+        max: 3
+      },
+      logging: function(sql) {
+        logger.debug(sql)
+      }
+    }
+  )
+  exp.sequelizeQuery = sequelizeQuery
+}
 
 module.exports = exp
