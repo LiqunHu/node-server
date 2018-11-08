@@ -26,14 +26,15 @@ const config = {
     opts: {}
   },
   // for mongo
-  mongoFileFlag: false,
+  mongoFileFlag: true,
+  mongoSyncFlag: true,
   mongo: {
     connect: 'mongodb://127.0.0.1:27017',
     dbName: 'mvnndata',
     bucketName: 'gridfsmvnn'
   },
   // for elasticsearch
-  elasticsearchFlag: true,
+  elasticsearchFlag: false,
   elasticsearch: {
     index: 'mvnn',
     host: 'localhost:9200',
