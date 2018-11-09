@@ -150,6 +150,9 @@ async function searchAct(req, res) {
     let doc = common.docValidate(req.body, searchSchema),
       user = req.user,
       returnData = {}
+    
+    let ss = common.model2Schema(tb_common_domain)
+    console.log(ss)
 
     let queryStr = `select * from tbl_common_domain where state = '1' `
     let replacements = []
