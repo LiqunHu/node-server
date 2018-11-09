@@ -1,8 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 
-const common = require('./util/CommonUtil.js')
-const logger = require('./util/Logger').createLogger('service.js')
+const common = require('../util/CommonUtil.js')
+const logger = require('../util/Logger').createLogger('service.js')
 
 let files = []
 
@@ -20,7 +20,7 @@ function readDirSync(path) {
   })
 }
 
-readDirSync('/services')
+readDirSync('/../services')
 
 module.exports = {}
 

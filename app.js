@@ -3,11 +3,8 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const fs = require('fs')
 
 const config = require('./config')
-const common = require('./util/CommonUtil.js')
-const logger = require('./util/Logger').createLogger('app.js')
 
 let app = express()
 let cors = require('cors')
@@ -16,7 +13,7 @@ let ejs = require('ejs')
 let authority = require('./util/Authority')
 let AuthSRV = require('./util/AuthSRV')
 let FileSRV = require('./util/FileSRV')
-let services = require('./service')
+let routers = require('./routes')
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -72,58 +69,8 @@ if (config.mongoFileFlag) {
 app.post('/api/auth', AuthSRV.AuthResource)
 app.post('/api/signout', AuthSRV.SignOutResource)
 
-// system
-
 //common
-//commonQuery
-app.post(
-  '/api/common/components/userSelectDialogControl',
-  services.UserSelectDialogSRV.UserSelectDialogResource
-)
-app.post(
-  '/api/common/components/DomainSelectDialogControl',
-  services.DomainSelectDialogSRV.DomainSelectDialogResource
-)
-
-// baseconfig
-app.post(
-  '/api/common/baseconfig/FollowerControl',
-  services.FollowerControlSRV.FollowerControlResource
-)
-
-// system
-app.post(
-  '/api/common/system/SystemApiControl',
-  services.SystemApiControlSRV.SystemApiControlResource
-)
-app.post(
-  '/api/common/system/DomainTemplateControl',
-  services.DomainTemplateControlSRV.DomainTemplateControlResource
-)
-app.post(
-  '/api/common/system/DomainControl',
-  services.DomainControlSRV.DomainControlResource
-)
-app.post(
-  '/api/common/system/DomainGroupControl',
-  services.DomainGroupControlSRV.DomainGroupControlResource
-)
-app.post(
-  '/api/common/system/DomainGroupApiControl',
-  services.DomainGroupApiControlSRV.DomainGroupApiControlResource
-)
-app.post(
-  '/api/common/system/OperatorControl',
-  services.OperatorControlSRV.OperatorControlResource
-)
-app.post(
-  '/api/common/system/UserSetting',
-  services.UserSettingSRV.UserSettingResource
-)
-app.post(
-  '/api/common/system/ResetPassword',
-  services.UserResetPasswordSRV.UserResetPasswordResource
-)
+app.use('/api/common', routers.common)
 
 // todo
 module.exports = app
