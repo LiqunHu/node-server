@@ -51,6 +51,24 @@ app.use(
 )
 app.use(bodyParser.raw())
 app.use(cookieParser())
+// 错误处理
+// app.use((err, req, res) => {
+//   res.status(err.status || 500)
+
+//   res.writeHeader(err.status || 500, {
+//     'Content-Type': 'application/json;charset=utf-8'
+//   })
+//   res.write(
+//     JSON.stringify({
+//       status: {
+//         status_code: err.status,
+//         status_reason: err.message
+//       }
+//     })
+//   )
+//   res.end()
+// })
+
 app.use('/api', authority.AuthMiddleware)
 
 //处理webpack服务请求

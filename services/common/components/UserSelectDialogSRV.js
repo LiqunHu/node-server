@@ -22,7 +22,7 @@ exports.UserSelectDialogResource = (req, res) => {
 
 async function searchAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user,
       returnData = {}
     let groups = []
@@ -101,7 +101,7 @@ async function genUserGroup(domain_id, parentId) {
 
 async function searchUserAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user,
       returnData = []
 

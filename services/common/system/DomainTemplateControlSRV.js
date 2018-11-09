@@ -101,7 +101,7 @@ async function genMenu(parentId) {
 
 async function searchTemplateAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user
 
     let templates = await tb_common_domaintemplate.findAll()
@@ -114,7 +114,7 @@ async function searchTemplateAct(req, res) {
 
 async function addTemplateAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user
 
     let templates = await tb_common_domaintemplate.create({
@@ -129,7 +129,7 @@ async function addTemplateAct(req, res) {
 
 async function deleteTemplateAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user
 
     let templates = await tb_common_domaintemplate.findOne({
@@ -157,7 +157,7 @@ async function deleteTemplateAct(req, res) {
 
 async function searchTemplateMenuAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user
 
     let menus = [
@@ -221,7 +221,7 @@ async function genTemplateMenu(domaintemplate_id, parentId) {
 
 async function addFolderAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let nextIndex = await tb_common_templatemenu.max('templatemenu_index', {
@@ -253,7 +253,7 @@ async function addFolderAct(req, res) {
 
 async function modifyFolderAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let folder = await tb_common_templatemenu.findOne({
@@ -279,7 +279,7 @@ async function modifyFolderAct(req, res) {
 
 async function deleteSelectAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let tm = await tb_common_templatemenu.findOne({
@@ -318,7 +318,7 @@ async function folderDelete(templatemenu_id) {
 
 async function addMenusAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let existM = await tb_common_templatemenu.findAll({
@@ -372,7 +372,7 @@ async function addMenusAct(req, res) {
 
 async function changeOrderAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     for (let i = 0; i < doc.menus.length; i++) {

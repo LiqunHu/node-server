@@ -1,4 +1,4 @@
-const fs = require('fs')
+const Joi = require('joi')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
 const Sequence = require('../../../util/Sequence')
@@ -52,7 +52,7 @@ exports.DomainControlResource = (req, res) => {
  */
 async function initAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user,
       returnData = {
         tfInfo: GLBConfig.TFINFO
@@ -135,10 +135,19 @@ async function genMenu(parentId) {
  * @apiHeader {String} Authorization                Authorization token.
  *
  * @apiParam {String} search_text                   Type, optional 查询条件.
+ * @apiParam {String} order                         Type, optional 排序.
+ * @apiParam {Number} limit                         Type, optional 数量限制.
+ * @apiParam {Number} offset                        Type, optional 偏移量.
  */
+const searchSchema = {
+  search_text: Joi.string().max(50),
+  order: Joi.string().max(50),
+  limit: Joi.number().integer(),
+  offset: Joi.number().integer()
+}
 async function searchAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body, searchSchema),
       user = req.user,
       returnData = {}
 
@@ -191,7 +200,7 @@ async function searchAct(req, res) {
  */
 async function addAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
     let domain = await tb_common_domain.findOne({
       where: {
@@ -302,9 +311,13 @@ async function addAct(req, res) {
  * @apiParam {Object} new                           Type, parameter and 修改后数据.
  * @apiParam {Object} old                           Type, parameter and 修改前记录.
  */
+const modifySchema = {
+  new: Joi.string().max(50),
+  old: Joi.string().max(50)
+}
 async function modifyAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body, modifySchema)
     let user = req.user
     let domain = await tb_common_domain.findOne({
       where: {
@@ -340,7 +353,7 @@ async function modifyAct(req, res) {
  */
 async function searchDomainMenuAct(req, res) {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user
 
     let menus = [
@@ -418,7 +431,7 @@ async function genDomainMenu(domain_id, parentId) {
  */
 async function addFolderAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let nextIndex = await tb_common_domainmenu.max('domainmenu_index', {
@@ -462,7 +475,7 @@ async function addFolderAct(req, res) {
  */
 async function modifyFolderAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let folder = await tb_common_domainmenu.findOne({
@@ -499,7 +512,7 @@ async function modifyFolderAct(req, res) {
  */
 async function deleteSelectAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let tm = await tb_common_domainmenu.findOne({
@@ -551,7 +564,7 @@ async function folderDelete(domainmenu_id) {
  */
 async function addMenusAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     let existM = await tb_common_domainmenu.findAll({
@@ -617,7 +630,7 @@ async function addMenusAct(req, res) {
  */
 async function changeOrderAct(req, res) {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user = req.user
 
     for (let i = 0; i < doc.menus.length; i++) {

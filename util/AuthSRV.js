@@ -22,7 +22,7 @@ const tb_common_usergroup = model.common_usergroup
 
 exports.AuthResource = async (req, res) => {
   try {
-    let doc = common.docTrim(req.body)
+    let doc = common.docValidate(req.body)
     let user
 
     if (!('loginType' in doc)) {
@@ -168,7 +168,7 @@ exports.SignOutResource = async (req, res) => {
   }
 }
 exports.SMSResource = async (req, res) => {
-  let doc = common.docTrim(req.body)
+  let doc = common.docValidate(req.body)
   if (!('phone' in doc)) {
     common.sendError(res, 'auth_06')
     return
@@ -195,7 +195,7 @@ exports.SMSResource = async (req, res) => {
 }
 exports.PhoneResetPasswordResource = async (req, res) => {
   try {
-    let doc = common.docTrim(req.body),
+    let doc = common.docValidate(req.body),
       user = req.user
 
     if (!('username' in doc)) {
