@@ -12,10 +12,10 @@ const tb_user = model.common_user
 const tb_common_templatemenu = model.common_templatemenu
 const tb_common_domainmenu = model.common_domainmenu
 const tb_common_systemmenu = model.common_systemmenu
-const tb_usergroupmenu = model.common_usergroupmenu
 
 exports.DomainControlResource = (req, res) => {
-  let method = req.query.method
+  let method = common.reqTrans(req, __filename)
+  
   if (method === 'init') {
     initAct(req, res)
   } else if (method === 'search') {
@@ -300,13 +300,13 @@ async function addAct(req, res) {
  * @apiParam {Object} new                           Type, parameter and 修改后数据.
  * @apiParam {Object} old                           Type, parameter and 修改前记录.
  */
-const modifySchema = {
-  new: Joi.object().keys(common.model2Schema(tb_common_domain)),
-  old: Joi.object().keys(common.model2Schema(tb_common_domain))
-}
+// const modifySchema = {
+//   new: Joi.object().keys(common.model2Schema(tb_common_domain)),
+//   old: Joi.object().keys(common.model2Schema(tb_common_domain))
+// }
 async function modifyAct(req, res) {
   try {
-    let doc = common.docValidate(req.body, modifySchema)
+    let doc = common.docValidate(req.body)
     let user = req.user
     let domain = await tb_common_domain.findOne({
       where: {
@@ -413,7 +413,7 @@ async function genDomainMenu(domain_id, parentId) {
  * @apiParam {Number} parent_id                     上级id.
  * @apiParam {Number} domain_id                     机构id.
  * @apiParam {String} domainmenu_name               目录名称.
- * @apiParam {String} domainmenu_name               目录图标.
+ * @apiParam {String} domainmenu_icon               目录图标.
  * @apiParam {String} root_show_flag                是否显示表示.
  */
 async function addFolderAct(req, res) {

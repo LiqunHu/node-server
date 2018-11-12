@@ -11,7 +11,6 @@ const Joi = require('joi')
 const WebSocket = require('ws')
 
 const config = require('../config')
-const S2J = require('./Sequelize2joi')
 const Error = require('./Error')
 const logger = require('./Logger').createLogger('CommonUtil.js')
 
@@ -43,9 +42,17 @@ function docValidate(req, schema) {
   // }
 }
 
-function model2Schema(model1, model2, model3) {
-  let schema = S2J.sequelizeToJoi(model1)
-  return schema
+function reqTrans(req, callFile) {
+  let method = req.query.method
+  console.log(33333)
+  console.log(callFile)
+  let validatorFile = callFile.substring(0,substring.length-3) + '.validator.js'
+  if(fs.existsSync(validatorFile)) {
+    let validator = require(validatorFile)
+    console.log(validator)
+  }
+  
+  return method
 }
 
 // common response
@@ -446,7 +453,7 @@ function wsClientsClose(clents, msg) {
 
 module.exports = {
   docValidate: docValidate,
-  model2Schema: model2Schema,
+  reqTrans: reqTrans,
   sendData: sendData,
   sendError: sendError,
   sendFault: sendFault,

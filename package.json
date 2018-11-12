@@ -9,7 +9,7 @@
     "debug": "node --inspect=0.0.0.0:9229 --use-strict ./bin/www",
     "webstorm": "node $NODE_DEBUG_OPTION ./bin/www",
     "gendoc": "rimraf public/apidoc && apidoc -i services -o public/apidoc/",
-    "genswagger": "joi-swagger-generator -r -v ./services/ -h ./public/swagger/header.json -o ./public/swagger/swagger.json"
+    "genswagger": "rimraf ./public/swagger/swagger.json && joi-swagger-generator -r -v ./services/ -h ./public/swagger/header.json -o ./public/swagger/swagger.json"
   },
   "dependencies": {
     "lodash": "^4.17.11",

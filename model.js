@@ -5,6 +5,7 @@ const config = require('./config')
 
 const common = require('./util/CommonUtil.js')
 const logger = require('./util/Logger').createLogger('model')
+const S2J = require('./util/Sequelize2joi')
 
 let files = []
 
@@ -47,11 +48,7 @@ module.exports.simpleSelect = async function(queryStr, replacements) {
 }
 
 // 分页查询函数 pageDoc 有offset limit 两个字段
-module.exports.queryWithCount = async function(
-  pageDoc,
-  queryStr,
-  replacements
-) {
+module.exports.queryWithCount = async function(pageDoc, queryStr, replacements) {
   let cnt = queryStr.indexOf('from') + 5
   let queryStrCnt = queryStr.substr(cnt)
 
@@ -100,6 +97,11 @@ module.exports.transaction = function(callback) {
         })
     }
   })
+}
+
+module.exports.model2Schema = function(model1, model2, model3) {
+  let schema = S2J.sequelizeToJoi(model1)
+  return schema
 }
 
 module.exports.sync = () => {
