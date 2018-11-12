@@ -75,9 +75,7 @@ async function initAct(req, res) {
         children: []
       }
     ]
-    returnData.sysmenus[0].children = JSON.parse(
-      JSON.stringify(await genMenu('0'))
-    )
+    returnData.sysmenus[0].children = JSON.parse(JSON.stringify(await genMenu('0')))
 
     common.sendData(res, returnData)
   } catch (error) {
@@ -140,8 +138,8 @@ async function genMenu(parentId) {
  * @apiParam {Number} offset                        Type, optional 偏移量.
  */
 const searchSchema = {
-  search_text: Joi.string().max(50),
-  order: Joi.string().max(50),
+  search_text: Joi.string().empty('').max(50),
+  order: Joi.string().empty('').max(50),
   limit: Joi.number().integer(),
   offset: Joi.number().integer()
 }
@@ -150,27 +148,19 @@ async function searchAct(req, res) {
     let doc = common.docValidate(req.body, searchSchema),
       user = req.user,
       returnData = {}
-    
-    let ss = common.model2Schema(tb_common_domain)
-    console.log(ss)
 
     let queryStr = `select * from tbl_common_domain where state = '1' `
     let replacements = []
 
     if (doc.search_text) {
-      queryStr +=
-        ' and (domain like ? or domain_name like ? or domain_address like ?)'
+      queryStr += ' and (domain like ? or domain_name like ? or domain_address like ?)'
       let search_text = '%' + doc.search_text + '%'
       replacements.push(search_text)
       replacements.push(search_text)
       replacements.push(search_text)
     }
 
-    let result = await model.queryWithCount(
-      doc,
-      queryStr,
-      replacements
-    )
+    let result = await model.queryWithCount(doc, queryStr, replacements)
 
     returnData.total = result.count
     returnData.rows = result.data
@@ -273,11 +263,7 @@ async function addAct(req, res) {
               root_show_flag: m.root_show_flag,
               parent_id: cparentId
             })
-            sub_menus = await genDomainMenu(
-              domaintemplate_id,
-              m.templatemenu_id,
-              dm.domainmenu_id
-            )
+            sub_menus = await genDomainMenu(domaintemplate_id, m.templatemenu_id, dm.domainmenu_id)
           } else {
             let dm = await tb_common_domainmenu.create({
               domain_id: domain.domain_id,
@@ -315,8 +301,8 @@ async function addAct(req, res) {
  * @apiParam {Object} old                           Type, parameter and 修改前记录.
  */
 const modifySchema = {
-  new: Joi.string().max(50),
-  old: Joi.string().max(50)
+  new: Joi.object().keys(common.model2Schema(tb_common_domain)),
+  old: Joi.object().keys(common.model2Schema(tb_common_domain))
 }
 async function modifyAct(req, res) {
   try {
@@ -368,9 +354,7 @@ async function searchDomainMenuAct(req, res) {
         children: []
       }
     ]
-    menus[0].children = JSON.parse(
-      JSON.stringify(await genDomainMenu(doc.domain_id, '0'))
-    )
+    menus[0].children = JSON.parse(JSON.stringify(await genDomainMenu(doc.domain_id, '0')))
 
     common.sendData(res, menus)
   } catch (error) {
