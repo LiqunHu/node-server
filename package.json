@@ -8,7 +8,8 @@
     "start": "node --use-strict ./bin/www",
     "debug": "node --inspect=0.0.0.0:9229 --use-strict ./bin/www",
     "webstorm": "node $NODE_DEBUG_OPTION ./bin/www",
-    "gendoc": "rimraf public/apidoc && apidoc -i services -o public/apidoc/"
+    "gendoc": "rimraf public/apidoc && apidoc -i services -o public/apidoc/",
+    "genswagger": "joi-swagger-generator -r -v ./services/ -h ./public/swagger/header.json -o ./public/swagger/swagger.json"
   },
   "dependencies": {
     "lodash": "^4.17.11",
@@ -60,6 +61,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "joi-swagger-generator": "https://github.com/LiqunHu/joi-swagger-generator.git#master"
   }
 }

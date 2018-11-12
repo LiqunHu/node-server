@@ -1,0 +1,59 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Identity account for undefined environment",
+        "version": "1.0.0",
+        "title": "Identity Service undefined",
+        "contact": {
+            "email": "huliquns@126.com"
+        }
+    },
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "paths": {
+        "\\api\\common\\system\\DomainControl?method=init": {
+            "post": {
+                "summary": "获取机构数据字典",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success operation"
+                    }
+                },
+                "deprecated": false,
+                "x-amazon-apigateway-integration": {
+                    "passthroughBehavior": "when_no_match",
+                    "httpMethod": "post",
+                    "type": "http_proxy",
+                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=init",
+                    "responses": {
+                        "default": {
+                            "statusCode": "200"
+                        }
+                    },
+                    "requestParameters": {
+                        "integration.request.header.Authorization": "method.request.header.Authorization"
+                    },
+                    "responseParameters": {}
+                }
+            }
+        }
+    },
+    "definitions": {}
+}

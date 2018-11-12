@@ -1,0 +1,13 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Identity account",
+    "version": "1.0.0",
+    "title": "Identity Service",
+    "contact": {
+      "email": "huliquns@126.com"
+    }
+  },
+  "basePath": "/",
+  "schemes": ["http", "https"]
+}
