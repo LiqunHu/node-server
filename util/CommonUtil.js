@@ -22,10 +22,10 @@ String.prototype.trim = function() {
 }
 
 // common response
-function docValidate(req, schema) {
-  let doc = req
-  if (arguments[1]) {
-    let result = Joi.validate(doc, schema)
+function docValidate(req) {
+  let doc = req.body
+  if (req.JoiSchema) {
+    let result = Joi.validate(doc, req.JoiSchema)
     if (result.error === null) {
       return doc
     } else {
@@ -44,14 +44,17 @@ function docValidate(req, schema) {
 
 function reqTrans(req, callFile) {
   let method = req.query.method
-  console.log(33333)
-  console.log(callFile)
-  let validatorFile = callFile.substring(0,substring.length-3) + '.validator.js'
-  if(fs.existsSync(validatorFile)) {
+  let validatorFile = callFile.substring(0, callFile.length - 3) + '.validator.js'
+  if (fs.existsSync(validatorFile)) {
     let validator = require(validatorFile)
-    console.log(validator)
+    if (validator.apiList[method]) {
+      let reqJoiSchema = validator.apiList[method].JoiSchema
+      if(reqJoiSchema.body) {
+        req.JoiSchema = reqJoiSchema.body
+      }
+    }
   }
-  
+
   return method
 }
 

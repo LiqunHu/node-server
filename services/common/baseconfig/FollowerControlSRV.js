@@ -28,7 +28,7 @@ exports.FollowerControlResource = (req, res) => {
 
 async function initAct(req, res) {
   try {
-    let doc = common.docValidate(req.body),
+    let doc = common.docValidate(req),
       user = req.user,
       returnData = {}
 
@@ -57,7 +57,7 @@ async function initAct(req, res) {
 
 async function searchAct(req, res) {
   try {
-    let doc = common.docValidate(req.body),
+    let doc = common.docValidate(req),
       user = req.user,
       returnData = {}
 
@@ -107,7 +107,7 @@ async function searchAct(req, res) {
 
 async function approveAct(req, res) {
   try {
-    let doc = common.docValidate(req.body)
+    let doc = common.docValidate(req)
     let user = req.user
 
     let ad = await tb_common_apidomain.findOne({
@@ -137,7 +137,7 @@ async function approveAct(req, res) {
 
 async function rejectAct(req, res) {
   try {
-    let doc = common.docValidate(req.body)
+    let doc = common.docValidate(req)
     let user = req.user
 
     let ad = await tb_common_apidomain.findOne({
@@ -166,7 +166,7 @@ async function rejectAct(req, res) {
 
 async function cancelAct(req, res) {
   try {
-    let doc = common.docValidate(req.body)
+    let doc = common.docValidate(req)
     let user = req.user
 
     let ad = await tb_common_apidomain.findOne({

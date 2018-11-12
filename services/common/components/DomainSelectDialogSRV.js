@@ -22,7 +22,7 @@ exports.DomainSelectDialogResource = (req, res) => {
 
 async function searchAct(req, res) {
   try {
-    let doc = common.docValidate(req.body),
+    let doc = common.docValidate(req),
       user = req.user,
       returnData = {}
     returnData.follow_list = []
@@ -100,7 +100,7 @@ async function searchAct(req, res) {
 
 async function modifyAct(req, res) {
   try {
-    let doc = common.docValidate(req.body),
+    let doc = common.docValidate(req),
       user = req.user,
       returnData = []
 

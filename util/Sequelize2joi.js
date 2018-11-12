@@ -73,7 +73,7 @@ function mapType(key, attribute) {
     // STRING TYPES
     case 'STRING':
     case 'TEXT':
-      return Joi.string()
+      return Joi.string().empty('')
     case 'UUID':
       return Joi.string().guid()
     case 'ENUM':
