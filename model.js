@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const fs = require('fs')
 const path = require('path')
 const db = require('./util/db')
@@ -99,8 +100,11 @@ module.exports.transaction = function(callback) {
   })
 }
 
-module.exports.model2Schema = function(model1, model2, model3) {
-  let schema = S2J.sequelizeToJoi(model1)
+module.exports.model2Schema = function() {
+  let schema = {}
+  for (let a of arguments) {
+    schema = _.extend(schema, S2J.sequelizeToJoi(a))
+  }
   return schema
 }
 
