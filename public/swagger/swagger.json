@@ -1,626 +1,329 @@
 {
-    "swagger": "2.0",
+    "openapi": "3.0.0",
     "info": {
-        "description": "Identity account for undefined environment",
+        "title": "Nodejs Service",
+        "description": "Nodejs Service",
         "version": "1.0.0",
-        "title": "Identity Service undefined",
         "contact": {
             "email": "huliquns@126.com"
         }
     },
-    "basePath": "/",
-    "schemes": [
-        "http",
-        "https"
+    "servers": [
+        {
+            "url": "http://localhost:9090",
+            "description": "dev"
+        }
+    ],
+    "security": [
+        {
+            "ApiKeyAuth": []
+        }
     ],
     "paths": {
-        "\\api\\common\\system\\DomainControl?method=init": {
+        "/api/common/system/DomainControl/init": {
             "post": {
                 "summary": "获取机构数据字典",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
+                "parameters": [],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": ""
+                            }
+                        }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=init",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         },
-        "\\api\\common\\system\\DomainControl?method=search": {
+        "/api/common/system/DomainControl/search": {
             "post": {
                 "summary": "机构查询",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/机构查询PostBody"
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DomainControlsearchPostBody"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=search",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         },
-        "\\api\\common\\system\\DomainControl?method=add": {
+        "/api/common/system/DomainControl/add": {
             "post": {
                 "summary": "机构增加",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/机构增加PostBody"
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DomainControladdPostBody"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=add",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         },
-        "\\api\\common\\system\\DomainControl?method=modify": {
+        "/api/common/system/DomainControl/modify": {
             "post": {
                 "summary": "机构修改",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/机构修改PostBody"
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DomainControlmodifyPostBody"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=modify",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         },
-        "\\api\\common\\system\\DomainControl?method=searchDomainMenu": {
+        "/api/common/system/DomainControl/searchDomainMenu": {
             "post": {
                 "summary": "查询机构菜单",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/查询机构菜单PostBody"
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DomainControlsearchDomainMenuPostBody"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=searchDomainMenu",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         },
-        "\\api\\common\\system\\DomainControl?method=deleteSelect": {
+        "/api/common/system/DomainControl/deleteSelect": {
             "post": {
                 "summary": "删除选定项",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/删除选定项PostBody"
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DomainControldeleteSelectPostBody"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=deleteSelect",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         },
-        "\\api\\common\\system\\DomainControl?method=changeOrder": {
+        "/api/common/system/DomainControl/changeOrder": {
             "post": {
                 "summary": "修改菜单顺序",
-                "consumes": [
-                    "application/json"
+                "tags": [
+                    "DomainControl"
                 ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "body",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/修改菜单顺序PostBody"
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DomainControlchangeOrderPostBody"
+                            }
                         }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success operation"
                     }
                 },
-                "deprecated": false,
-                "x-amazon-apigateway-integration": {
-                    "passthroughBehavior": "when_no_match",
-                    "httpMethod": "post",
-                    "type": "http_proxy",
-                    "uri": "http://${stageVariables.url}\\api\\common\\system\\DomainControl?method=changeOrder",
-                    "responses": {
-                        "default": {
-                            "statusCode": "200"
-                        }
-                    },
-                    "requestParameters": {
-                        "integration.request.header.Authorization": "method.request.header.Authorization"
-                    },
-                    "responseParameters": {}
-                }
+                "deprecated": false
             }
         }
     },
-    "definitions": {
-        "机构查询PostBody": {
-            "type": "object",
-            "properties": {
-                "search_text": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "order": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "limit": {
-                    "type": "integer"
-                },
-                "offset": {
-                    "type": "integer"
-                }
+    "components": {
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "Authorization"
             }
         },
-        "机构增加PostBody": {
-            "type": "object",
-            "properties": {
-                "domain": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domaintemplate_id": {
-                    "type": "integer"
-                },
-                "domain_name": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_province": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_city": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_district": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_address": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_contact": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_phone": {
-                    "type": "string",
-                    "maxLength": 50
-                },
-                "domain_description": {
-                    "type": "string",
-                    "maxLength": 500
-                }
-            }
-        },
-        "机构修改PostBody": {
-            "type": "object",
-            "properties": {
-                "new": {
-                    "type": "object",
-                    "required": [
-                        "domain_id",
-                        "domain",
-                        "created_at",
-                        "updated_at"
-                    ],
-                    "properties": {
-                        "domain_id": {
-                            "type": "integer"
-                        },
-                        "domain": {
-                            "type": "string"
-                        },
-                        "domain_type": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domaintemplate_id": {
-                            "type": "integer",
-                            "nullable": true
-                        },
-                        "domain_name": {
-                            "type": "string"
-                        },
-                        "domain_province": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domain_city": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domain_district": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domain_address": {
-                            "type": "string"
-                        },
-                        "domain_contact": {
-                            "type": "string"
-                        },
-                        "domain_phone": {
-                            "type": "string"
-                        },
-                        "domain_fax": {
-                            "type": "string"
-                        },
-                        "domain_description": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "state": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": "1"
-                        },
-                        "version": {
-                            "type": "integer"
-                        },
-                        "created_at": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "updated_at": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
-                    }
-                },
-                "old": {
-                    "type": "object",
-                    "required": [
-                        "domain_id",
-                        "domain",
-                        "created_at",
-                        "updated_at"
-                    ],
-                    "properties": {
-                        "domain_id": {
-                            "type": "integer"
-                        },
-                        "domain": {
-                            "type": "string"
-                        },
-                        "domain_type": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domaintemplate_id": {
-                            "type": "integer",
-                            "nullable": true
-                        },
-                        "domain_name": {
-                            "type": "string"
-                        },
-                        "domain_province": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domain_city": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domain_district": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "domain_address": {
-                            "type": "string"
-                        },
-                        "domain_contact": {
-                            "type": "string"
-                        },
-                        "domain_phone": {
-                            "type": "string"
-                        },
-                        "domain_fax": {
-                            "type": "string"
-                        },
-                        "domain_description": {
-                            "type": "string",
-                            "nullable": true
-                        },
-                        "state": {
-                            "type": "string",
-                            "nullable": true,
-                            "default": "1"
-                        },
-                        "version": {
-                            "type": "integer"
-                        },
-                        "created_at": {
-                            "type": "string",
-                            "format": "date-time"
-                        },
-                        "updated_at": {
-                            "type": "string",
-                            "format": "date-time"
-                        }
+        "schemas": {
+            "DomainControlsearchPostBody": {
+                "type": "object",
+                "properties": {
+                    "search_text": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "order": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "limit": {
+                        "type": "integer"
+                    },
+                    "offset": {
+                        "type": "integer"
                     }
                 }
-            }
-        },
-        "查询机构菜单PostBody": {
-            "type": "object",
-            "required": [
-                "domain_id"
-            ],
-            "properties": {
-                "domain_id": {
-                    "type": "integer"
+            },
+            "DomainControladdPostBody": {
+                "type": "object",
+                "properties": {
+                    "domain": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domaintemplate_id": {
+                        "type": "integer"
+                    },
+                    "domain_name": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_province": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_city": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_district": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_address": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_contact": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_phone": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "domain_description": {
+                        "type": "string",
+                        "maxLength": 500
+                    }
                 }
-            }
-        },
-        "删除选定项PostBody": {
-            "type": "object",
-            "required": [
-                "domainmenu_id"
-            ],
-            "properties": {
-                "domainmenu_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "修改菜单顺序PostBody": {
-            "type": "object",
-            "properties": {
-                "menus": {
-                    "type": "array",
-                    "items": {
+            },
+            "DomainControlmodifyPostBody": {
+                "type": "object",
+                "properties": {
+                    "new": {
                         "type": "object",
                         "required": [
-                            "domainmenu_id",
-                            "domainmenu_name",
+                            "domain_id",
+                            "domain",
                             "created_at",
                             "updated_at"
                         ],
                         "properties": {
-                            "domainmenu_id": {
+                            "domain_id": {
                                 "type": "integer"
                             },
-                            "domain_id": {
-                                "type": "integer",
-                                "nullable": true
-                            },
-                            "domainmenu_name": {
+                            "domain": {
                                 "type": "string"
                             },
-                            "domainmenu_icon": {
-                                "type": "string"
-                            },
-                            "domainmenu_index": {
-                                "type": "integer",
-                                "default": "0"
-                            },
-                            "api_id": {
-                                "type": "integer",
-                                "nullable": true
-                            },
-                            "api_function": {
-                                "type": "string"
-                            },
-                            "node_type": {
+                            "domain_type": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "parent_id": {
+                            "domaintemplate_id": {
+                                "type": "integer",
+                                "nullable": true
+                            },
+                            "domain_name": {
+                                "type": "string"
+                            },
+                            "domain_province": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "root_show_flag": {
+                            "domain_city": {
                                 "type": "string",
-                                "default": "1"
+                                "nullable": true
+                            },
+                            "domain_district": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "domain_address": {
+                                "type": "string"
+                            },
+                            "domain_contact": {
+                                "type": "string"
+                            },
+                            "domain_phone": {
+                                "type": "string"
+                            },
+                            "domain_fax": {
+                                "type": "string"
+                            },
+                            "domain_description": {
+                                "type": "string",
+                                "nullable": true
                             },
                             "state": {
                                 "type": "string",
@@ -637,6 +340,171 @@
                             "updated_at": {
                                 "type": "string",
                                 "format": "date-time"
+                            }
+                        }
+                    },
+                    "old": {
+                        "type": "object",
+                        "required": [
+                            "domain_id",
+                            "domain",
+                            "created_at",
+                            "updated_at"
+                        ],
+                        "properties": {
+                            "domain_id": {
+                                "type": "integer"
+                            },
+                            "domain": {
+                                "type": "string"
+                            },
+                            "domain_type": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "domaintemplate_id": {
+                                "type": "integer",
+                                "nullable": true
+                            },
+                            "domain_name": {
+                                "type": "string"
+                            },
+                            "domain_province": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "domain_city": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "domain_district": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "domain_address": {
+                                "type": "string"
+                            },
+                            "domain_contact": {
+                                "type": "string"
+                            },
+                            "domain_phone": {
+                                "type": "string"
+                            },
+                            "domain_fax": {
+                                "type": "string"
+                            },
+                            "domain_description": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "state": {
+                                "type": "string",
+                                "nullable": true,
+                                "default": "1"
+                            },
+                            "version": {
+                                "type": "integer"
+                            },
+                            "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            "updated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                            }
+                        }
+                    }
+                }
+            },
+            "DomainControlsearchDomainMenuPostBody": {
+                "type": "object",
+                "required": [
+                    "domain_id"
+                ],
+                "properties": {
+                    "domain_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "DomainControldeleteSelectPostBody": {
+                "type": "object",
+                "required": [
+                    "domainmenu_id"
+                ],
+                "properties": {
+                    "domainmenu_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "DomainControlchangeOrderPostBody": {
+                "type": "object",
+                "properties": {
+                    "menus": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "domainmenu_id",
+                                "domainmenu_name",
+                                "created_at",
+                                "updated_at"
+                            ],
+                            "properties": {
+                                "domainmenu_id": {
+                                    "type": "integer"
+                                },
+                                "domain_id": {
+                                    "type": "integer",
+                                    "nullable": true
+                                },
+                                "domainmenu_name": {
+                                    "type": "string"
+                                },
+                                "domainmenu_icon": {
+                                    "type": "string"
+                                },
+                                "domainmenu_index": {
+                                    "type": "integer",
+                                    "default": "0"
+                                },
+                                "api_id": {
+                                    "type": "integer",
+                                    "nullable": true
+                                },
+                                "api_function": {
+                                    "type": "string"
+                                },
+                                "node_type": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "parent_id": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "root_show_flag": {
+                                    "type": "string",
+                                    "default": "1"
+                                },
+                                "state": {
+                                    "type": "string",
+                                    "nullable": true,
+                                    "default": "1"
+                                },
+                                "version": {
+                                    "type": "integer"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                },
+                                "updated_at": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                }
                             }
                         }
                     }

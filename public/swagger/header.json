@@ -1,13 +1,18 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
+    "title": "Nodejs Service",
     "description": "Nodejs Service",
     "version": "1.0.0",
-    "title": "Nodejs Service",
     "contact": {
       "email": "huliquns@126.com"
     }
   },
-  "basePath": "/",
-  "schemes": ["http", "https"]
+  "servers": [
+    {
+      "url": "http://localhost:9090",
+      "description": "dev"
+    }
+  ],
+  "security": [{ "ApiKeyAuth": [] }]
 }

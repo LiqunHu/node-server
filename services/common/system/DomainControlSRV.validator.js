@@ -7,23 +7,19 @@ module.exports = {
     init: {
       name: '获取机构数据字典',
       enname: 'DomainControlinit',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/init',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        })
       }
     },
     search: {
       name: '机构查询',
       enname: 'DomainControlsearch',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/search',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           search_text: Joi.string()
             .empty('')
@@ -39,12 +35,10 @@ module.exports = {
     addAct: {
       name: '机构增加',
       enname: 'DomainControladd',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/add',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           domain: Joi.string().max(50),
           domaintemplate_id: Joi.number().integer(),
@@ -62,12 +56,10 @@ module.exports = {
     modify: {
       name: '机构修改',
       enname: 'DomainControlmodify',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/modify',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           new: Joi.object().keys(model.model2Schema(model.common_domain)),
           old: Joi.object().keys(model.model2Schema(model.common_domain))
@@ -77,12 +69,10 @@ module.exports = {
     searchDomainMenu: {
       name: '查询机构菜单',
       enname: 'DomainControlsearchDomainMenu',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/searchDomainMenu',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           domain_id: Joi.number()
             .integer()
@@ -93,12 +83,10 @@ module.exports = {
     modifyFolder: {
       name: '修改目录',
       enname: 'DomainControlmodifyFolder',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/modifyFolder',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           new: Joi.object().keys(model.model2Schema(model.common_domainmenu)),
           old: Joi.object().keys(model.model2Schema(model.common_domainmenu))
@@ -108,12 +96,10 @@ module.exports = {
     modifyFolder: {
       name: '删除选定项',
       enname: 'DomainControldeleteSelect',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/deleteSelect',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           domainmenu_id: Joi.number()
             .integer()
@@ -124,12 +110,10 @@ module.exports = {
     addMenus: {
       name: '目录增加菜单',
       enname: 'DomainControladdMenus',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/addMenus',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           domain_id: Joi.number()
             .integer()
@@ -144,12 +128,10 @@ module.exports = {
     addMenus: {
       name: '修改菜单顺序',
       enname: 'DomainControlchangeOrder',
+      tags: ['DomainControl'],
       path: '/api/common/system/DomainControl/changeOrder',
       type: 'post',
       JoiSchema: {
-        header: Joi.object().keys({
-          Authorization: Joi.string().required()
-        }),
         body: Joi.object().keys({
           menus: Joi.array().items(Joi.object().keys(model.model2Schema(model.common_domainmenu)))
         })
