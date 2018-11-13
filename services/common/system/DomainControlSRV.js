@@ -15,7 +15,6 @@ const tb_common_systemmenu = model.common_systemmenu
 
 exports.DomainControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
-  
   if (method === 'init') {
     initAct(req, res)
   } else if (method === 'search') {
