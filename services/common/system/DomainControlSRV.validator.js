@@ -6,7 +6,7 @@ module.exports = {
   apiList: {
     init: {
       name: '获取机构数据字典',
-      path: '/api/common/system/DomainControl?method=init',
+      path: '/api/common/system/DomainControl/init',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -16,7 +16,7 @@ module.exports = {
     },
     search: {
       name: '机构查询',
-      path: '/api/common/system/DomainControl?method=search',
+      path: '/api/common/system/DomainControl/search',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -36,7 +36,7 @@ module.exports = {
     },
     addAct: {
       name: '机构增加',
-      path: '/api/common/system/DomainControl?method=add',
+      path: '/api/common/system/DomainControl/add',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -58,7 +58,7 @@ module.exports = {
     },
     modify: {
       name: '机构修改',
-      path: '/api/common/system/DomainControl?method=modify',
+      path: '/api/common/system/DomainControl/modify',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -72,7 +72,7 @@ module.exports = {
     },
     searchDomainMenu: {
       name: '查询机构菜单',
-      path: '/api/common/system/DomainControl?method=searchDomainMenu',
+      path: '/api/common/system/DomainControl/searchDomainMenu',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -87,7 +87,7 @@ module.exports = {
     },
     modifyFolder: {
       name: '修改目录',
-      path: '/api/common/system/DomainControl?method=modifyFolder',
+      path: '/api/common/system/DomainControl/modifyFolder',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -101,7 +101,7 @@ module.exports = {
     },
     modifyFolder: {
       name: '删除选定项',
-      path: '/api/common/system/DomainControl?method=deleteSelect',
+      path: '/api/common/system/DomainControl/deleteSelect',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -116,7 +116,7 @@ module.exports = {
     },
     addMenus: {
       name: '目录增加菜单',
-      path: '/api/common/system/DomainControl?method=deleteSelect',
+      path: '/api/common/system/DomainControl/deleteSelect',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -135,7 +135,7 @@ module.exports = {
     },
     addMenus: {
       name: '修改菜单顺序',
-      path: '/api/common/system/DomainControl?method=changeOrder',
+      path: '/api/common/system/DomainControl/changeOrder',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({

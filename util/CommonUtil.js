@@ -43,7 +43,7 @@ function docValidate(req) {
 }
 
 function reqTrans(req, callFile) {
-  let method = req.query.method
+  let method = req.params.method
   let validatorFile = callFile.substring(0, callFile.length - 3) + '.validator.js'
   if (fs.existsSync(validatorFile)) {
     let validator = require(validatorFile)

@@ -1,9 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "Identity account",
+    "description": "Nodejs Service",
     "version": "1.0.0",
-    "title": "Identity Service",
+    "title": "Nodejs Service",
     "contact": {
       "email": "huliquns@126.com"
     }
