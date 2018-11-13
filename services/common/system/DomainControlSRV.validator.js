@@ -6,6 +6,7 @@ module.exports = {
   apiList: {
     init: {
       name: '获取机构数据字典',
+      enname: 'DomainControlinit',
       path: '/api/common/system/DomainControl/init',
       type: 'post',
       JoiSchema: {
@@ -16,6 +17,7 @@ module.exports = {
     },
     search: {
       name: '机构查询',
+      enname: 'DomainControlsearch',
       path: '/api/common/system/DomainControl/search',
       type: 'post',
       JoiSchema: {
@@ -36,6 +38,7 @@ module.exports = {
     },
     addAct: {
       name: '机构增加',
+      enname: 'DomainControladd',
       path: '/api/common/system/DomainControl/add',
       type: 'post',
       JoiSchema: {
@@ -58,6 +61,7 @@ module.exports = {
     },
     modify: {
       name: '机构修改',
+      enname: 'DomainControlmodify',
       path: '/api/common/system/DomainControl/modify',
       type: 'post',
       JoiSchema: {
@@ -72,6 +76,7 @@ module.exports = {
     },
     searchDomainMenu: {
       name: '查询机构菜单',
+      enname: 'DomainControlsearchDomainMenu',
       path: '/api/common/system/DomainControl/searchDomainMenu',
       type: 'post',
       JoiSchema: {
@@ -87,6 +92,7 @@ module.exports = {
     },
     modifyFolder: {
       name: '修改目录',
+      enname: 'DomainControlmodifyFolder',
       path: '/api/common/system/DomainControl/modifyFolder',
       type: 'post',
       JoiSchema: {
@@ -101,6 +107,7 @@ module.exports = {
     },
     modifyFolder: {
       name: '删除选定项',
+      enname: 'DomainControldeleteSelect',
       path: '/api/common/system/DomainControl/deleteSelect',
       type: 'post',
       JoiSchema: {
@@ -116,7 +123,8 @@ module.exports = {
     },
     addMenus: {
       name: '目录增加菜单',
-      path: '/api/common/system/DomainControl/deleteSelect',
+      enname: 'DomainControladdMenus',
+      path: '/api/common/system/DomainControl/addMenus',
       type: 'post',
       JoiSchema: {
         header: Joi.object().keys({
@@ -135,6 +143,7 @@ module.exports = {
     },
     addMenus: {
       name: '修改菜单顺序',
+      enname: 'DomainControlchangeOrder',
       path: '/api/common/system/DomainControl/changeOrder',
       type: 'post',
       JoiSchema: {
