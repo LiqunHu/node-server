@@ -16,7 +16,6 @@ const MongoCli = require('./MongoClient')
 let FileResource = async (req, res) => {
   try {
     let fileName = req.params.filetag
-    let ext = path.extname(fileName)
 
     let bucket = await MongoCli.getBucket()
     let downloadStream = bucket.openDownloadStreamByName(fileName)
@@ -44,12 +43,7 @@ function ImageCropperSave(req) {
               MongoCli.getBucket().then(bucket => {
                 let uploadStream = bucket.openUploadStream(filename)
                 let outStream = gm(files.cropper_file[0].path)
-                  .crop(
-                    cropper_data.width,
-                    cropper_data.height,
-                    cropper_data.x,
-                    cropper_data.y
-                  )
+                  .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
                   .rotate('white', cropper_data.rotate)
                   .stream('.jpg')
                 outStream.on('end', function() {
@@ -64,21 +58,16 @@ function ImageCropperSave(req) {
             } else {
               let today = new Date()
               let relPath = 'upload/' + moment().format('YYYY/MM/DD/')
-              let svPath = path.join(
-                __dirname,
-                '../' + config.filesDir + '/' + relPath
-              )
+              let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
               if (!fs.existsSync(svPath)) {
-                mkdirssync(svPath)
+                let result = fs.mkdirSync(svPath, { recursive: true })
+                if (result) {
+                  reject(result)
+                }
               }
               gm(files.cropper_file[0].path)
                 .setFormat('jpeg')
-                .crop(
-                  cropper_data.width,
-                  cropper_data.height,
-                  cropper_data.x,
-                  cropper_data.y
-                )
+                .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
                 .rotate('white', cropper_data.rotate)
                 .write(path.join(svPath, filename), function(err) {
                   if (!err) resolve(config.fileUrlBase + relPath + filename)
@@ -131,12 +120,12 @@ function fileSave(req) {
               })
             } else {
               let relPath = 'upload/' + moment().format('YYYY/MM/DD/')
-              let svPath = path.join(
-                __dirname,
-                '../' + config.filesDir + '/' + relPath
-              )
+              let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
               if (!fs.existsSync(svPath)) {
-                mkdirssync(svPath)
+                let result = fs.mkdirSync(svPath, { recursive: true })
+                if (result) {
+                  reject(result)
+                }
               }
               fs.renameSync(files.file[0].path, path.join(svPath, filename))
               resolve({
@@ -159,35 +148,33 @@ function fileSave(req) {
   })
 }
 
-function mkdirssync(dirpath) {
-  try {
-    if (!fs.existsSync(dirpath)) {
-      let pathtmp
-      dirpath.split(/[/\\]/).forEach(function(dirname) {
-        //这里指用/ 或\ 都可以分隔目录  如  linux的/usr/local/services   和windows的 d:\temp\aaaa
-        if (dirname) {
-          if (pathtmp) {
-            pathtmp = path.join(pathtmp, dirname)
-          } else {
-            pathtmp = '/' + dirname
+function fileDeleteByUrl(url) {
+  return new Promise(function(resolve, reject) {
+    let fileSys = url.substring(0, 9)
+    if (fileSys === '/filesys/') {
+      MongoCli.getBucket().then(bucket => {
+        let fileName = url.substring(9, url.length)
+        bucket.find({ filename: url.substring(9, url.length) }).toArray(function(err, docs) {
+          if (err) {
+            reject(err)
           }
-          if (!fs.existsSync(pathtmp)) {
-            if (!fs.mkdirSync(pathtmp)) {
-              return false
+          bucket.delete(docs[0]._id, function(err, result) {
+            if (err) {
+              reject(err)
             }
-          }
-        }
+            resolve()
+          })
+        })
       })
+    } else {
+      let relPath = url.substring(7, url.length)
     }
-    return true
-  } catch (e) {
-    logger.error('create director fail! path=' + dirpath + ' errorMsg:' + e)
-    return false
-  }
+  })
 }
 
 module.exports = {
   FileResource: FileResource,
   ImageCropperSave: ImageCropperSave,
-  fileSave: fileSave
+  fileSave: fileSave,
+  fileDeleteByUrl: fileDeleteByUrl
 }
