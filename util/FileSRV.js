@@ -192,7 +192,7 @@ function fileSaveTemp(req) {
           if (files.file) {
             resolve({
               name: files.file[0].originalFilename,
-              ext: ext,
+              ext: path.extname(files.file[0].path),
               url: config.tmpUrlBase + files.file[0].name,
               type: mime.lookup(path.extname(files.file[0].path))
             })
