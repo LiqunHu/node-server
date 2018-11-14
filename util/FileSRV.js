@@ -150,24 +150,105 @@ function fileSave(req) {
 
 function fileDeleteByUrl(url) {
   return new Promise(function(resolve, reject) {
-    let fileSys = url.substring(0, 9)
-    if (fileSys === '/filesys/') {
+    let fileSys = url.substring(0, config.fsUrlBase.length)
+    if (fileSys === config.fsUrlBase) {
       MongoCli.getBucket().then(bucket => {
-        let fileName = url.substring(9, url.length)
-        bucket.find({ filename: url.substring(9, url.length) }).toArray(function(err, docs) {
-          if (err) {
-            reject(err)
-          }
-          bucket.delete(docs[0]._id, function(err, result) {
+        let fileName = url.substring(config.fsUrlBase.length, url.length)
+        bucket
+          .find({ filename: url.substring(config.fsUrlBase.length, url.length) })
+          .toArray(function(err, docs) {
             if (err) {
               reject(err)
             }
-            resolve()
+            bucket.delete(docs[0]._id, function(err, result) {
+              if (err) {
+                reject(err)
+              }
+              resolve()
+            })
           })
-        })
       })
     } else {
-      let relPath = url.substring(7, url.length)
+      let relPath = url.substring(config.fileUrlBase.length, url.length)
+      let filePath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
+      let err = fs.unlinkSync(filePath)
+      if (err) {
+        reject(err)
+      }
+      resolve()
+    }
+  })
+}
+
+function fileSaveTemp(req) {
+  return new Promise(function(resolve, reject) {
+    if (req.is('multipart/*')) {
+      try {
+        let form = new multiparty.Form(config.uploadOptions)
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            reject(err)
+          }
+          if (files.file) {
+            resolve({
+              name: files.file[0].originalFilename,
+              ext: ext,
+              url: config.tmpUrlBase + files.file[0].name,
+              type: mime.lookup(path.extname(files.file[0].path))
+            })
+          } else {
+            reject('no file')
+          }
+        })
+      } catch (error) {
+        reject(error)
+      }
+    } else {
+      reject('content-type error')
+    }
+  })
+}
+
+function fileMove(url) {
+  return new Promise(function(resolve, reject) {
+    let fileSys = url.substring(0, config.tmpUrlBase.length)
+    if (fileSys === config.tmpUrlBase) {
+      let ext = path.extname(url)
+      let tempName = path.basename(url)
+      let tempfile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + tempName)
+      let filename = uuid.v4() + ext
+      if (config.mongoFileFlag) {
+        MongoCli.getBucket().then(bucket => {
+          let uploadStream = bucket.openUploadStream(filename)
+          let readStream = fs.createReadStream(tempfile)
+          readStream.on('end', function() {
+            fs.unlinkSync(tempfile)
+            resolve({
+              url: config.fsUrlBase + filename
+            })
+          })
+
+          readStream.on('error', function(err) {
+            reject(err)
+          })
+          readStream.pipe(uploadStream)
+        })
+      } else {
+        let relPath = 'upload/' + moment().format('YYYY/MM/DD/')
+        let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath)
+        if (!fs.existsSync(svPath)) {
+          let result = fs.mkdirSync(svPath, { recursive: true })
+          if (result) {
+            reject(result)
+          }
+        }
+        fs.renameSync(tempfile, path.join(svPath, filename))
+        resolve({
+          url: config.fileUrlBase + relPath + filename
+        })
+      }
+    } else {
+      reject('url error')
     }
   })
 }
@@ -176,5 +257,7 @@ module.exports = {
   FileResource: FileResource,
   ImageCropperSave: ImageCropperSave,
   fileSave: fileSave,
-  fileDeleteByUrl: fileDeleteByUrl
+  fileDeleteByUrl: fileDeleteByUrl,
+  fileSaveTemp: fileSaveTemp,
+  fileMove: fileMove
 }
