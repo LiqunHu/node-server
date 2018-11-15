@@ -69,6 +69,17 @@ const config = {
   },
   // schedule Flag
   scheduleFlag: false,
+  rpcservers: {
+    'pooltest': {
+      host: '127.0.0.1',
+      port: 9090,
+      config: {
+        max: 10, // maximum size of the pool
+        min: 3 // minimum size of the pool
+      },
+      desc: '内部连接池测试'
+    }
+  },
   weixin: {
     appid: 'wx1bf0976923162a6b',
     app_secret: 'f03e63ca1aca1c007b5915b54b6ec8c7'
