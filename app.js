@@ -3,12 +3,14 @@ const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
+const app = express()
+const cors = require('cors')
+const ejs = require('ejs')
+
 
 const config = require('./config')
 
-let app = express()
-let cors = require('cors')
-let ejs = require('ejs')
+
 
 let authority = require('./util/Authority')
 let AuthSRV = require('./util/AuthSRV')
