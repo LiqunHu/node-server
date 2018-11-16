@@ -1,74 +1,65 @@
+const _ = require('lodash')
 const genericPool = require('generic-pool')
 const WebSocket = require('ws')
 
 const config = require('../config')
 const logger = require('./Logger').createLogger('RPCServerClient')
 
-/**
- * Step 1 - Create pool using a factory object
- */
+let RPCPools = {}
+if (_.isEmpty(RPCPools)) {
+  for (let s in config.rpcservers) {
+    const factory = {
+      create: () => {
+        return new Promise((resolve, reject) => {
+          const ws = new WebSocket(
+            'ws://' + config.rpcservers[s].host + ':' + config.rpcservers[s].port
+          )
+          ws.on('open', function open() {
+            logger.info('%s connected', s)
+            resolve(ws)
+          })
 
-const opts = {
-  max: 10, // maximum size of the pool
-  min: 3 // minimum size of the pool
+          ws.on('close', function close(code, reason) {
+            logger.info('%s connected: %d  %s', s, code, reason)
+            RPCPools[s].destroy(ws)
+          })
+        })
+      },
+      destroy: function(client) {
+        ws.terminate()
+      }
+    }
+    RPCPools[s] = {}
+    RPCPools[s].pool = genericPool.createPool(factory, config.rpcservers[s].config)
+  }
 }
 
-const RPCPools = {}
-for (let s in config.rpcservers) {
-  const factory = {
-    create: () => {
-      return new Promise((resolve, reject) => {
-        const ws = new WebSocket(
-          'ws://' + config.rpcservers[s].host + ':' + config.rpcservers[s].port
-        )
-        ws.on('open', function open() {
-          logger.info('%s connected', s)
-          resolve(ws)
-        })
-
-        ws.on('close', function close(code, reason) {
-          logger.info('%s connected: %d  %s', s, code, reason)
-          RPCPools[s].destroy(ws)
-        })
-
+// Message
+exports.ServerRequest = (server, message) => {
+  return new Promise((resolve, reject) => {
+    RPCPools[server].pool.acquire()
+      .then(function(ws) {
+        function incomingHandler(msg) {
+          RPCPools[server].pool.release(ws)
+          ws.removeListener('message', incomingHandler)
+          // console.log(RPCPools[server].pool.available)
+          // console.log(RPCPools[server].pool.size)
+          // console.log(RPCPools[server].pool.borrowed)
+          resolve(message)
+        }
+        ws.on('message', incomingHandler)
         ws.on('error', function error(error) {
           logger.info('%s connected: %s', s, error)
-          RPCPools[s].destroy(ws)
+          RPCPools[server].pool.destroy(ws)
+          reject(message)
         })
+        ws.send('1111')
       })
-    },
-    destroy: function(client) {
-      client.disconnect()
-    }
-  }
-  RPCPools[s] = genericPool.createPool(factory, config.rpcservers[s].config)
+      .catch(function(err) {
+        // handle error - this is generally a timeout or maxWaitingClients
+        // error
+        console.log(err)
+        reject(err)
+      })
+  })
 }
-
-/**
- * Step 2 - Use pool in your code to acquire/release resources
- */
-
-// acquire connection - Promise is resolved
-// once a resource becomes available
-const resourcePromise = myPool.acquire()
-
-resourcePromise
-  .then(function(client) {
-    client.query('select * from foo', [], function() {
-      // return object back to pool
-      myPool.release(client)
-    })
-  })
-  .catch(function(err) {
-    // handle error - this is generally a timeout or maxWaitingClients
-    // error
-  })
-
-/**
- * Step 3 - Drain pool during shutdown (optional)
- */
-// Only call this once in your application -- at the point you want
-// to shutdown and stop using this pool.
-myPool.drain().then(function() {
-  myPool.clear()
-})

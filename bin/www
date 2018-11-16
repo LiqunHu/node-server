@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-const app = require('../app')
-const schedule = require('../schedule')
-const config = require('../config')
 const debug = require('debug')('demo:server')
 const http = require('http')
 const url = require('url')
 const WebSocket = require('ws')
+
+const app = require('../app')
+const schedule = require('../schedule')
+const config = require('../config')
 let port = 9090
 
 /**
@@ -40,6 +41,7 @@ wss.on('connection', function connection(ws, req) {
 
   ws.on('message', function incoming(message) {
     console.log('received: %s', message)
+    ws.send('2222222')
   })
 
   ws.on('pong', heartbeat)

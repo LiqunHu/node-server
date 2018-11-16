@@ -20,4 +20,5 @@ router.post('/system/OperatorControl/:method', services.OperatorControlSRV.Opera
 router.post('/system/UserSetting/:method', services.UserSettingSRV.UserSettingResource)
 router.post('/system/ResetPassword/:method', services.UserResetPasswordSRV.UserResetPasswordResource)
 
+router.post('/test/:method', services.TestSRV.TestResource)
 module.exports = router
