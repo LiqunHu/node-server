@@ -8,7 +8,6 @@ const config = require('../config')
 const GLBConfig = require('./GLBConfig')
 
 // table
-const sequelize = model.sequelize
 const tb_common_userlog = model.common_userlog
 
 exports.token2user = async req => {

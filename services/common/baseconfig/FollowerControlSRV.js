@@ -75,25 +75,15 @@ async function searchAct(req, res) {
       queryStr += " and a.effect_state = '0'"
     }
 
-    let result = await model.queryWithCount(
-      doc,
-      queryStr,
-      replacements
-    )
+    let result = await model.queryWithCount(doc, queryStr, replacements)
 
     returnData.total = result.count
     returnData.rows = []
     for (let r of result.data) {
       let result = JSON.parse(JSON.stringify(r))
-      if (
-        result.effect_state === GLBConfig.DISABLE &&
-        result.state === GLBConfig.DISABLE
-      ) {
+      if (result.effect_state === GLBConfig.DISABLE && result.state === GLBConfig.DISABLE) {
         result.follow_state = '申请关注'
-      } else if (
-        result.effect_state === GLBConfig.DISABLE &&
-        result.state === GLBConfig.ENABLE
-      ) {
+      } else if (result.effect_state === GLBConfig.DISABLE && result.state === GLBConfig.ENABLE) {
         result.follow_state = '取消关注'
       }
       returnData.rows.push(result)

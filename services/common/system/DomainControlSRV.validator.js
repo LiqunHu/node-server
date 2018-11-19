@@ -138,9 +138,11 @@ module.exports = {
       type: 'post',
       JoiSchema: {
         body: Joi.object().keys({
-          menus: Joi.array().items(Joi.object().keys({
-            domainmenu_id: Joi.number().integer()
-          }))
+          menus: Joi.array().items(
+            Joi.object().keys({
+              domainmenu_id: Joi.number().integer()
+            })
+          )
         })
       }
     }

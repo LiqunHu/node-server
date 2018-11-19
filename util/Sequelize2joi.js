@@ -2,7 +2,17 @@ const _ = require('lodash')
 const Joi = require('joi')
 const Sequelize = require('sequelize')
 
-const VALID_GEOJSON_TYPES = ['Point', 'Linestring', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon', 'GeometryCollection', 'FeatureCollection', 'Feature']
+const VALID_GEOJSON_TYPES = [
+  'Point',
+  'Linestring',
+  'Polygon',
+  'MultiPoint',
+  'MultiLineString',
+  'MultiPolygon',
+  'GeometryCollection',
+  'FeatureCollection',
+  'Feature'
+]
 
 function createGeoJSONValidator() {
   let geojsonBasic = Joi.object({
@@ -150,7 +160,11 @@ function map(attribute) {
     joi = joi.allow(null)
   }
 
-  if (typeof attribute.defaultValue !== 'undefined' && !_.isObject(attribute.defaultValue) && !_.isFunction(attribute.defaultValue)) {
+  if (
+    typeof attribute.defaultValue !== 'undefined' &&
+    !_.isObject(attribute.defaultValue) &&
+    !_.isFunction(attribute.defaultValue)
+  ) {
     joi = joi.optional().default(attribute.defaultValue)
   }
 
@@ -199,7 +213,11 @@ function findAndConvertModels(object, options) {
   _.forIn(object, (value, key) => {
     if (value.hasOwnProperty('prototype') && value.prototype instanceof Sequelize.Model) {
       object[key] = sequelizeToJoi(value, options)
-    } else if (_.isArray(value) && (_.first(value).hasOwnProperty('prototype') && _.first(value).prototype instanceof Sequelize.Model)) {
+    } else if (
+      _.isArray(value) &&
+      (_.first(value).hasOwnProperty('prototype') &&
+        _.first(value).prototype instanceof Sequelize.Model)
+    ) {
       object[key] = Joi.array().items(sequelizeToJoi(_.first(value), options))
     } else if (_.isObject(value)) {
       object[key] = findAndConvertModels(value, options)

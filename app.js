@@ -7,10 +7,7 @@ const app = express()
 const cors = require('cors')
 const ejs = require('ejs')
 
-
 const config = require('./config')
-
-
 
 let authority = require('./util/Authority')
 let AuthSRV = require('./util/AuthSRV')

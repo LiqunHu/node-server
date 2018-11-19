@@ -40,12 +40,11 @@ exports.ServerRequest = (server, message) => {
     RPCPools[server].pool.acquire()
       .then(function(ws) {
         function incomingHandler(msg) {
+          logger.info(RPCPools[server].pool.available)
+          logger.info(RPCPools[server].pool.size)
+          logger.info(RPCPools[server].pool.borrowed)
           RPCPools[server].pool.release(ws)
           ws.removeListener('message', incomingHandler)
-          // console.log(RPCPools[server].pool.available)
-          // console.log(RPCPools[server].pool.size)
-          // console.log(RPCPools[server].pool.borrowed)
-          // console.log(msg)
           resolve(JSON.parse(msg))
         }
         ws.on('message', incomingHandler)

@@ -40,15 +40,9 @@ async function searchAct(req, res) {
     for (let r of result) {
       let row = JSON.parse(JSON.stringify(r))
 
-      if (
-        row.effect_state === GLBConfig.ENABLE &&
-        row.state === GLBConfig.ENABLE
-      ) {
+      if (row.effect_state === GLBConfig.ENABLE && row.state === GLBConfig.ENABLE) {
         row.follow_state = '关注'
-      } else if (
-        row.effect_state === GLBConfig.DISABLE &&
-        row.state === GLBConfig.DISABLE
-      ) {
+      } else if (row.effect_state === GLBConfig.DISABLE && row.state === GLBConfig.DISABLE) {
         row.follow_state = '关注申请中'
       }
 
@@ -65,18 +59,12 @@ async function searchAct(req, res) {
                       `
     let dereplacements = [doc.api_name, user.domain_id]
 
-    let deresult = await model.simpleSelect(
-      dequeryStr,
-      dereplacements
-    )
+    let deresult = await model.simpleSelect(dequeryStr, dereplacements)
 
     for (let r of deresult) {
       let row = JSON.parse(JSON.stringify(r))
 
-      if (
-        row.effect_state === GLBConfig.DISABLE &&
-        row.state === GLBConfig.ENABLE
-      ) {
+      if (row.effect_state === GLBConfig.DISABLE && row.state === GLBConfig.ENABLE) {
         row.follow_state = '取消关注中'
       }
       returnData.defollow_list.push(row)
@@ -134,19 +122,10 @@ async function modifyAct(req, res) {
     let rids = []
     for (let rf of rFowllow) {
       rids.push(rf.follow_domain_id)
-      if (
-        rf.effect_state === GLBConfig.DISABLE &&
-        rf.state === GLBConfig.DISABLE
-      ) {
+      if (rf.effect_state === GLBConfig.DISABLE && rf.state === GLBConfig.DISABLE) {
         await rf.destroy()
-      } else if (
-        rf.effect_state === GLBConfig.DISABLE &&
-        rf.state === GLBConfig.ENABLE
-      ) {
-      } else if (
-        rf.effect_state === GLBConfig.ENABLE &&
-        rf.state === GLBConfig.ENABLE
-      ) {
+      } else if (rf.effect_state === GLBConfig.DISABLE && rf.state === GLBConfig.ENABLE) {
+      } else if (rf.effect_state === GLBConfig.ENABLE && rf.state === GLBConfig.ENABLE) {
         rf.effect_state = GLBConfig.DISABLE
         rf.user_id = user.user_id
         await rf.save()
@@ -178,10 +157,7 @@ async function modifyAct(req, res) {
       let addFlag = true
       for (let mf of mFowllow) {
         if (d.follow_domain_id === mf.follow_domain_id) {
-          if (
-            mf.effect_state === GLBConfig.DISABLE &&
-            mf.state === GLBConfig.ENABLE
-          ) {
+          if (mf.effect_state === GLBConfig.DISABLE && mf.state === GLBConfig.ENABLE) {
             mf.effect_state = GLBConfig.ENABLE
             await mf.save()
           }
