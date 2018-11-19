@@ -2,6 +2,7 @@
 const debug = require('debug')('demo:server')
 const http = require('http')
 const url = require('url')
+const _ = require('lodash')
 const WebSocket = require('ws')
 
 const app = require('../app')
@@ -41,14 +42,30 @@ wss.on('connection', function connection(ws, req) {
   ws.authorization = location.query.authorization
 
   ws.on('message', async function incoming(message) {
-    let resopnse = {}
+    let req = {
+        WebSocket: true,
+        params: {
+          method: ''
+        },
+        body: {}
+      },
+      res = {
+        WebSocket: true,
+        errno: 0,
+        msg: 'ok',
+        info: {}
+      }
     let request = JSON.parse(message)
-    if (request.url in wsrouter) {
-      resopnse = await wsrouter[request.url](request.method ,request.reqMessage)
+    req.params.method = _.last(_.split(request.url, '/'))
+    req.body = request.message
+    let url = request.url.substring(0, request.url.length - req.params.method.length - 1)
+    if (url in wsrouter) {
+      await wsrouter[url](req, res)
     } else {
-      resopnse = {error:1}
+      res.errno = -1
+      res.msg = 'url is not in router list'
     }
-    ws.send(JSON.stringify(resopnse))
+    ws.send(JSON.stringify(res))
   })
 
   ws.on('pong', heartbeat)

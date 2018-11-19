@@ -4,20 +4,22 @@ const config = require('../../config')
 const model = require('../../model')
 const RPCServer = require('../../util/RPCServerClient')
 
-exports.TestResource = async (method, req) => {
-  let res = {}
+exports.TestResource = async (req, res) => {
+  let method = common.reqTrans(req, __filename)
   if (method === 'search') {
-    res = await searchAct(req)
+    await searchAct(req, res)
   } else {
     common.sendError(res, 'common_01')
   }
-  return res
 }
 
-async function searchAct(req) {
+async function searchAct(req, res) {
   try {
-    return { result: 1 }
+    let doc = common.docValidate(req)
+    console.log(doc)
+    JSON.parse('{{')
+    common.sendData(res, { aaa: 111111 })
   } catch (error) {
-    return { result: -1 }
+    common.sendFault(res, error)
   }
 }

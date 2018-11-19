@@ -35,14 +35,15 @@ if (_.isEmpty(RPCPools)) {
 }
 
 // Message
-exports.ServerRequest = (server, message) => {
+exports.ServerRequest = (server, url, message) => {
   return new Promise((resolve, reject) => {
-    RPCPools[server].pool.acquire()
+    RPCPools[server].pool
+      .acquire()
       .then(function(ws) {
         function incomingHandler(msg) {
-          logger.info(RPCPools[server].pool.available)
-          logger.info(RPCPools[server].pool.size)
-          logger.info(RPCPools[server].pool.borrowed)
+          // logger.info(RPCPools[server].pool.available)
+          // logger.info(RPCPools[server].pool.size)
+          // logger.info(RPCPools[server].pool.borrowed)
           RPCPools[server].pool.release(ws)
           ws.removeListener('message', incomingHandler)
           resolve(JSON.parse(msg))
@@ -53,7 +54,7 @@ exports.ServerRequest = (server, message) => {
           RPCPools[server].pool.destroy(ws)
           reject(message)
         })
-        ws.send(JSON.stringify(message))
+        ws.send(JSON.stringify({ url: url, message: message }))
       })
       .catch(function(err) {
         // handle error - this is generally a timeout or maxWaitingClients

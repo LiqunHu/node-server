@@ -20,7 +20,7 @@ function readDirSync(path) {
   })
 }
 
-readDirSync('/../wsservices')
+readDirSync('/../services')
 
 module.exports = {}
 

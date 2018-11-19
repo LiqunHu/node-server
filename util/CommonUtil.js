@@ -49,7 +49,7 @@ function reqTrans(req, callFile) {
     let validator = require(validatorFile)
     if (validator.apiList[method]) {
       let reqJoiSchema = validator.apiList[method].JoiSchema
-      if(reqJoiSchema.body) {
+      if (reqJoiSchema.body) {
         req.JoiSchema = reqJoiSchema.body
       }
     }
@@ -60,49 +60,68 @@ function reqTrans(req, callFile) {
 
 // common response
 function sendData(res, data) {
-  let datares = arguments[1] ? arguments[1] : {}
-  let sendData = {
-    errno: 0,
-    msg: 'ok',
-    info: datares
+  if ('WebSocket' in res) {
+    res.info = data
+  } else {
+    let datares = arguments[1] ? arguments[1] : {}
+    let sendData = {
+      errno: 0,
+      msg: 'ok',
+      info: datares
+    }
+    res.send(sendData)
   }
-  res.send(sendData)
 }
 
 function sendError(res, errno, msg = '错误未配置') {
   let errnores = arguments[1] ? arguments[1] : -1
   let msgres = arguments[2] ? arguments[2] : 'error'
-  let sendData
-  if (errnores in Error) {
-    sendData = {
-      errno: errnores,
-      msg: Error[errnores]
+  if ('WebSocket' in res) {
+    res.errno = errnores
+    if (errnores in Error) {
+      res.msg = Error[errnores]
+    } else {
+      res.msg = msg
     }
   } else {
-    sendData = {
-      errno: errnores,
-      msg: msg
+    let sendData
+    if (errnores in Error) {
+      sendData = {
+        errno: errnores,
+        msg: Error[errnores]
+      }
+    } else {
+      sendData = {
+        errno: errnores,
+        msg: msg
+      }
     }
+    res.status(700).send(sendData)
   }
-  res.status(700).send(sendData)
 }
 
 function sendFault(res, msg) {
   let msgres = arguments[1] ? arguments[1] : 'Internal Error'
   let sendData = {}
   logger.error(msg)
-  if (process.env.NODE_ENV === 'test') {
-    sendData = {
-      errno: -1,
-      msg: msgres.message
-    }
+
+  if ('WebSocket' in res) {
+    res.errno = -1
+    res.msg = msgres.message
   } else {
-    sendData = {
-      errno: -1,
-      msg: 'Internal Error'
+    if (process.env.NODE_ENV === 'test') {
+      sendData = {
+        errno: -1,
+        msg: msgres.message
+      }
+    } else {
+      sendData = {
+        errno: -1,
+        msg: 'Internal Error'
+      }
     }
+    res.status(500).send(sendData)
   }
-  res.status(500).send(sendData)
 }
 
 // function fileMove(url, mode) {
@@ -334,7 +353,10 @@ function ejs2File(templateFile, renderData, options, outputType, res) {
       }
 
       data.basedir = path.join(__dirname, '../printTemplate')
-      let ejsFile = fs.readFileSync(path.join(__dirname, '../printTemplate/' + templateFile), 'utf8')
+      let ejsFile = fs.readFileSync(
+        path.join(__dirname, '../printTemplate/' + templateFile),
+        'utf8'
+      )
       let html = ejs.render(ejsFile, data)
 
       if (options.htmlFlag || outputType === 'htmlurl') {

@@ -8,6 +8,8 @@ exports.TestResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
   if (method === 'search') {
     searchAct(req, res)
+  } else if (method === 'search2') {
+    search2Act(req, res)
   } else {
     common.sendError(res, 'common_01')
   }
@@ -15,11 +17,16 @@ exports.TestResource = (req, res) => {
 
 async function searchAct(req, res) {
   try {
-    let response = await RPCServer.ServerRequest('pooltest', {
-      url: '/common/test',
-      method: 'search',
-      reqMessage: { a: 1, b: 2 }
-    })
+    let doc = common.docValidate(req)
+    common.sendData(res, { aaaa: 1111 })
+  } catch (error) {
+    common.sendFault(res, error)
+  }
+}
+
+async function search2Act(req, res) {
+  try {
+    let response = await RPCServer.ServerRequest('pooltest', '/common/test/search', { a: 1, b: 2 })
     common.sendData(res, response)
   } catch (error) {
     common.sendFault(res, error)
