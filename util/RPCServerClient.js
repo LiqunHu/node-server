@@ -45,7 +45,8 @@ exports.ServerRequest = (server, message) => {
           // console.log(RPCPools[server].pool.available)
           // console.log(RPCPools[server].pool.size)
           // console.log(RPCPools[server].pool.borrowed)
-          resolve(message)
+          // console.log(msg)
+          resolve(JSON.parse(msg))
         }
         ws.on('message', incomingHandler)
         ws.on('error', function error(error) {
@@ -53,7 +54,7 @@ exports.ServerRequest = (server, message) => {
           RPCPools[server].pool.destroy(ws)
           reject(message)
         })
-        ws.send('1111')
+        ws.send(JSON.stringify(message))
       })
       .catch(function(err) {
         // handle error - this is generally a timeout or maxWaitingClients

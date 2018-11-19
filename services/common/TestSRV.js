@@ -15,8 +15,12 @@ exports.TestResource = (req, res) => {
 
 async function searchAct(req, res) {
   try {
-    let response = await RPCServer.ServerRequest('pooltest', { 11: 11 })
-    common.sendData(res)
+    let response = await RPCServer.ServerRequest('pooltest', {
+      url: '/common/test',
+      method: 'search',
+      reqMessage: { a: 1, b: 2 }
+    })
+    common.sendData(res, response)
   } catch (error) {
     common.sendFault(res, error)
   }

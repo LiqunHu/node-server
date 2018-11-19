@@ -7,6 +7,7 @@ const WebSocket = require('ws')
 const app = require('../app')
 const schedule = require('../schedule')
 const config = require('../config')
+const wsrouter = require('../wsroutes')
 let port = 9090
 
 /**
@@ -39,9 +40,17 @@ wss.on('connection', function connection(ws, req) {
   // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
   ws.authorization = location.query.authorization
 
-  ws.on('message', function incoming(message) {
+  ws.on('message', async function incoming(message) {
+    let resopnse = {}
+    let request = JSON.parse(message)
+    if (request.url in wsrouter) {
+      resopnse = await wsrouter[request.url](request.method ,request.reqMessage)
+    } else {
+      resopnse = {error:1}
+    }
     console.log('received: %s', message)
-    ws.send('2222222')
+    console.log(wsrouter)
+    ws.send(JSON.stringify(resopnse))
   })
 
   ws.on('pong', heartbeat)
