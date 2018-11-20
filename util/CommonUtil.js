@@ -14,15 +14,8 @@ const config = require('../config')
 const Error = require('./Error')
 const logger = require('./Logger').createLogger('CommonUtil.js')
 
-// String trim
-String.prototype.trim = function() {
-  //return this.replace(/[(^\s+)(\s+$)]/g,"");//會把字符串中間的空白符也去掉
-  //return this.replace(/^\s+|\s+$/g,""); //
-  return this.replace(/^\s+/g, '').replace(/\s+$/g, '')
-}
-
 // common response
-function docValidate(req) {
+const docValidate = req => {
   let doc = req.body
   if (req.JoiSchema) {
     let result = Joi.validate(doc, req.JoiSchema)
@@ -34,15 +27,9 @@ function docValidate(req) {
   } else {
     return doc
   }
-  // for (let idx in doc) {
-  //   //不使用过滤
-  //   if (typeof doc[idx] == 'string') {
-  //     doc[idx] = doc[idx].trim()
-  //   }
-  // }
 }
 
-function reqTrans(req, callFile) {
+const reqTrans = (req, callFile) => {
   let method = req.params.method
   let validatorFile = callFile.substring(0, callFile.length - 3) + '.validator.js'
   if (fs.existsSync(validatorFile)) {
@@ -59,7 +46,7 @@ function reqTrans(req, callFile) {
 }
 
 // common response
-function sendData(res, data) {
+const sendData = (res, data) => {
   if ('WebSocket' in res) {
     res.info = data
   } else {
@@ -73,7 +60,7 @@ function sendData(res, data) {
   }
 }
 
-function sendError(res, errno, msg = '错误未配置') {
+const sendError = (res, errno, msg = '错误未配置') => {
   let errnores = arguments[1] ? arguments[1] : -1
   let msgres = arguments[2] ? arguments[2] : 'error'
   if ('WebSocket' in res) {
@@ -100,7 +87,7 @@ function sendError(res, errno, msg = '错误未配置') {
   }
 }
 
-function sendFault(res, msg) {
+const sendFault = (res, msg) => {
   let msgres = arguments[1] ? arguments[1] : 'Internal Error'
   let sendData = {}
   logger.error(msg)
@@ -124,142 +111,7 @@ function sendFault(res, msg) {
   }
 }
 
-// function fileMove(url, mode) {
-//   return new Promise(async function (resolve, reject) {
-//     if (url) {
-//       let fileName = path.basename(url)
-//       let relPath = ''
-//       let today = new Date()
-//       if (mode == 'avatar') {
-//         relPath = 'avatar/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-//       } else if (mode == 'upload') {
-//         relPath = 'upload/' + today.getFullYear() + '/' + today.getMonth() + '/' + today.getDate() + '/'
-//       } else {
-//         reject('mode error');
-//       }
-
-//       let svPath = path.join(__dirname, '../' + config.filesDir + '/' + relPath);
-
-//       if (!fs.existsSync(svPath)) {
-//         mkdirssync(svPath)
-//       }
-
-//       let tempfile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName);
-//       if (config.mongoFileFlag) {
-//         let connectStr = ''
-//         if (config.mongo.auth) {
-//           connectStr = format(config.mongo.connect,
-//             config.mongo.auth.username, config.mongo.auth.password);
-//         } else {
-//           connectStr = config.mongo.connect
-//         }
-//         mongodb.MongoClient.connect(connectStr, async function (err, db) {
-//           if (err) reject(err)
-//           try {
-//             // Our file ID
-//             let fileId = new mongodb.ObjectID();
-//             let mongoName = fileId + path.extname(fileName)
-//             let gridStore = new mongodb.GridStore(db, fileId, mongoName, 'w', {
-//               content_type: mime.lookup(fileName)
-//             })
-//             let gs = await gridStore.open()
-//             let fileData = fs.readFileSync(tempfile);
-//             await gs.write(fileData)
-//             await gs.close()
-//             fs.unlinkSync(tempfile)
-//             db.close()
-//             resolve(config.fileUrlBase + mongoName)
-//           } catch (error) {
-//             db.close()
-//             reject(error);
-//           }
-//         });
-//       } else {
-//         fs.renameSync(tempfile, path.join(svPath, fileName))
-//         resolve(config.fileUrlBase + relPath + fileName);
-//       }
-//     } else {
-//       reject('url error');
-//     }
-//   })
-// }
-
-// function fileGet(url) {
-//   return new Promise(async function (resolve, reject) {
-//     if (url) {
-//       let connectStr = ''
-//       if (config.mongo.auth) {
-//         connectStr = format(config.mongo.connect,
-//           config.mongo.auth.username, config.mongo.auth.password);
-//       } else {
-//         connectStr = config.mongo.connect
-//       }
-//       mongodb.MongoClient.connect(connectStr, async function (err, db) {
-//         if (err) reject(err)
-//         try {
-//           let fileName = path.basename(url)
-//           let gridStore = new mongodb.GridStore(db, fileName, 'r')
-//           gridStore.open(function (err, gs) {
-//             if (err) {
-//               reject(err);
-//             }
-//             gridStore.seek(0, function () {
-//               gridStore.read(function (err, data) {
-//                 if (err) {
-//                   reject(err);
-//                 }
-//                 db.close();
-//                 resolve(data)
-//               });
-//             })
-//           })
-//         } catch (error) {
-//           db.close()
-//           reject(error);
-//         }
-//       });
-//     } else {
-//       reject('url error');
-//     }
-//   })
-// }
-
-// function fileRemove(url) {
-//   return new Promise(async function (resolve, reject) {
-//     if (url) {
-//       if (config.mongoFileFlag) {
-//         let connectStr = ''
-//         if (config.mongo.auth) {
-//           connectStr = format(config.mongo.connect,
-//             config.mongo.auth.username, config.mongo.auth.password);
-//         } else {
-//           connectStr = config.mongo.connect
-//         }
-//         mongodb.MongoClient.connect(connectStr, async function (err, db) {
-//           if (err) reject(err)
-//           try {
-//             let fileName = path.basename(url)
-//             // Our file ID
-//             mongodb.GridStore.unlink(db, fileName, function (err) {
-//               if (err) reject(err)
-//               db.close()
-//               resolve('ok')
-//             })
-//           } catch (error) {
-//             db.close()
-//             reject(error);
-//           }
-//         });
-//       } else {
-//         resolve(config.fileUrlBase + relPath + fileName);
-//       }
-//     } else {
-//       reject('url error');
-//     }
-//   })
-// }
-
-function generateRandomAlphaNum(len) {
+const generateRandomAlphaNum = len => {
   let charSet = '0123456789'
   let randomString = ''
   for (let i = 0; i < len; i++) {
@@ -269,7 +121,7 @@ function generateRandomAlphaNum(len) {
   return randomString
 }
 
-function getApiName(path) {
+const getApiName = path => {
   if (path) {
     let patha = path.split('/')
     let func = patha[patha.length - 1].toUpperCase()
@@ -279,12 +131,12 @@ function getApiName(path) {
   }
 }
 
-function buildXML(json) {
+const buildXML = json => {
   let builder = new xml2js.Builder()
   return builder.buildObject(json)
 }
 
-function parseXML(xml) {
+const parseXML = xml => {
   return new Promise(function(resolve, reject) {
     let parser = new xml2js.Parser({
       trim: true,
@@ -298,7 +150,7 @@ function parseXML(xml) {
   })
 }
 
-function generateNonceString(length) {
+const generateNonceString = length => {
   let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let maxPos = chars.length
   let noceStr = ''
@@ -308,12 +160,12 @@ function generateNonceString(length) {
   return noceStr
 }
 
-function getUploadTempPath(uploadurl) {
+const getUploadTempPath = uploadurl => {
   let fileName = path.basename(uploadurl)
   return path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName)
 }
 
-function getUUIDByTime(offset) {
+const getUUIDByTime = offset => {
   let uuidStand = uuid.v1()
   let uuidArr = uuidStand.split('-')
   let uuidResult = ''
@@ -324,7 +176,7 @@ function getUUIDByTime(offset) {
   return uuidResult.substring(0, offset)
 }
 
-function ejs2File(templateFile, renderData, options, outputType, res) {
+const ejs2File = (templateFile, renderData, options, outputType, res) => {
   return new Promise(function(resolve, reject) {
     try {
       let data = JSON.parse(JSON.stringify(renderData))
@@ -414,7 +266,7 @@ function ejs2File(templateFile, renderData, options, outputType, res) {
   })
 }
 
-function ejs2xlsx(templateFile, renderData, res) {
+const ejs2xlsx = (templateFile, renderData, res) => {
   return new Promise(function(resolve, reject) {
     try {
       let templateBuf = fs.readFileSync(path.join(__dirname, '../dumpTemplate/' + templateFile))
@@ -443,7 +295,7 @@ function ejs2xlsx(templateFile, renderData, res) {
   })
 }
 
-function getWSClients(req) {
+const getWSClients = req => {
   let authorization = req.get('authorization')
   let clients = []
   global.wss.clients.forEach(function each(client) {
@@ -454,7 +306,7 @@ function getWSClients(req) {
   return clients
 }
 
-function getWSClientsByToken(token) {
+const getWSClientsByToken = token => {
   let clients = []
   global.wss.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN && token === client.authorization) {
@@ -464,13 +316,13 @@ function getWSClientsByToken(token) {
   return clients
 }
 
-function wsClientsSend(clents, msg) {
+const wsClientsSend = (clents, msg) => {
   for (let c of clents) {
     c.send(msg)
   }
 }
 
-function wsClientsClose(clents, msg) {
+const wsClientsClose = (clents, msg) => {
   for (let c of clents) {
     c.terminate()
   }

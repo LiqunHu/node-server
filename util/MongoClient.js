@@ -8,7 +8,7 @@ const Error = require('./Error')
 const syslogger = require('./Logger').createLogger('MongoClinet.js')
 let db = undefined
 
-async function getDb() {
+const getDb = async () => {
   if (db) {
     return db
   } else {
@@ -32,7 +32,7 @@ async function getDb() {
     Logger.setLevel('info')
 
     // Set our own logger
-    Logger.setCurrentLogger(function(msg, context) {
+    Logger.setCurrentLogger((msg, context) => {
       syslogger.debug(msg, context)
     })
 
@@ -41,13 +41,13 @@ async function getDb() {
   }
 }
 
-async function getBucket() {
+const getBucket = async () => {
   let db = await getDb()
   let bucket = new GridFSBucket(db, { bucketName: config.mongo.bucketName })
   return bucket
 }
 
-function genObjectID() {
+const genObjectID = () => {
   let fileId = new ObjectID()
   return fileId
 }

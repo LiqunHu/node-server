@@ -36,9 +36,7 @@ exports.token2user = async req => {
       }
     }
 
-    let authData = await RedisClient.getItem(
-      GLBConfig.REDISKEY.AUTH + type + uid
-    )
+    let authData = await RedisClient.getItem(GLBConfig.REDISKEY.AUTH + type + uid)
     if (authData) {
       let user = authData.user
       if (!user) {
@@ -54,16 +52,10 @@ exports.token2user = async req => {
 
       let s = ''
       if (type === 'WEB' || type === 'MOBILE') {
-        let idf = aesEncryptModeCFB(
-          user.user_username,
-          user.user_password,
-          magicNo
-        )
+        let idf = aesEncryptModeCFB(user.user_username, user.user_password, magicNo)
         s = [type, uid, idf, expires, config.SECRET_KEY].join('-')
       } else if (type === 'WEIXIN') {
-        s = [type, uid, user.user_wx_openid, expires, config.SECRET_KEY].join(
-          '-'
-        )
+        s = [type, uid, user.user_wx_openid, expires, config.SECRET_KEY].join('-')
       }
 
       if (sha1 != CryptoJS.SHA1(s).toString()) {
@@ -113,7 +105,7 @@ exports.token2user = async req => {
   }
 }
 
-function generateRandomAlphaNum(len) {
+const generateRandomAlphaNum = len => {
   var rdmString = ''
   // toSting接受的参数表示进制，默认为10进制。36进制为0-9 a-z
   for (; rdmString.length < len; ) {
@@ -124,7 +116,7 @@ function generateRandomAlphaNum(len) {
   return rdmString.substr(0, len)
 }
 
-function aesEncryptModeCFB(msg, pwd, magicNo) {
+const aesEncryptModeCFB = (msg, pwd, magicNo) => {
   let key = CryptoJS.enc.Hex.parse(pwd)
   let iv = CryptoJS.enc.Hex.parse(magicNo)
 
@@ -157,20 +149,8 @@ exports.user2token = (type, user, identifyCode, magicNo) => {
       expires = Date.now() + config.TOKEN_AGE
     }
 
-    let s = [
-      type,
-      user.user_id,
-      identifyCode,
-      expires.toString(),
-      config.SECRET_KEY
-    ].join('-')
-    let L = [
-      type,
-      user.user_id,
-      magicNo,
-      expires.toString(),
-      CryptoJS.SHA1(s).toString()
-    ]
+    let s = [type, user.user_id, identifyCode, expires.toString(), config.SECRET_KEY].join('-')
+    let L = [type, user.user_id, magicNo, expires.toString(), CryptoJS.SHA1(s).toString()]
     return L.join('-')
   } catch (error) {
     logger.error(error)

@@ -13,7 +13,7 @@ const logger = require('./Logger').createLogger('FileSRV.js')
 const config = require('../config')
 const MongoCli = require('./MongoClient')
 
-let FileResource = async (req, res) => {
+const FileResource = async (req, res) => {
   try {
     let fileName = req.params.filetag
 
@@ -27,8 +27,8 @@ let FileResource = async (req, res) => {
   }
 }
 
-function ImageCropperSave(req) {
-  return new Promise(function(resolve, reject) {
+const ImageCropperSave = req => {
+  return new Promise((resolve, reject) => {
     if (req.is('multipart/*')) {
       try {
         let form = new multiparty.Form(config.uploadOptions)
@@ -46,11 +46,11 @@ function ImageCropperSave(req) {
                   .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
                   .rotate('white', cropper_data.rotate)
                   .stream('.jpg')
-                outStream.on('end', function() {
+                outStream.on('end', () => {
                   resolve(config.fsUrlBase + filename)
                 })
 
-                outStream.on('error', function(err) {
+                outStream.on('error', err => {
                   reject(err)
                 })
                 outStream.pipe(uploadStream)
@@ -69,7 +69,7 @@ function ImageCropperSave(req) {
                 .setFormat('jpeg')
                 .crop(cropper_data.width, cropper_data.height, cropper_data.x, cropper_data.y)
                 .rotate('white', cropper_data.rotate)
-                .write(path.join(svPath, filename), function(err) {
+                .write(path.join(svPath, filename), err => {
                   if (!err) resolve(config.fileUrlBase + relPath + filename)
                   reject(err)
                 })
@@ -87,8 +87,8 @@ function ImageCropperSave(req) {
   })
 }
 
-function fileSave(req) {
-  return new Promise(function(resolve, reject) {
+const fileSave = req => {
+  return new Promise((resolve, reject) => {
     if (req.is('multipart/*')) {
       try {
         let form = new multiparty.Form(config.uploadOptions)
@@ -103,7 +103,7 @@ function fileSave(req) {
               MongoCli.getBucket().then(bucket => {
                 let uploadStream = bucket.openUploadStream(filename)
                 let readStream = fs.createReadStream(files.file[0].path)
-                readStream.on('end', function() {
+                readStream.on('end', () => {
                   fs.unlinkSync(files.file[0].path)
                   resolve({
                     name: files.file[0].originalFilename,
@@ -113,7 +113,7 @@ function fileSave(req) {
                   })
                 })
 
-                readStream.on('error', function(err) {
+                readStream.on('error', err => {
                   reject(err)
                 })
                 readStream.pipe(uploadStream)
@@ -148,19 +148,19 @@ function fileSave(req) {
   })
 }
 
-function fileDeleteByUrl(url) {
-  return new Promise(function(resolve, reject) {
+const fileDeleteByUrl = url => {
+  return new Promise((resolve, reject) => {
     let fileSys = url.substring(0, config.fsUrlBase.length)
     if (fileSys === config.fsUrlBase) {
       MongoCli.getBucket().then(bucket => {
         let fileName = url.substring(config.fsUrlBase.length, url.length)
         bucket
           .find({ filename: url.substring(config.fsUrlBase.length, url.length) })
-          .toArray(function(err, docs) {
+          .toArray((err, docs) => {
             if (err) {
               reject(err)
             }
-            bucket.delete(docs[0]._id, function(err, result) {
+            bucket.delete(docs[0]._id, (err, result) => {
               if (err) {
                 reject(err)
               }
@@ -180,8 +180,8 @@ function fileDeleteByUrl(url) {
   })
 }
 
-function fileSaveTemp(req) {
-  return new Promise(function(resolve, reject) {
+const fileSaveTemp = req => {
+  return new Promise((resolve, reject) => {
     if (req.is('multipart/*')) {
       try {
         let form = new multiparty.Form(config.uploadOptions)
@@ -209,8 +209,8 @@ function fileSaveTemp(req) {
   })
 }
 
-function fileMove(url) {
-  return new Promise(function(resolve, reject) {
+const fileMove = url => {
+  return new Promise((resolve, reject) => {
     let fileSys = url.substring(0, config.tmpUrlBase.length)
     if (fileSys === config.tmpUrlBase) {
       let ext = path.extname(url)
@@ -221,14 +221,14 @@ function fileMove(url) {
         MongoCli.getBucket().then(bucket => {
           let uploadStream = bucket.openUploadStream(filename)
           let readStream = fs.createReadStream(tempfile)
-          readStream.on('end', function() {
+          readStream.on('end', () => {
             fs.unlinkSync(tempfile)
             resolve({
               url: config.fsUrlBase + filename
             })
           })
 
-          readStream.on('error', function(err) {
+          readStream.on('error', err => {
             reject(err)
           })
           readStream.pipe(uploadStream)

@@ -14,7 +14,7 @@ const VALID_GEOJSON_TYPES = [
   'Feature'
 ]
 
-function createGeoJSONValidator() {
+const createGeoJSONValidator = () => {
   let geojsonBasic = Joi.object({
     type: Joi.string()
       .valid(VALID_GEOJSON_TYPES)
@@ -52,7 +52,7 @@ function createGeoJSONValidator() {
   })
 }
 
-function createNonIntegerValidator(attr) {
+const createNonIntegerValidator = attr => {
   let j = Joi.number()
   if (!attr.type) {
     return j
@@ -67,7 +67,7 @@ function createNonIntegerValidator(attr) {
   return j
 }
 
-function mapType(key, attribute) {
+const mapType = (key, attribute) => {
   switch (key) {
     // NUMBER TYPES
     case 'BIGINT':
@@ -112,7 +112,7 @@ function mapType(key, attribute) {
   }
 }
 
-function mapValidator(joi, validator, key) {
+const mapValidator = (joi, validator, key) => {
   if (validator === false) {
     return joi
   }
@@ -141,7 +141,7 @@ function mapValidator(joi, validator, key) {
   }
 }
 
-function map(attribute) {
+const map = attribute => {
   //allow user to personally set joi objects in models, mainly for JSON/B data types
   if (attribute.sequelizeToJoiOverride) {
     return attribute.sequelizeToJoiOverride
@@ -175,7 +175,7 @@ function map(attribute) {
   return joi
 }
 
-function sequelizeToJoi(model, { omitAssociations = false } = {}) {
+const sequelizeToJoi = (model, { omitAssociations = false } = {}) => {
   // Ensure that the model we receive is a Sequelize Model
   if (model.hasOwnProperty('prototype') && !(model.prototype instanceof Sequelize.Model)) {
     throw new TypeError('model is not an instance of Sequelize.Model')
@@ -209,7 +209,7 @@ function sequelizeToJoi(model, { omitAssociations = false } = {}) {
   return keys
 }
 
-function findAndConvertModels(object, options) {
+const findAndConvertModels = (object, options) => {
   _.forIn(object, (value, key) => {
     if (value.hasOwnProperty('prototype') && value.prototype instanceof Sequelize.Model) {
       object[key] = sequelizeToJoi(value, options)

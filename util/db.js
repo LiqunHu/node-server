@@ -36,7 +36,7 @@ let sequelize = new Sequelize(
 const ID_TYPE = Sequelize.STRING(30)
 const IDNO_TYPE = Sequelize.BIGINT
 
-function defineModel(name, attributes, params) {
+const defineModel = (name, attributes, params) => {
   let attrs = {}
   let tbpara = arguments[2] ? arguments[2] : {}
 
@@ -94,7 +94,7 @@ function defineModel(name, attributes, params) {
         timestamps: true,
         underscored: true,
         hooks: {
-          beforeValidate: function(obj) {
+          beforeValidate: obj => {
             if (obj.isNewRecord) {
               logger.debug('will create entity...' + obj)
               obj.version = 0
@@ -103,7 +103,7 @@ function defineModel(name, attributes, params) {
               obj.version++
             }
           },
-          afterCreate: async function(obj) {
+          afterCreate: async obj => {
             try {
               let jsonObj = JSON.parse(JSON.stringify(obj))
               if (obj.constructor.tableName === 'tbl_common_user') {
@@ -112,10 +112,7 @@ function defineModel(name, attributes, params) {
               if (config.elasticsearchFlag) {
                 elaClient
                   .create({
-                    index:
-                      config.elasticsearch.index +
-                      '-' +
-                      obj.constructor.tableName,
+                    index: config.elasticsearch.index + '-' + obj.constructor.tableName,
                     type: 'table',
                     id: obj[obj.constructor.primaryKeyField],
                     body: jsonObj
@@ -137,7 +134,7 @@ function defineModel(name, attributes, params) {
               logger.error(err)
             }
           },
-          afterUpdate: async function(obj) {
+          afterUpdate: async obj => {
             try {
               let jsonObj = JSON.parse(JSON.stringify(obj))
               if (obj.constructor.tableName === 'tbl_common_user') {
@@ -146,10 +143,7 @@ function defineModel(name, attributes, params) {
               if (config.elasticsearchFlag) {
                 elaClient
                   .index({
-                    index:
-                      config.elasticsearch.index +
-                      '-' +
-                      obj.constructor.tableName,
+                    index: config.elasticsearch.index + '-' + obj.constructor.tableName,
                     type: 'table',
                     id: obj[obj.constructor.primaryKeyField],
                     body: jsonObj
@@ -175,7 +169,7 @@ function defineModel(name, attributes, params) {
               logger.error(err)
             }
           },
-          afterBulkCreate: function(instances) {
+          afterBulkCreate: instances => {
             if (config.elasticsearchFlag) {
               try {
                 for (let obj of instances) {
@@ -185,10 +179,7 @@ function defineModel(name, attributes, params) {
                   }
                   elaClient
                     .create({
-                      index:
-                        config.elasticsearch.index +
-                        '-' +
-                        obj.constructor.tableName,
+                      index: config.elasticsearch.index + '-' + obj.constructor.tableName,
                       type: 'table',
                       id: obj[obj.constructor.primaryKeyField],
                       body: jsonObj
@@ -212,16 +203,7 @@ function defineModel(name, attributes, params) {
   )
 }
 
-const TYPES = [
-  'STRING',
-  'INTEGER',
-  'BIGINT',
-  'TEXT',
-  'DOUBLE',
-  'DATEONLY',
-  'DATE',
-  'BOOLEAN'
-]
+const TYPES = ['STRING', 'INTEGER', 'BIGINT', 'TEXT', 'DOUBLE', 'DATEONLY', 'DATE', 'BOOLEAN']
 
 let exp = {
   defineModel: defineModel,

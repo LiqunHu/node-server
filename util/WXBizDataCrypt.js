@@ -1,11 +1,11 @@
 var crypto = require('crypto')
 
-function WXBizDataCrypt(appId, sessionKey) {
+const WXBizDataCrypt = (appId, sessionKey) => {
   this.appId = appId
   this.sessionKey = sessionKey
 }
 
-WXBizDataCrypt.prototype.decryptData = function(encryptedData, iv) {
+WXBizDataCrypt.prototype.decryptData = (encryptedData, iv) => {
   // base64 decode
   var sessionKey = new Buffer(this.sessionKey, 'base64')
   encryptedData = new Buffer(encryptedData, 'base64')

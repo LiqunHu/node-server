@@ -7,11 +7,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype)
 bluebird.promisifyAll(redis.Multi.prototype)
 let client = undefined
 if (!client) {
-  client = redis.createClient(
-    config.redis.port,
-    config.redis.host,
-    config.redis.opts
-  )
+  client = redis.createClient(config.redis.port, config.redis.host, config.redis.opts)
 }
 
 /**
@@ -52,8 +48,8 @@ exports.getItem = async key => {
  * @param key 缓存key
  */
 exports.getLiveTime = key => {
-  return new Promise(function(resolve, reject) {
-    client.ttl(key, function(err, data) {
+  return new Promise((resolve, reject) => {
+    client.ttl(key, (err, data) => {
       if (err) {
         reject(err)
       }
