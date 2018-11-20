@@ -8,12 +8,12 @@ const common = require('./util/CommonUtil.js')
 const logger = require('./util/Logger').createLogger('model')
 const S2J = require('./util/Sequelize2joi')
 
-let files = []
+const files = []
 
-function readDirSync(path) {
+const readDirSync = path => {
   let pa = fs.readdirSync(__dirname + path)
-  pa.forEach(function(ele, index) {
-    var info = fs.statSync(__dirname + path + '/' + ele)
+  pa.forEach((ele, index) => {
+    let info = fs.statSync(__dirname + path + '/' + ele)
     if (info.isDirectory()) {
       readDirSync(path + '/' + ele)
     } else {
@@ -41,7 +41,7 @@ if (config.RWSeperateFlag) {
 }
 module.exports.sequelize = db.sequelize
 
-module.exports.simpleSelect = async function(queryStr, replacements) {
+module.exports.simpleSelect = async (queryStr, replacements) => {
   return await dbHandle.query(queryStr, {
     replacements: replacements,
     type: dbHandle.QueryTypes.SELECT
@@ -49,7 +49,7 @@ module.exports.simpleSelect = async function(queryStr, replacements) {
 }
 
 // 分页查询函数 pageDoc 有offset limit 两个字段
-module.exports.queryWithCount = async function(pageDoc, queryStr, replacements) {
+module.exports.queryWithCount = async (pageDoc, queryStr, replacements) => {
   let cnt = queryStr.indexOf('from') + 5
   let queryStrCnt = queryStr.substr(cnt)
 
@@ -73,34 +73,34 @@ module.exports.queryWithCount = async function(pageDoc, queryStr, replacements) 
   }
 }
 
-module.exports.transaction = function(callback) {
-  return new Promise(function(resolve, reject) {
+module.exports.transaction = callback => {
+  return new Promise((resolve, reject) => {
     if (Object.prototype.toString.call(callback) === '[object AsyncFunction]') {
       db.sequelize
-        .transaction(function(t) {
+        .transaction(t => {
           // chain all your queries here. make sure you return them.
           return Promise.all([callback(t)])
         })
-        .then(function(result) {
+        .then(result => {
           resolve()
         })
-        .catch(function(err) {
+        .catch(err => {
           reject(err)
         })
     } else {
       db.sequelize
         .transaction(callback)
-        .then(function(result) {
+        .then(result => {
           resolve()
         })
-        .catch(function(err) {
+        .catch(err => {
           reject(err)
         })
     }
   })
 }
 
-module.exports.model2Schema = function(...args) {
+module.exports.model2Schema = (...args) => {
   let schema = {}
   for (let a of args) {
     schema = _.extend(schema, S2J.sequelizeToJoi(a))

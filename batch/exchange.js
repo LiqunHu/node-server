@@ -3,7 +3,7 @@ const model = require('../model')
 
 const sequelize = model.sequelize
 
-function generateNonceString(length) {
+const generateNonceString = length => {
   let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let maxPos = chars.length
   let noceStr = ''

@@ -6,9 +6,9 @@ const logger = require('../util/Logger').createLogger('service.js')
 
 const files = []
 
-function readDirSync(path) {
+const readDirSync = path => {
   let pa = fs.readdirSync(__dirname + path)
-  pa.forEach(function(ele, index) {
+  pa.forEach((ele, index) => {
     var info = fs.statSync(__dirname + path + '/' + ele)
     if (info.isDirectory()) {
       readDirSync(path + '/' + ele)

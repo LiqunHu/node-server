@@ -33,7 +33,7 @@ function heartbeat() {
   this.isAlive = true
 }
 
-wss.on('connection', function connection(ws, req) {
+wss.on('connection', (ws, req) => {
   ws.isAlive = true
 
   const location = url.parse(req.url, true)
@@ -41,7 +41,7 @@ wss.on('connection', function connection(ws, req) {
   // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
   ws.authorization = location.query.authorization
 
-  ws.on('message', async function incoming(message) {
+  ws.on('message', async message => {
     let req = {
         WebSocket: true,
         params: {
@@ -78,8 +78,8 @@ wss.on('connection', function connection(ws, req) {
   // ws.send('something');
 })
 
-const interval = setInterval(function ping() {
-  wss.clients.forEach(function each(ws) {
+const interval = setInterval(() => {
+  wss.clients.forEach(ws => {
     if (ws.isAlive === false) return ws.terminate()
 
     ws.isAlive = false
@@ -89,7 +89,7 @@ const interval = setInterval(function ping() {
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port, function() {
+server.listen(port, () => {
   if (config.scheduleFlag) {
     console.log('App started, gathering monitors')
     let jobs = schedule.scheduleJob()
@@ -103,7 +103,7 @@ server.on('listening', onListening)
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+const normalizePort = val => {
   let port = parseInt(val, 10)
 
   if (isNaN(port)) {
@@ -123,7 +123,7 @@ function normalizePort(val) {
  * Event listener for HTTP server "error" event.
  */
 
-function onError(error) {
+const onError = error => {
   if (error.syscall !== 'listen') {
     throw error
   }
@@ -149,7 +149,7 @@ function onError(error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening() {
+const onListening = () => {
   console.log('services running on port ' + port)
   let addr = server.address()
   let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
