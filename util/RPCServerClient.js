@@ -69,7 +69,7 @@ exports.ServerRequest = (server, url, message) => {
       .catch(err => {
         // handle error - this is generally a timeout or maxWaitingClients
         // error
-        console.log(err)
+        logger.error(err)
         reject(err)
       })
   })
