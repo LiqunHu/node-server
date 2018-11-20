@@ -100,9 +100,9 @@ module.exports.transaction = function(callback) {
   })
 }
 
-module.exports.model2Schema = function() {
+module.exports.model2Schema = function(...args) {
   let schema = {}
-  for (let a of arguments) {
+  for (let a of args) {
     schema = _.extend(schema, S2J.sequelizeToJoi(a))
   }
   return schema
