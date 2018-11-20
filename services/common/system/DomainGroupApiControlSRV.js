@@ -1,9 +1,7 @@
 const fs = require('fs')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
-const logger = require('../../../util/Logger').createLogger(
-  'SysGroupApiControl'
-)
+const logger = require('../../../util/Logger').createLogger('SysGroupApiControl')
 const model = require('../../../model')
 
 const tb_usergroup = model.common_usergroup
@@ -26,7 +24,7 @@ exports.DomainGroupApiControlResource = (req, res) => {
   }
 }
 
-async function initAct(req, res) {
+const initAct = async (req, res) => {
   try {
     let returnData = {}
     let user = req.user
@@ -56,7 +54,7 @@ async function initAct(req, res) {
   }
 }
 
-async function genDomainMenu(domain_id, parentId) {
+const genDomainMenu = async (domain_id, parentId) => {
   let return_list = []
   let menus = await tb_common_domainmenu.findAll({
     where: {
@@ -93,7 +91,7 @@ async function genDomainMenu(domain_id, parentId) {
   return return_list
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let returnData = {}
@@ -113,7 +111,7 @@ async function searchAct(req, res) {
   }
 }
 
-async function modifyAct(req, res) {
+const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
 
@@ -136,7 +134,7 @@ async function modifyAct(req, res) {
   }
 }
 
-async function genUserGroup(domain_id, parentId, lev) {
+const genUserGroup = async (domain_id, parentId, lev) => {
   let actgroups = await tb_usergroup.findAll({
     where: {
       domain_id: domain_id,

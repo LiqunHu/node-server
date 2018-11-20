@@ -36,7 +36,7 @@ exports.DomainTemplateControlResource = (req, res) => {
   }
 }
 
-async function initAct(req, res) {
+const initAct = async (req, res) => {
   try {
     let user = req.user,
       returnData = {
@@ -51,9 +51,7 @@ async function initAct(req, res) {
         children: []
       }
     ]
-    returnData.sysmenus[0].children = JSON.parse(
-      JSON.stringify(await genMenu('0'))
-    )
+    returnData.sysmenus[0].children = JSON.parse(JSON.stringify(await genMenu('0')))
 
     common.sendData(res, returnData)
   } catch (error) {
@@ -61,7 +59,7 @@ async function initAct(req, res) {
   }
 }
 
-async function genMenu(parentId) {
+const genMenu = async parentId => {
   let return_list = []
   let menus = await tb_common_systemmenu.findAll({
     where: {
@@ -99,7 +97,7 @@ async function genMenu(parentId) {
   return return_list
 }
 
-async function searchTemplateAct(req, res) {
+const searchTemplateAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user
@@ -112,7 +110,7 @@ async function searchTemplateAct(req, res) {
   }
 }
 
-async function addTemplateAct(req, res) {
+const addTemplateAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user
@@ -127,7 +125,7 @@ async function addTemplateAct(req, res) {
   }
 }
 
-async function deleteTemplateAct(req, res) {
+const deleteTemplateAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user
@@ -155,7 +153,7 @@ async function deleteTemplateAct(req, res) {
   }
 }
 
-async function searchTemplateMenuAct(req, res) {
+const searchTemplateMenuAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user
@@ -179,7 +177,7 @@ async function searchTemplateMenuAct(req, res) {
   }
 }
 
-async function genTemplateMenu(domaintemplate_id, parentId) {
+const genTemplateMenu = async (domaintemplate_id, parentId) => {
   let return_list = []
   let menus = await tb_common_templatemenu.findAll({
     where: {
@@ -219,7 +217,7 @@ async function genTemplateMenu(domaintemplate_id, parentId) {
   return return_list
 }
 
-async function addFolderAct(req, res) {
+const addFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -251,7 +249,7 @@ async function addFolderAct(req, res) {
   }
 }
 
-async function modifyFolderAct(req, res) {
+const modifyFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -277,7 +275,7 @@ async function modifyFolderAct(req, res) {
   }
 }
 
-async function deleteSelectAct(req, res) {
+const deleteSelectAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -300,7 +298,7 @@ async function deleteSelectAct(req, res) {
   }
 }
 
-async function folderDelete(templatemenu_id) {
+const folderDelete = async templatemenu_id => {
   let subM = await tb_common_templatemenu.findAll({
     where: {
       parent_id: templatemenu_id
@@ -316,7 +314,7 @@ async function folderDelete(templatemenu_id) {
   }
 }
 
-async function addMenusAct(req, res) {
+const addMenusAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -370,7 +368,7 @@ async function addMenusAct(req, res) {
   }
 }
 
-async function changeOrderAct(req, res) {
+const changeOrderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user

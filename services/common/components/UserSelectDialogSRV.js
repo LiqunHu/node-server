@@ -20,7 +20,7 @@ exports.UserSelectDialogResource = (req, res) => {
   }
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -63,7 +63,7 @@ async function searchAct(req, res) {
   }
 }
 
-async function genUserGroup(domain_id, parentId) {
+const genUserGroup = async (domain_id, parentId) => {
   let return_list = []
   let groups = await tb_usergroup.findAll({
     where: {
@@ -99,7 +99,7 @@ async function genUserGroup(domain_id, parentId) {
   return return_list
 }
 
-async function searchUserAct(req, res) {
+const searchUserAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -132,7 +132,7 @@ async function searchUserAct(req, res) {
   }
 }
 
-function genPosition(usergroup_id, usergroups) {
+const genPosition = (usergroup_id, usergroups) => {
   let positionName = '',
     parent_id
 

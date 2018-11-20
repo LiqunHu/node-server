@@ -19,7 +19,7 @@ exports.UserSettingResource = (req, res) => {
   }
 }
 
-async function setpwdAct(req, res) {
+const setpwdAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -48,7 +48,7 @@ async function setpwdAct(req, res) {
   }
 }
 
-async function modifyAct(req, res) {
+const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -78,7 +78,7 @@ async function modifyAct(req, res) {
   }
 }
 
-async function uploadAct(req, res) {
+const uploadAct = async (req, res) => {
   try {
     let uploadurl = await FileSRV.ImageCropperSave(req)
     common.sendData(res, {

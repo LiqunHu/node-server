@@ -21,7 +21,7 @@ exports.UserResetPasswordResource = (req, res) => {
     common.sendError(res, 'common_01')
   }
 }
-let initAct = async (req, res) => {
+const initAct = async (req, res) => {
   try {
     let returnData = {}
     let user = req.user
@@ -33,7 +33,7 @@ let initAct = async (req, res) => {
     common.sendFault(res, error)
   }
 }
-let searchAct = async (req, res) => {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -60,7 +60,7 @@ let searchAct = async (req, res) => {
     common.sendFault(res, error)
   }
 }
-let resetAct = async (req, res) => {
+const resetAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user

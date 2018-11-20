@@ -28,7 +28,7 @@ exports.OperatorControlResource = (req, res) => {
   }
 }
 
-async function initAct(req, res) {
+const initAct = async (req, res) => {
   try {
     let returnData = {}
     let user = req.user
@@ -43,7 +43,7 @@ async function initAct(req, res) {
   }
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -66,11 +66,7 @@ async function searchAct(req, res) {
       replacements.push(search_text)
     }
 
-    let result = await model.queryWithCount(
-      req,
-      queryStr,
-      replacements
-    )
+    let result = await model.queryWithCount(req, queryStr, replacements)
 
     returnData.total = result.count
     returnData.rows = []
@@ -88,7 +84,7 @@ async function searchAct(req, res) {
   }
 }
 
-async function addAct(req, res) {
+const addAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -142,7 +138,7 @@ async function addAct(req, res) {
   }
 }
 
-async function modifyAct(req, res) {
+const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -184,7 +180,7 @@ async function modifyAct(req, res) {
   }
 }
 
-async function deleteAct(req, res) {
+const deleteAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -211,7 +207,7 @@ async function deleteAct(req, res) {
   }
 }
 
-async function genUserGroup(domain_id, parentId, lev) {
+const genUserGroup = async (domain_id, parentId, lev) => {
   let actgroups = await tb_usergroup.findAll({
     where: {
       domain_id: domain_id,

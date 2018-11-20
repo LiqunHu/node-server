@@ -49,7 +49,7 @@ exports.DomainControlResource = (req, res) => {
  *
  * @apiHeader {String} Authorization                 Authorization token.
  */
-async function initAct(req, res) {
+const initAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -82,7 +82,7 @@ async function initAct(req, res) {
   }
 }
 
-async function genMenu(parentId) {
+const genMenu = async parentId => {
   let return_list = []
   let menus = await tb_common_systemmenu.findAll({
     where: {
@@ -142,7 +142,7 @@ async function genMenu(parentId) {
 //   limit: Joi.number().integer(),
 //   offset: Joi.number().integer()
 // }
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -190,7 +190,7 @@ async function searchAct(req, res) {
  * @apiParam {String} domain_phone                  Type, parameter and 联系电话.
  * @apiParam {String} domain_description            Type, parameter and domain描述.
  */
-async function addAct(req, res) {
+const addAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -303,7 +303,7 @@ async function addAct(req, res) {
 //   new: Joi.object().keys(common.model2Schema(tb_common_domain)),
 //   old: Joi.object().keys(common.model2Schema(tb_common_domain))
 // }
-async function modifyAct(req, res) {
+const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -339,7 +339,7 @@ async function modifyAct(req, res) {
  *
  * @apiParam {Number} domain_id                     查询domain id.
  */
-async function searchDomainMenuAct(req, res) {
+const searchDomainMenuAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user
@@ -361,7 +361,7 @@ async function searchDomainMenuAct(req, res) {
   }
 }
 
-async function genDomainMenu(domain_id, parentId) {
+const genDomainMenu = async (domain_id, parentId) => {
   let return_list = []
   let menus = await tb_common_domainmenu.findAll({
     where: {
@@ -415,7 +415,7 @@ async function genDomainMenu(domain_id, parentId) {
  * @apiParam {String} domainmenu_icon               目录图标.
  * @apiParam {String} root_show_flag                是否显示表示.
  */
-async function addFolderAct(req, res) {
+const addFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -459,7 +459,7 @@ async function addFolderAct(req, res) {
  * @apiParam {Object} new                           Type, parameter and 修改后数据.
  * @apiParam {Object} old                           Type, parameter and 修改前记录.
  */
-async function modifyFolderAct(req, res) {
+const modifyFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -496,7 +496,7 @@ async function modifyFolderAct(req, res) {
  *
  * @apiParam {Number} domainmenu_id                 删除对象id.
  */
-async function deleteSelectAct(req, res) {
+const deleteSelectAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -519,7 +519,7 @@ async function deleteSelectAct(req, res) {
   }
 }
 
-async function folderDelete(domainmenu_id) {
+const folderDelete = async domainmenu_id => {
   let subM = await tb_common_domainmenu.findAll({
     where: {
       parent_id: domainmenu_id
@@ -548,7 +548,7 @@ async function folderDelete(domainmenu_id) {
  * @apiParam {Number} parent_id                     目标目录id.
  * @apiParam {Object[]} menus                       增加的菜单.
  */
-async function addMenusAct(req, res) {
+const addMenusAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -614,7 +614,7 @@ async function addMenusAct(req, res) {
  *
  * @apiParam {Object[]} menus                       新排序的菜单.
  */
-async function changeOrderAct(req, res) {
+const changeOrderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user

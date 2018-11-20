@@ -20,7 +20,7 @@ exports.DomainSelectDialogResource = (req, res) => {
   }
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -86,7 +86,7 @@ async function searchAct(req, res) {
   }
 }
 
-async function modifyAct(req, res) {
+const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
       user = req.user,
@@ -183,7 +183,7 @@ async function modifyAct(req, res) {
   }
 }
 
-function genPosition(usergroup_id, usergroups) {
+const genPosition = (usergroup_id, usergroups) => {
   let positionName = '',
     parent_id
 

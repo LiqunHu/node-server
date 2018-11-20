@@ -29,7 +29,7 @@ exports.SystemApiControlResource = (req, res) => {
   }
 }
 
-async function initAct(req, res) {
+const initAct = async (req, res) => {
   try {
     let user = req.user,
       returnData = {
@@ -43,7 +43,7 @@ async function initAct(req, res) {
   }
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let user = req.user
     let menus = [
@@ -62,7 +62,7 @@ async function searchAct(req, res) {
   }
 }
 
-async function genMenu(parentId) {
+const genMenu = async parentId => {
   let return_list = []
   let menus = await tb_common_systemmenu.findAll({
     where: {
@@ -98,7 +98,7 @@ async function genMenu(parentId) {
   return return_list
 }
 
-async function addFolderAct(req, res) {
+const addFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -131,7 +131,7 @@ async function addFolderAct(req, res) {
   }
 }
 
-async function modifyFolderAct(req, res) {
+const modifyFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -171,7 +171,7 @@ async function modifyFolderAct(req, res) {
   }
 }
 
-function getApiName(path) {
+const getApiName = path => {
   if (path) {
     let patha = path.split('/')
     let func = patha[patha.length - 1].toUpperCase()
@@ -181,7 +181,7 @@ function getApiName(path) {
   }
 }
 
-async function addMenuAct(req, res) {
+const addMenuAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -229,7 +229,7 @@ async function addMenuAct(req, res) {
   }
 }
 
-async function modifyMenuAct(req, res) {
+const modifyMenuAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -298,7 +298,7 @@ async function modifyMenuAct(req, res) {
   }
 }
 
-async function getApiAct(req, res) {
+const getApiAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user

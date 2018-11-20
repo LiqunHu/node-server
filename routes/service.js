@@ -4,7 +4,7 @@ const path = require('path')
 const common = require('../util/CommonUtil.js')
 const logger = require('../util/Logger').createLogger('service.js')
 
-let files = []
+const files = []
 
 function readDirSync(path) {
   let pa = fs.readdirSync(__dirname + path)

@@ -15,7 +15,7 @@ exports.TestResource = (req, res) => {
   }
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     common.sendData(res, { aaaa: 1111 })
@@ -24,7 +24,7 @@ async function searchAct(req, res) {
   }
 }
 
-async function search2Act(req, res) {
+const search2Act = async (req, res) => {
   try {
     let response = await RPCServer.ServerRequest('pooltest', '/common/test/search', { a: 1, b: 2 })
     common.sendData(res, response)

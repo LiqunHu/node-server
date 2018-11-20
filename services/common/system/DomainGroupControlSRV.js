@@ -29,7 +29,7 @@ exports.DomainGroupControlResource = (req, res) => {
   }
 }
 
-async function initAct(req, res) {
+const initAct = async (req, res) => {
   try {
     let user = req.user,
       returnData = {}
@@ -53,7 +53,7 @@ async function initAct(req, res) {
   }
 }
 
-async function genDomainMenu(domain_id, parentId) {
+const genDomainMenu = async (domain_id, parentId) => {
   let return_list = []
   let menus = await tb_common_domainmenu.findAll({
     where: {
@@ -91,7 +91,7 @@ async function genDomainMenu(domain_id, parentId) {
   return return_list
 }
 
-async function searchAct(req, res) {
+const searchAct = async (req, res) => {
   try {
     let user = req.user
     let groups = [
@@ -103,16 +103,14 @@ async function searchAct(req, res) {
         children: []
       }
     ]
-    groups[0].children = JSON.parse(
-      JSON.stringify(await genUserGroup(user.domain_id, '0'))
-    )
+    groups[0].children = JSON.parse(JSON.stringify(await genUserGroup(user.domain_id, '0')))
     common.sendData(res, groups)
   } catch (error) {
     common.sendFault(res, error)
   }
 }
 
-async function genUserGroup(domain_id, parentId) {
+const genUserGroup = async (domain_id, parentId) => {
   let return_list = []
   let groups = await tb_common_usergroup.findAll({
     where: {
@@ -148,7 +146,7 @@ async function genUserGroup(domain_id, parentId) {
   return return_list
 }
 
-async function getCheckAct(req, res) {
+const getCheckAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let returnData = {}
@@ -168,7 +166,7 @@ async function getCheckAct(req, res) {
   }
 }
 
-async function addAct(req, res) {
+const addAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -196,7 +194,7 @@ async function addAct(req, res) {
   }
 }
 
-async function modifyAct(req, res) {
+const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
@@ -232,7 +230,7 @@ async function modifyAct(req, res) {
   }
 }
 
-async function deleteAct(req, res) {
+const deleteAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
