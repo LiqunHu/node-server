@@ -8,6 +8,7 @@ const tb_common_domain = model.common_domain
 const tb_common_domaintemplate = model.common_domaintemplate
 const tb_usergroup = model.common_usergroup
 const tb_user = model.common_user
+const tb_user_groups = model.common_user_groups
 const tb_common_templatemenu = model.common_templatemenu
 const tb_common_domainmenu = model.common_domainmenu
 const tb_common_systemmenu = model.common_systemmenu
@@ -233,11 +234,15 @@ const addAct = async (req, res) => {
       let adduser = await tb_user.create({
         user_id: await Sequence.genUserID(),
         domain_id: domain.domain_id,
-        usergroup_id: usergroup.usergroup_id,
         user_username: doc.domain + 'admin',
         user_name: 'admin',
         user_password: 'admin',
         user_type: GLBConfig.TYPE_ADMINISTRATOR
+      })
+
+      await tb_user_groups.create({
+        user_id: adduser.user_id,
+        usergroup_id: usergroup.usergroup_id
       })
 
       async function genDomainMenu(domaintemplate_id, parentId, cparentId) {

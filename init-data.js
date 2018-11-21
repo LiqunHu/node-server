@@ -4,11 +4,12 @@ const GLBConfig = require('./util/GLBConfig')
 const logger = require('./util/Logger').createLogger('init-data')
 const model = require('./model.js')
 
-let tb_common_domain = model.common_domain
-let tb_common_user = model.common_user
-let tb_common_usergroup = model.common_usergroup
-let tb_common_api = model.common_api
-let tb_common_systemmenu = model.common_systemmenu
+const tb_common_domain = model.common_domain
+const tb_common_user = model.common_user
+const tb_user_groups = model.common_user_groups
+const tb_common_usergroup = model.common_usergroup
+const tb_common_api = model.common_api
+const tb_common_systemmenu = model.common_systemmenu
 
 ;(async () => {
   try {
@@ -27,14 +28,6 @@ let tb_common_systemmenu = model.common_systemmenu
 
     usergroup = await tb_common_usergroup.create({
       domain_id: domain.domain_id,
-      usergroup_name: 'default',
-      usergroup_type: GLBConfig.TYPE_DEFAULT,
-      node_type: '01',
-      parent_id: 0
-    })
-
-    usergroup = await tb_common_usergroup.create({
-      domain_id: domain.domain_id,
       usergroup_name: 'administrator',
       usergroup_type: GLBConfig.TYPE_ADMINISTRATOR,
       node_type: '01',
@@ -44,11 +37,15 @@ let tb_common_systemmenu = model.common_systemmenu
     let user = await tb_common_user.create({
       user_id: await Sequence.genUserID(),
       domain_id: domain.domain_id,
-      usergroup_id: usergroup.usergroup_id,
       user_type: GLBConfig.TYPE_ADMINISTRATOR,
       user_username: 'admin',
       user_name: 'admin',
       user_password: 'admin'
+    })
+
+    let user_groups = await tb_user_groups.create({
+      user_id: user.user_id,
+      usergroup_id: usergroup.usergroup_id
     })
 
     // common
