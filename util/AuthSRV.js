@@ -20,6 +20,173 @@ const tb_common_user = model.common_user
 const tb_common_domainmenu = model.common_domainmenu
 const tb_common_usergroup = model.common_usergroup
 
+const loginInit = async (user, session_token, type) => {
+  try {
+    let returnData = {}
+    returnData.avatar = user.user_avatar
+    returnData.user_id = user.user_id
+    returnData.username = user.user_username
+    returnData.name = user.user_name
+    returnData.phone = user.user_phone
+    returnData.created_at = moment(user.created_at).format('MM[, ]YYYY')
+    returnData.type = user.user_type
+    returnData.city = user.user_city
+    let domain
+    if (user.domain_id) {
+      domain = await tb_common_domain.findOne({
+        where: {
+          domain_id: user.domain_id
+        }
+      })
+      returnData.domain_id = user.domain_id
+      returnData.domain_name = domain.domain_name
+      returnData.domain_type = domain.domain_type
+    } else {
+      domain = null
+      returnData.domain_id = user.domain_id
+      returnData.domain_name = '未知'
+    }
+
+    let usergroup = await tb_common_usergroup.findOne({
+      where: {
+        usergroup_id: user.usergroup_id,
+        state: GLBConfig.ENABLE
+      }
+    })
+
+    if (usergroup) {
+      returnData.description = usergroup.usergroup_name
+      returnData.menulist = await iterationMenu(
+        user,
+        domain,
+        usergroup.usergroup_id,
+        '0',
+        [],
+        [usergroup.usergroup_id]
+      )
+
+      if (config.redisCache) {
+        // prepare redis Cache
+        let authApis = []
+        if (user.user_type === GLBConfig.TYPE_ADMINISTRATOR) {
+          if (domain.domain_type === '0') {
+            authApis.push({
+              api_name: '系统菜单维护',
+              api_path: '/common/system/SystemApiControl',
+              api_function: 'SYSTEMAPICONTROL',
+              auth_flag: '1',
+              show_flag: '1'
+            })
+            authApis.push({
+              api_name: '机构模板维护',
+              api_path: '/common/system/DomainTemplateControl',
+              api_function: 'DOMAINTEMPLATECONTROL',
+              auth_flag: '1',
+              show_flag: '1'
+            })
+            authApis.push({
+              api_name: '机构维护',
+              api_path: '/common/system/DomainControl',
+              api_function: 'DOMAINCONTROL',
+              auth_flag: '1',
+              show_flag: '1'
+            })
+            authApis.push({
+              api_name: '系统组权限维护',
+              api_path: '/common/system/DomainGroupApiControl',
+              api_function: 'DOMAINGROUPAPICONTROL',
+              auth_flag: '1',
+              show_flag: '1'
+            })
+          }
+
+          authApis.push({
+            api_name: '用户设置',
+            api_path: '/common/system/UserSetting',
+            api_function: 'USERSETTING',
+            auth_flag: '1',
+            show_flag: '1'
+          })
+
+          authApis.push({
+            api_name: '角色组维护',
+            api_path: '/common/system/DomainGroupControl',
+            api_function: 'DOMAINGROUPCONTROL',
+            auth_flag: '1',
+            show_flag: '1'
+          })
+
+          authApis.push({
+            api_name: '员工维护',
+            api_path: '/common/system/OperatorControl',
+            api_function: 'OPERATORCONTROL',
+            auth_flag: '1',
+            show_flag: '1'
+          })
+        } else {
+          let groupapis = await queryGroupApi(user.usergroup_id)
+          for (let item of groupapis) {
+            if (item.api_kind === '3') {
+              let sub_group = await tb_common_usergroup.findOne({
+                where: {
+                  usergroup_type: item.sys_usergroup_type
+                }
+              })
+              let subgroupapis = await queryGroupApi(sub_group.usergroup_id)
+              for (let subitem of subgroupapis) {
+                authApis.push({
+                  api_name: subitem.api_name,
+                  api_path: subitem.api_path,
+                  api_function: subitem.api_function,
+                  auth_flag: subitem.auth_flag,
+                  show_flag: subitem.show_flag
+                })
+              }
+            } else {
+              authApis.push({
+                api_name: item.api_name,
+                api_path: item.api_path,
+                api_function: item.api_function,
+                auth_flag: item.auth_flag,
+                show_flag: item.show_flag
+              })
+            }
+          }
+        }
+        let expired = null
+        if (type == 'MOBILE') {
+          expired = RedisClient.mobileTokenExpired
+        } else {
+          expired = RedisClient.tokenExpired
+        }
+        let error = await RedisClient.setItem(
+          GLBConfig.REDISKEY.AUTH + type + user.user_id,
+          {
+            session_token: session_token,
+            user: Object.assign(
+              JSON.parse(JSON.stringify(user)),
+              JSON.parse(JSON.stringify(domain))
+            ),
+            authApis: authApis
+          },
+          expired
+        )
+        if (error) {
+          return null
+        }
+      }
+
+      return returnData
+    } else {
+      return null
+    }
+  } catch (error) {
+    logger.error(error)
+    return null
+  }
+}
+exports.loginInit = loginInit
+
 exports.AuthResource = async (req, res) => {
   try {
     let doc = common.docValidate(req)
@@ -227,173 +394,6 @@ exports.PhoneResetPasswordResource = async (req, res) => {
     return common.sendFault(res, error)
   }
 }
-
-const loginInit = async (user, session_token, type) => {
-  try {
-    let returnData = {}
-    returnData.avatar = user.user_avatar
-    returnData.user_id = user.user_id
-    returnData.username = user.user_username
-    returnData.name = user.user_name
-    returnData.phone = user.user_phone
-    returnData.created_at = moment(user.created_at).format('MM[, ]YYYY')
-    returnData.type = user.user_type
-    returnData.city = user.user_city
-    let domain
-    if (user.domain_id) {
-      domain = await tb_common_domain.findOne({
-        where: {
-          domain_id: user.domain_id
-        }
-      })
-      returnData.domain_id = user.domain_id
-      returnData.domain_name = domain.domain_name
-      returnData.domain_type = domain.domain_type
-    } else {
-      domain = null
-      returnData.domain_id = user.domain_id
-      returnData.domain_name = '未知'
-    }
-
-    let usergroup = await tb_common_usergroup.findOne({
-      where: {
-        usergroup_id: user.usergroup_id,
-        state: GLBConfig.ENABLE
-      }
-    })
-
-    if (usergroup) {
-      returnData.description = usergroup.usergroup_name
-      returnData.menulist = await iterationMenu(
-        user,
-        domain,
-        usergroup.usergroup_id,
-        '0',
-        [],
-        [usergroup.usergroup_id]
-      )
-
-      if (config.redisCache) {
-        // prepare redis Cache
-        let authApis = []
-        if (user.user_type === GLBConfig.TYPE_ADMINISTRATOR) {
-          if (domain.domain_type === '0') {
-            authApis.push({
-              api_name: '系统菜单维护',
-              api_path: '/common/system/SystemApiControl',
-              api_function: 'SYSTEMAPICONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-            authApis.push({
-              api_name: '机构模板维护',
-              api_path: '/common/system/DomainTemplateControl',
-              api_function: 'DOMAINTEMPLATECONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-            authApis.push({
-              api_name: '机构维护',
-              api_path: '/common/system/DomainControl',
-              api_function: 'DOMAINCONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-            authApis.push({
-              api_name: '系统组权限维护',
-              api_path: '/common/system/DomainGroupApiControl',
-              api_function: 'DOMAINGROUPAPICONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-          }
-
-          authApis.push({
-            api_name: '用户设置',
-            api_path: '/common/system/UserSetting',
-            api_function: 'USERSETTING',
-            auth_flag: '1',
-            show_flag: '1'
-          })
-
-          authApis.push({
-            api_name: '角色组维护',
-            api_path: '/common/system/DomainGroupControl',
-            api_function: 'DOMAINGROUPCONTROL',
-            auth_flag: '1',
-            show_flag: '1'
-          })
-
-          authApis.push({
-            api_name: '员工维护',
-            api_path: '/common/system/OperatorControl',
-            api_function: 'OPERATORCONTROL',
-            auth_flag: '1',
-            show_flag: '1'
-          })
-        } else {
-          let groupapis = await queryGroupApi(user.usergroup_id)
-          for (let item of groupapis) {
-            if (item.api_kind === '3') {
-              let sub_group = await tb_common_usergroup.findOne({
-                where: {
-                  usergroup_type: item.sys_usergroup_type
-                }
-              })
-              let subgroupapis = await queryGroupApi(sub_group.usergroup_id)
-              for (let subitem of subgroupapis) {
-                authApis.push({
-                  api_name: subitem.api_name,
-                  api_path: subitem.api_path,
-                  api_function: subitem.api_function,
-                  auth_flag: subitem.auth_flag,
-                  show_flag: subitem.show_flag
-                })
-              }
-            } else {
-              authApis.push({
-                api_name: item.api_name,
-                api_path: item.api_path,
-                api_function: item.api_function,
-                auth_flag: item.auth_flag,
-                show_flag: item.show_flag
-              })
-            }
-          }
-        }
-        let expired = null
-        if (type == 'MOBILE') {
-          expired = RedisClient.mobileTokenExpired
-        } else {
-          expired = RedisClient.tokenExpired
-        }
-        let error = await RedisClient.setItem(
-          GLBConfig.REDISKEY.AUTH + type + user.user_id,
-          {
-            session_token: session_token,
-            user: Object.assign(
-              JSON.parse(JSON.stringify(user)),
-              JSON.parse(JSON.stringify(domain))
-            ),
-            authApis: authApis
-          },
-          expired
-        )
-        if (error) {
-          return null
-        }
-      }
-
-      return returnData
-    } else {
-      return null
-    }
-  } catch (error) {
-    logger.error(error)
-    return null
-  }
-}
-exports.loginInit = loginInit
 
 const queryGroupApi = async GroupID => {
   try {

@@ -50,11 +50,10 @@ const sendData = (res, data) => {
   if ('WebSocket' in res) {
     res.info = data
   } else {
-    let datares = arguments[1] ? arguments[1] : {}
     let sendData = {
       errno: 0,
       msg: 'ok',
-      info: datares
+      info: data
     }
     res.send(sendData)
   }
