@@ -12,11 +12,6 @@ module.exports = db.defineModel('tbl_common_user', {
     type: db.IDNO,
     allowNull: true
   },
-  usergroup_id: {
-    // 用户组
-    type: db.IDNO,
-    allowNull: true
-  },
   user_username: {
     type: db.STRING(100),
     allowNull: false,
