@@ -9,7 +9,7 @@ module.exports = db.defineModel('tbl_common_user_groups', {
     primaryKey: true
   },
   user_id: {
-    type: db.IDNO,
+    type: db.ID,
     allowNull: false
   },
   usergroup_id: {

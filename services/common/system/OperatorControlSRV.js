@@ -1,13 +1,14 @@
-const fs = require('fs')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
 const Sequence = require('../../../util/Sequence')
 const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 const RedisClient = require('../../../util/RedisClient')
+const Op = model.Op
 
 const tb_usergroup = model.common_usergroup
 const tb_user = model.common_user
+const tb_user_groups = model.common_user_groups
 
 let groups = []
 
@@ -51,7 +52,7 @@ const searchAct = async (req, res) => {
 
     let queryStr =
       'select * from tbl_common_user where domain_id = ? and state = "1" and user_type = "' +
-      GLBConfig.TYPE_OPERATOR +
+      GLBConfig.TYPE_DEFAULT +
       '"'
     let replacements = [user.domain_id]
 
@@ -72,9 +73,17 @@ const searchAct = async (req, res) => {
     returnData.rows = []
 
     for (let ap of result.data) {
-      let d = JSON.parse(JSON.stringify(ap))
-      delete d.user_password
-      returnData.rows.push(d)
+      ap.user_groups = []
+      let user_groups = await tb_user_groups.findAll({
+        where: {
+          user_id: ap.user_id
+        }
+      })
+      for (let g of user_groups) {
+        ap.user_groups.push(g.usergroup_id)
+      }
+      delete ap.user_password
+      returnData.rows.push(ap)
     }
 
     common.sendData(res, returnData)
@@ -89,24 +98,24 @@ const addAct = async (req, res) => {
     let doc = common.docValidate(req)
     let user = req.user
 
-    let usergroup = await tb_usergroup.findOne({
-      where: {
-        usergroup_id: doc.usergroup_id
-      }
-    })
+    let groupCheckFlag = true
 
-    if (usergroup) {
-      let adduser = await tb_user.findOne({
+    for (let gid of doc.user_groups) {
+      let usergroup = await tb_usergroup.findOne({
         where: {
-          user_phone: doc.user_phone
+          usergroup_id: gid
         }
       })
-      if (adduser) {
-        return common.sendError(res, 'operator_02')
+      if (!usergroup) {
+        groupCheckFlag = false
+        break
       }
-      adduser = await tb_user.findOne({
+    }
+
+    if (groupCheckFlag) {
+      let adduser = await tb_user.findOne({
         where: {
-          user_username: doc.user_username
+          [Op.or]: [{ user_phone: doc.user_phone }, { user_username: doc.user_username }]
         }
       })
       if (adduser) {
@@ -114,8 +123,8 @@ const addAct = async (req, res) => {
       }
       adduser = await tb_user.create({
         user_id: await Sequence.genUserID(),
+        user_type: GLBConfig.TYPE_DEFAULT,
         domain_id: user.domain_id,
-        usergroup_id: doc.usergroup_id,
         user_username: doc.user_username,
         user_email: doc.user_email,
         user_phone: doc.user_phone,
@@ -123,9 +132,17 @@ const addAct = async (req, res) => {
         user_name: doc.user_name,
         user_gender: doc.user_gender,
         user_address: doc.user_address,
-        user_zipcode: doc.user_zipcode,
-        user_type: usergroup.usergroup_type
+        user_zipcode: doc.user_zipcode
       })
+
+      for (let gid of doc.user_groups) {
+        await tb_user_groups.create({
+          user_id: adduser.user_id,
+          usergroup_id: gid
+        })
+      }
+
+      adduser.user_groups = doc.user_groups
       delete adduser.password
       common.sendData(res, adduser)
     } else {
@@ -150,11 +167,6 @@ const modifyAct = async (req, res) => {
         state: GLBConfig.ENABLE
       }
     })
-    let usergroup = await tb_usergroup.findOne({
-      where: {
-        usergroup_id: doc.new.usergroup_id
-      }
-    })
     if (modiuser) {
       modiuser.user_email = doc.new.user_email
       modiuser.user_phone = doc.new.user_phone
@@ -164,9 +176,22 @@ const modifyAct = async (req, res) => {
       modiuser.user_address = doc.new.user_address
       modiuser.user_state = doc.new.user_state
       modiuser.user_zipcode = doc.new.user_zipcode
-      modiuser.usergroup_id = doc.new.usergroup_id
-      modiuser.user_type = usergroup.usergroup_type
       await modiuser.save()
+
+      await tb_user_groups.destroy({
+        where: {
+          user_id: modiuser.user_id
+        }
+      })
+
+      for (let gid of doc.new.user_groups) {
+        await tb_user_groups.create({
+          user_id: modiuser.user_id,
+          usergroup_id: gid
+        })
+      }
+
+      modiuser.user_groups = doc.new.user_groups
       delete modiuser.user_password
       common.sendData(res, modiuser)
       return

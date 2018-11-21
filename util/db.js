@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize')
-const uuid = require('uuid')
 
 const config = require('../config')
 const common = require('./CommonUtil.js')
@@ -226,6 +225,7 @@ for (let type of TYPES) {
 exp.ID = ID_TYPE
 exp.IDNO = IDNO_TYPE
 exp.sequelize = sequelize
+exp.Op = Sequelize.Op
 
 if (config.RWSeperateFlag) {
   let sequelizeQuery = new Sequelize(
