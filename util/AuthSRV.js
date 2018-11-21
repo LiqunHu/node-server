@@ -1,4 +1,4 @@
-const fs = require('fs')
+const _ = require('lodash')
 const moment = require('moment')
 const rp = require('request-promise')
 
@@ -17,6 +17,7 @@ const sequelize = model.sequelize
 const tb_common_api = model.common_api
 const tb_common_domain = model.common_domain
 const tb_common_user = model.common_user
+const tb_user_groups = model.common_user_groups
 const tb_common_domainmenu = model.common_domainmenu
 const tb_common_usergroup = model.common_usergroup
 
@@ -29,7 +30,6 @@ const loginInit = async (user, session_token, type) => {
     returnData.name = user.user_name
     returnData.phone = user.user_phone
     returnData.created_at = moment(user.created_at).format('MM[, ]YYYY')
-    returnData.type = user.user_type
     returnData.city = user.user_city
     let domain
     if (user.domain_id) {
@@ -47,23 +47,18 @@ const loginInit = async (user, session_token, type) => {
       returnData.domain_name = '未知'
     }
 
-    let usergroup = await tb_common_usergroup.findOne({
+    let groups = await tb_user_groups.findAll({
       where: {
-        usergroup_id: user.usergroup_id,
-        state: GLBConfig.ENABLE
+        user_id: user.user_id
       }
     })
 
-    if (usergroup) {
-      returnData.description = usergroup.usergroup_name
-      returnData.menulist = await iterationMenu(
-        user,
-        domain,
-        usergroup.usergroup_id,
-        '0',
-        [],
-        [usergroup.usergroup_id]
-      )
+    if (groups.length > 0) {
+      let gids = []
+      groups.forEach((item, index) => {
+        gids.push(item.usergroup_id)
+      })
+      returnData.menulist = await iterationMenu(user, domain, gids, '0')
 
       if (config.redisCache) {
         // prepare redis Cache
@@ -124,33 +119,15 @@ const loginInit = async (user, session_token, type) => {
             show_flag: '1'
           })
         } else {
-          let groupapis = await queryGroupApi(user.usergroup_id)
+          let groupapis = await queryGroupApi(gids)
           for (let item of groupapis) {
-            if (item.api_kind === '3') {
-              let sub_group = await tb_common_usergroup.findOne({
-                where: {
-                  usergroup_type: item.sys_usergroup_type
-                }
-              })
-              let subgroupapis = await queryGroupApi(sub_group.usergroup_id)
-              for (let subitem of subgroupapis) {
-                authApis.push({
-                  api_name: subitem.api_name,
-                  api_path: subitem.api_path,
-                  api_function: subitem.api_function,
-                  auth_flag: subitem.auth_flag,
-                  show_flag: subitem.show_flag
-                })
-              }
-            } else {
-              authApis.push({
-                api_name: item.api_name,
-                api_path: item.api_path,
-                api_function: item.api_function,
-                auth_flag: item.auth_flag,
-                show_flag: item.show_flag
-              })
-            }
+            authApis.push({
+              api_name: item.api_name,
+              api_path: item.api_path,
+              api_function: item.api_function,
+              auth_flag: item.auth_flag,
+              show_flag: item.show_flag
+            })
           }
         }
         let expired = null
@@ -185,50 +162,63 @@ const loginInit = async (user, session_token, type) => {
     return null
   }
 }
-exports.loginInit = loginInit
 
 exports.AuthResource = async (req, res) => {
   try {
+    common.reqTrans(req, __filename)
     let doc = common.docValidate(req)
     let user
 
-    if (!('loginType' in doc)) {
-      return common.sendError(res, 'auth_19')
-    }
-
-    if (doc.loginType === 'WEB' || doc.loginType === 'MOBILE') {
+    if (doc.login_type === 'WEB' || doc.login_type === 'MOBILE') {
       if (!('username' in doc)) {
         return common.sendError(res, 'auth_02')
       }
-      if (!('identifyCode' in doc)) {
+      if (!('identify_code' in doc)) {
         return common.sendError(res, 'auth_03')
       }
-      if (!('magicNo' in doc)) {
+      if (!('magic_no' in doc)) {
         return common.sendError(res, 'auth_04')
       }
 
-      let replacements = []
-      let userQueryStr =
-        'select * from tbl_common_user t where t.user_username=? and t.state=' + GLBConfig.ENABLE
-      replacements.push(doc.username)
-      user = await sequelize.query(userQueryStr, {
-        replacements: replacements,
-        type: sequelize.QueryTypes.SELECT
+      // let replacements = []
+      // let userQueryStr =
+      //   'select * from tbl_common_user t where t.user_username=? and t.state=' + GLBConfig.ENABLE
+      // replacements.push(doc.username)
+      // user = await sequelize.query(userQueryStr, {
+      //   replacements: replacements,
+      //   type: sequelize.QueryTypes.SELECT
+      // })
+
+      // user = user[0]
+      user = await tb_common_user.findOne({
+        where: {
+          user_username: doc.username,
+          state: GLBConfig.ENABLE
+        }
       })
 
-      if (user.length === 0) {
+      if (_.isEmpty(user)) {
         return common.sendError(res, 'auth_05')
       }
-      user = user[0]
 
-      let decrypted = Security.aesDecryptModeCFB(doc.identifyCode, user.user_password, doc.magicNo)
+      let decrypted = Security.aesDecryptModeCFB(
+        doc.identify_code,
+        user.user_password,
+        doc.magic_no
+      )
 
       if (!(decrypted == user.user_username)) {
         return common.sendError(res, 'auth_05')
       } else {
-        let session_token = Security.user2token(doc.loginType, user, doc.identifyCode, doc.magicNo)
+        let session_token = Security.user2token(
+          doc.login_type,
+          user,
+          doc.identify_code,
+          doc.magic_no
+        )
         res.append('Authorization', session_token)
-        let loginData = await loginInit(user, session_token, doc.loginType)
+        delete user.user_password
+        let loginData = await loginInit(user, session_token, doc.login_type)
 
         if (loginData) {
           loginData.Authorization = session_token
@@ -297,11 +287,6 @@ exports.AuthResource = async (req, res) => {
   }
 }
 
-/**
- * 用户登出
- * @param req
- * @param res
- */
 exports.SignOutResource = async (req, res) => {
   try {
     let token_str = req.get('Authorization')
@@ -322,6 +307,7 @@ exports.SignOutResource = async (req, res) => {
     return common.sendData(res)
   }
 }
+
 exports.SMSResource = async (req, res) => {
   let doc = common.docValidate(req)
   if (!('phone' in doc)) {
@@ -348,6 +334,7 @@ exports.SMSResource = async (req, res) => {
     return
   }
 }
+
 exports.PhoneResetPasswordResource = async (req, res) => {
   try {
     let doc = common.docValidate(req),
@@ -395,16 +382,17 @@ exports.PhoneResetPasswordResource = async (req, res) => {
   }
 }
 
-const queryGroupApi = async GroupID => {
+const queryGroupApi = async groups => {
   try {
     // prepare redis Cache
-    let queryStr = `select * from tbl_common_usergroupmenu a, tbl_common_domainmenu b, tbl_common_api c
+    let queryStr = `select DISTINCT c.api_name, c.api_path, c.api_function, c.auth_flag, c.show_flag 
+          from tbl_common_usergroupmenu a, tbl_common_domainmenu b, tbl_common_api c
           where a.domainmenu_id = b.domainmenu_id
           and b.api_id = c.api_id
-          and a.usergroup_id = ?
+          and a.usergroup_id in (?)
           and b.state = '1'`
 
-    let replacements = [GroupID]
+    let replacements = [groups]
     let groupmenus = await sequelize.query(queryStr, {
       replacements: replacements,
       type: sequelize.QueryTypes.SELECT
@@ -416,7 +404,7 @@ const queryGroupApi = async GroupID => {
   }
 }
 
-const iterationMenu = async (user, domain, GroupID, parent_id, m_list, actGroups) => {
+const iterationMenu = async (user, domain, groups, parent_id) => {
   if (user.user_type === GLBConfig.TYPE_ADMINISTRATOR) {
     let return_list = []
     return_list.push({
@@ -475,15 +463,16 @@ const iterationMenu = async (user, domain, GroupID, parent_id, m_list, actGroups
 
     return return_list
   } else {
-    let return_list = m_list
-    let queryStr = `select * from tbl_common_usergroupmenu a, tbl_common_domainmenu b
+    let return_list = []
+    let queryStr = `select distinct b.domainmenu_id, b.node_type,b.domainmenu_name,b.domainmenu_icon, b.root_show_flag, c.show_flag, c.api_path
+        from tbl_common_usergroupmenu a, tbl_common_domainmenu b
           left join tbl_common_api c on b.api_id = c.api_id
           where a.domainmenu_id = b.domainmenu_id
-          and a.usergroup_id = ?
+          and a.usergroup_id in (?)
           and b.parent_id = ?
           order by b.domainmenu_index`
 
-    let replacements = [GroupID, parent_id]
+    let replacements = [groups, parent_id]
     let menus = await sequelize.query(queryStr, {
       replacements: replacements,
       type: sequelize.QueryTypes.SELECT
@@ -493,94 +482,35 @@ const iterationMenu = async (user, domain, GroupID, parent_id, m_list, actGroups
       let sub_menu = []
 
       if (m.node_type === GLBConfig.MTYPE_ROOT && m.root_show_flag === '1') {
-        if (m.api_kind === '3') {
-          sub_menu = await iterationMenu(
-            user,
-            domain,
-            GroupID,
-            m.domainmenu_id,
-            return_list,
-            actGroups
-          )
-        } else {
-          sub_menu = await iterationMenu(user, domain, GroupID, m.domainmenu_id, [], actGroups)
-        }
+        sub_menu = await iterationMenu(user, domain, groups, m.domainmenu_id)
       }
 
-      if (m.api_kind === '3') {
-        if (m.node_type === GLBConfig.MTYPE_LEAF) {
-          let usergroup = await tb_common_usergroup.findOne({
-            where: {
-              usergroup_type: m.sys_usergroup_type
-            }
-          })
-          if (usergroup) {
-            if (actGroups.indexOf(usergroup.usergroup_id) < 0) {
-              actGroups.push(usergroup.usergroup_id)
-              return_list = await iterationMenu(
-                user,
-                domain,
-                usergroup.usergroup_id,
-                '0',
-                return_list,
-                actGroups
-              )
-            }
-          }
-        }
-      } else {
-        if (m.node_type === GLBConfig.MTYPE_LEAF) {
-          return_list.push({
-            menu_id: m.domainmenu_id,
-            menu_kind: m.api_kind,
-            menu_type: m.node_type,
-            menu_name: m.domainmenu_name,
-            menu_path: m.api_path,
-            menu_icon: m.domainmenu_icon,
-            show_flag: m.show_flag,
-            sub_menu: sub_menu
-          })
-        } else if (
-          m.node_type === GLBConfig.MTYPE_ROOT &&
-          sub_menu.length > 0 &&
-          m.root_show_flag === '1'
-        ) {
-          let i
-          for (i = 0; i < return_list.length; i++) {
-            if (return_list[i].menu_id === m.domainmenu_id) {
-              for (let ms of sub_menu) {
-                let j
-                for (j = 0; j < return_list[i].sub_menu.length; j++) {
-                  if (ms.menu_id === return_list[i].sub_menu[j].menu_id) break
-                }
-                if (j >= return_list[i].sub_menu.length)
-                  return_list[i].sub_menu.push({
-                    menu_id: ms.menu_id,
-                    menu_kind: ms.menu_kind,
-                    menu_type: ms.menu_type,
-                    menu_name: ms.menu_name,
-                    menu_path: ms.menu_path,
-                    menu_icon: ms.menu_icon,
-                    show_flag: ms.show_flag,
-                    sub_menu: ms.sub_menu
-                  })
-              }
-              break
-            }
-          }
-          if (i >= return_list.length) {
-            return_list.push({
-              menu_id: m.domainmenu_id,
-              menu_kind: m.api_kind,
-              menu_type: m.node_type,
-              menu_name: m.domainmenu_name,
-              menu_path: m.api_path,
-              menu_icon: m.domainmenu_icon,
-              show_flag: m.show_flag,
-              sub_menu: sub_menu
-            })
-          }
-        }
+      if (m.node_type === GLBConfig.MTYPE_LEAF) {
+        return_list.push({
+          menu_id: m.domainmenu_id,
+          menu_kind: m.api_kind,
+          menu_type: m.node_type,
+          menu_name: m.domainmenu_name,
+          menu_path: m.api_path,
+          menu_icon: m.domainmenu_icon,
+          show_flag: m.show_flag,
+          sub_menu: sub_menu
+        })
+      } else if (
+        m.node_type === GLBConfig.MTYPE_ROOT &&
+        sub_menu.length > 0 &&
+        m.root_show_flag === '1'
+      ) {
+        return_list.push({
+          menu_id: m.domainmenu_id,
+          menu_kind: m.api_kind,
+          menu_type: m.node_type,
+          menu_name: m.domainmenu_name,
+          menu_path: m.api_path,
+          menu_icon: m.domainmenu_icon,
+          show_flag: m.show_flag,
+          sub_menu: sub_menu
+        })
       }
     }
     return return_list

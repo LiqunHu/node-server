@@ -1,4 +1,3 @@
-const Joi = require('joi')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
 const Sequence = require('../../../util/Sequence')
