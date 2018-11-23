@@ -2,14 +2,6 @@ const express = require('express')
 const services = require('./service')
 const router = express.Router()
 
-//common
-//commonQuery
-router.post('/components/userSelectDialogControl/:method', services.UserSelectDialogSRV.UserSelectDialogResource)
-router.post('/components/DomainSelectDialogControl/:method', services.DomainSelectDialogSRV.DomainSelectDialogResource)
-
-// baseconfig
-router.post('/baseconfig/FollowerControl/:method', services.FollowerControlSRV.FollowerControlResource)
-
 // system
 router.post('/system/SystemApiControl/:method', services.SystemApiControlSRV.SystemApiControlResource)
 router.post('/system/DomainTemplateControl/:method', services.DomainTemplateControlSRV.DomainTemplateControlResource)

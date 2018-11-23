@@ -52,7 +52,7 @@ const searchAct = async (req, res) => {
 
     let queryStr =
       'select * from tbl_common_user where domain_id = ? and state = "1" and user_type = "' +
-      GLBConfig.TYPE_DEFAULT +
+      GLBConfig.TYPE_OPERATOR +
       '"'
     let replacements = [user.domain_id]
 
@@ -123,7 +123,7 @@ const addAct = async (req, res) => {
       }
       adduser = await tb_user.create({
         user_id: await Sequence.genUserID(),
-        user_type: GLBConfig.TYPE_DEFAULT,
+        user_type: GLBConfig.TYPE_OPERATOR,
         domain_id: user.domain_id,
         user_username: doc.user_username,
         user_email: doc.user_email,
