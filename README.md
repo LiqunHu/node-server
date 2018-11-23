@@ -17,7 +17,7 @@
 [crypto-js]: https://github.com/brix/crypto-js
 [log4js]: https://log4js-node.github.io/log4js-node/index.html
 [sequelize]: http://docs.sequelizejs.com
-[node-schedule]：https://github.com/node-schedule/node-schedule#readme
+[node-schedule]: https://github.com/node-schedule/node-schedule#readme
 [joi]: https://github.com/hapijs/joi
 
 
