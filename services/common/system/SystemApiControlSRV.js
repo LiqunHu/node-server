@@ -77,6 +77,7 @@ const genMenu = async parentId => {
       return_list.push({
         systemmenu_id: m.systemmenu_id,
         systemmenu_name: m.systemmenu_name,
+        systemmenu_icon: m.systemmenu_icon,
         node_type: m.node_type,
         name: m.systemmenu_name,
         isParent: true,
@@ -136,22 +137,6 @@ const modifyFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
     let user = req.user
-
-    let afolder = await tb_common_systemmenu.findOne({
-      where: {
-        systemmenu_name: doc.systemmenu_name
-      }
-    })
-
-    let aapi = await tb_common_api.findOne({
-      where: {
-        api_name: doc.systemmenu_name
-      }
-    })
-
-    if (afolder || aapi) {
-      return common.sendError(res, 'common_api_01')
-    }
 
     let folder = await tb_common_systemmenu.findOne({
       where: {
