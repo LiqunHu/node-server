@@ -297,8 +297,7 @@ exports.SignOutResource = async (req, res) => {
         magicNo = tokensplit[2],
         expires = tokensplit[3],
         sha1 = tokensplit[4]
-      let error = await RedisClient.removeItem(GLBConfig.REDISKEY.AUTH + type + uid)
-      if (error) logger.error(error)
+      await RedisClient.removeItem(GLBConfig.REDISKEY.AUTH + type + uid)
     }
     return common.sendData(res)
   } catch (error) {
