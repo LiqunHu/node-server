@@ -13,12 +13,9 @@ const sms = require('../util/SMSUtil.js')
 
 // table
 const sequelize = model.sequelize
-const tb_common_api = model.common_api
 const tb_common_domain = model.common_domain
 const tb_common_user = model.common_user
 const tb_user_groups = model.common_user_groups
-const tb_common_domainmenu = model.common_domainmenu
-const tb_common_usergroup = model.common_usergroup
 
 const loginInit = async (user, session_token, type) => {
   try {
