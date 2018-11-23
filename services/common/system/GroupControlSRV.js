@@ -167,7 +167,6 @@ const addAct = async (req, res) => {
     let user = req.user
 
     let usergroup = await tb_common_usergroup.create({
-      domain_id: user.domain_id,
       usergroup_name: doc.usergroup_name,
       usergroup_type: GLBConfig.TYPE_OPERATOR,
       node_type: doc.node_type,
@@ -231,7 +230,6 @@ const deleteAct = async (req, res) => {
     let user = req.user
     let usergroup = await tb_common_usergroup.findOne({
       where: {
-        domain_id: user.domain_id,
         usergroup_id: doc.usergroup_id
       }
     })

@@ -68,26 +68,6 @@ app.use(cookieParser())
 //   res.end()
 // })
 
-// error handler
-app.use(function(err, req, res, next) {
-  // specific for validation errors
-  if (err instanceof ev.ValidationError) return res.status(err.status).json(err)
-
-  // other type of errors, it *might* also be a Runtime Error
-  // example handling
-  if (process.env.NODE_ENV !== 'production') {
-    return res.status(500).send({
-      errno: -1,
-      msg: err.stack
-    })
-  } else {
-    return res.status(500).send({
-      errno: -1,
-      msg: 'Internal Error'
-    })
-  }
-})
-
 app.use('/api', authority.AuthMiddleware)
 
 //处理webpack服务请求

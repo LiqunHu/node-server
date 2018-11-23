@@ -14,5 +14,16 @@
       "description": "dev"
     }
   ],
-  "security": [{ "ApiKeyAuth": [] }]
+  "security": [{ "ApiKeyAuth": [] }],
+  "paths": {},
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "schemas": {}
+  }
 }

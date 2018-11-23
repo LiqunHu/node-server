@@ -20,11 +20,11 @@
         }
     ],
     "paths": {
-        "/api/common/system/DomainControl/init": {
+        "/api/common/system/GroupControl/init": {
             "post": {
-                "summary": "获取机构数据字典",
+                "summary": "获取组数据字典",
                 "tags": [
-                    "DomainControl"
+                    "GroupControl"
                 ],
                 "parameters": [],
                 "requestBody": {
@@ -45,19 +45,19 @@
                 "deprecated": false
             }
         },
-        "/api/common/system/DomainControl/search": {
+        "/api/common/system/GroupControl/search": {
             "post": {
-                "summary": "机构查询",
+                "summary": "组查询",
                 "tags": [
-                    "DomainControl"
+                    "GroupControl"
                 ],
                 "parameters": [],
                 "requestBody": {
-                    "required": true,
+                    "required": false,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DomainControlsearchPostBody"
+                                "$ref": ""
                             }
                         }
                     }
@@ -70,11 +70,11 @@
                 "deprecated": false
             }
         },
-        "/api/common/system/DomainControl/add": {
+        "/api/common/system/GroupControl/getcheck": {
             "post": {
-                "summary": "机构增加",
+                "summary": "获取组下拥有的菜单",
                 "tags": [
-                    "DomainControl"
+                    "GroupControl"
                 ],
                 "parameters": [],
                 "requestBody": {
@@ -82,7 +82,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DomainControladdPostBody"
+                                "$ref": "#/components/schemas/GroupControlgetcheckPostBody"
                             }
                         }
                     }
@@ -95,11 +95,11 @@
                 "deprecated": false
             }
         },
-        "/api/common/system/DomainControl/modify": {
+        "/api/common/system/GroupControl/add": {
             "post": {
-                "summary": "机构修改",
+                "summary": "增加目录或者节点",
                 "tags": [
-                    "DomainControl"
+                    "GroupControl"
                 ],
                 "parameters": [],
                 "requestBody": {
@@ -107,7 +107,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DomainControlmodifyPostBody"
+                                "$ref": "#/components/schemas/GroupControladdPostBody"
                             }
                         }
                     }
@@ -120,11 +120,11 @@
                 "deprecated": false
             }
         },
-        "/api/common/system/DomainControl/searchDomainMenu": {
+        "/api/common/system/GroupControl/modify": {
             "post": {
-                "summary": "查询机构菜单",
+                "summary": "修改节点",
                 "tags": [
-                    "DomainControl"
+                    "GroupControl"
                 ],
                 "parameters": [],
                 "requestBody": {
@@ -132,7 +132,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DomainControlsearchDomainMenuPostBody"
+                                "$ref": "#/components/schemas/GroupControlmodifyPostBody"
                             }
                         }
                     }
@@ -145,11 +145,11 @@
                 "deprecated": false
             }
         },
-        "/api/common/system/DomainControl/deleteSelect": {
+        "/api/common/system/GroupControl/delete": {
             "post": {
-                "summary": "删除选定项",
+                "summary": "删除组",
                 "tags": [
-                    "DomainControl"
+                    "GroupControl"
                 ],
                 "parameters": [],
                 "requestBody": {
@@ -157,7 +157,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DomainControldeleteSelectPostBody"
+                                "$ref": "#/components/schemas/GroupControldeletePostBody"
                             }
                         }
                     }
@@ -170,11 +170,36 @@
                 "deprecated": false
             }
         },
-        "/api/common/system/DomainControl/changeOrder": {
+        "/api/common/system/OperatorControl/init": {
             "post": {
-                "summary": "修改菜单顺序",
+                "summary": "获取组相关信息",
                 "tags": [
-                    "DomainControl"
+                    "OperatorControl"
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": ""
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success operation"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/api/common/system/OperatorControl/search": {
+            "post": {
+                "summary": "用户查询查询",
+                "tags": [
+                    "OperatorControl"
                 ],
                 "parameters": [],
                 "requestBody": {
@@ -182,7 +207,82 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/DomainControlchangeOrderPostBody"
+                                "$ref": "#/components/schemas/OperatorControlsearchPostBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success operation"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/api/common/system/OperatorControl/add": {
+            "post": {
+                "summary": "增加操作员",
+                "tags": [
+                    "OperatorControl"
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OperatorControladdPostBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success operation"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/api/common/system/OperatorControl/modify": {
+            "post": {
+                "summary": "修改用户",
+                "tags": [
+                    "OperatorControl"
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OperatorControlmodifyPostBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success operation"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/api/common/system/OperatorControl/delete": {
+            "post": {
+                "summary": "删除用户",
+                "tags": [
+                    "OperatorControl"
+                ],
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OperatorControldeletePostBody"
                             }
                         }
                     }
@@ -205,125 +305,183 @@
             }
         },
         "schemas": {
-            "DomainControlsearchPostBody": {
+            "GroupControlgetcheckPostBody": {
+                "type": "object",
+                "properties": {
+                    "usergroup_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "GroupControladdPostBody": {
+                "type": "object",
+                "properties": {
+                    "usergroup_name": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "node_type": {
+                        "type": "string",
+                        "maxLength": 2
+                    },
+                    "parent_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "GroupControlmodifyPostBody": {
+                "type": "object",
+                "required": [
+                    "usergroup_id"
+                ],
+                "properties": {
+                    "usergroup_id": {
+                        "type": "integer"
+                    },
+                    "usergroup_name": {
+                        "type": "string",
+                        "maxLength": 50
+                    },
+                    "menus": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "systemmenu_id": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "GroupControldeletePostBody": {
+                "type": "object",
+                "properties": {
+                    "usergroup_id": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "OperatorControlsearchPostBody": {
                 "type": "object",
                 "properties": {
                     "search_text": {
                         "type": "string",
                         "maxLength": 50
-                    },
-                    "order": {
-                        "type": "string",
-                        "maxLength": 50
-                    },
-                    "limit": {
-                        "type": "integer"
-                    },
-                    "offset": {
-                        "type": "integer"
                     }
                 }
             },
-            "DomainControladdPostBody": {
+            "OperatorControladdPostBody": {
                 "type": "object",
                 "properties": {
-                    "domain": {
+                    "user_username": {
                         "type": "string",
                         "maxLength": 50
                     },
-                    "domaintemplate_id": {
-                        "type": "integer"
-                    },
-                    "domain_name": {
+                    "user_email": {
                         "type": "string",
                         "maxLength": 50
                     },
-                    "domain_province": {
+                    "user_phone": {
                         "type": "string",
                         "maxLength": 50
                     },
-                    "domain_city": {
+                    "user_name": {
                         "type": "string",
                         "maxLength": 50
                     },
-                    "domain_district": {
+                    "user_gender": {
                         "type": "string",
-                        "maxLength": 50
+                        "maxLength": 2
                     },
-                    "domain_address": {
+                    "user_address": {
                         "type": "string",
-                        "maxLength": 50
+                        "maxLength": 100
                     },
-                    "domain_contact": {
+                    "user_zipcode": {
                         "type": "string",
-                        "maxLength": 50
+                        "maxLength": 10
                     },
-                    "domain_phone": {
-                        "type": "string",
-                        "maxLength": 50
-                    },
-                    "domain_description": {
-                        "type": "string",
-                        "maxLength": 500
+                    "user_groups": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
                     }
                 }
             },
-            "DomainControlmodifyPostBody": {
+            "OperatorControlmodifyPostBody": {
                 "type": "object",
                 "properties": {
                     "new": {
                         "type": "object",
                         "required": [
-                            "domain_id",
-                            "domain",
+                            "user_id",
+                            "user_username",
+                            "user_password",
                             "created_at",
                             "updated_at"
                         ],
                         "properties": {
-                            "domain_id": {
-                                "type": "integer"
-                            },
-                            "domain": {
+                            "user_id": {
                                 "type": "string"
                             },
-                            "domain_type": {
+                            "user_username": {
+                                "type": "string"
+                            },
+                            "user_wx_openid": {
+                                "type": "string"
+                            },
+                            "user_type": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domaintemplate_id": {
-                                "type": "integer",
-                                "nullable": true
-                            },
-                            "domain_name": {
-                                "type": "string"
-                            },
-                            "domain_province": {
+                            "user_email": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domain_city": {
+                            "user_phone": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domain_district": {
+                            "user_password": {
+                                "type": "string"
+                            },
+                            "user_name": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domain_address": {
-                                "type": "string"
-                            },
-                            "domain_contact": {
-                                "type": "string"
-                            },
-                            "domain_phone": {
-                                "type": "string"
-                            },
-                            "domain_fax": {
-                                "type": "string"
-                            },
-                            "domain_description": {
+                            "user_gender": {
                                 "type": "string",
                                 "nullable": true
+                            },
+                            "user_avatar": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_province": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_city": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_district": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_address": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_zipcode": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_remark": {
+                                "type": "string"
                             },
                             "state": {
                                 "type": "string",
@@ -340,62 +498,83 @@
                             "updated_at": {
                                 "type": "string",
                                 "format": "date-time"
+                            },
+                            "user_groups": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
                             }
                         }
                     },
                     "old": {
                         "type": "object",
                         "required": [
-                            "domain_id",
-                            "domain",
+                            "user_id",
+                            "user_username",
+                            "user_password",
                             "created_at",
                             "updated_at"
                         ],
                         "properties": {
-                            "domain_id": {
-                                "type": "integer"
-                            },
-                            "domain": {
+                            "user_id": {
                                 "type": "string"
                             },
-                            "domain_type": {
+                            "user_username": {
+                                "type": "string"
+                            },
+                            "user_wx_openid": {
+                                "type": "string"
+                            },
+                            "user_type": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domaintemplate_id": {
-                                "type": "integer",
-                                "nullable": true
-                            },
-                            "domain_name": {
-                                "type": "string"
-                            },
-                            "domain_province": {
+                            "user_email": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domain_city": {
+                            "user_phone": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domain_district": {
+                            "user_password": {
+                                "type": "string"
+                            },
+                            "user_name": {
                                 "type": "string",
                                 "nullable": true
                             },
-                            "domain_address": {
-                                "type": "string"
-                            },
-                            "domain_contact": {
-                                "type": "string"
-                            },
-                            "domain_phone": {
-                                "type": "string"
-                            },
-                            "domain_fax": {
-                                "type": "string"
-                            },
-                            "domain_description": {
+                            "user_gender": {
                                 "type": "string",
                                 "nullable": true
+                            },
+                            "user_avatar": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_province": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_city": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_district": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_address": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_zipcode": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "user_remark": {
+                                "type": "string"
                             },
                             "state": {
                                 "type": "string",
@@ -412,101 +591,23 @@
                             "updated_at": {
                                 "type": "string",
                                 "format": "date-time"
-                            }
-                        }
-                    }
-                }
-            },
-            "DomainControlsearchDomainMenuPostBody": {
-                "type": "object",
-                "required": [
-                    "domain_id"
-                ],
-                "properties": {
-                    "domain_id": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "DomainControldeleteSelectPostBody": {
-                "type": "object",
-                "required": [
-                    "domainmenu_id"
-                ],
-                "properties": {
-                    "domainmenu_id": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "DomainControlchangeOrderPostBody": {
-                "type": "object",
-                "properties": {
-                    "menus": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "required": [
-                                "domainmenu_id",
-                                "domainmenu_name",
-                                "created_at",
-                                "updated_at"
-                            ],
-                            "properties": {
-                                "domainmenu_id": {
+                            },
+                            "user_groups": {
+                                "type": "array",
+                                "items": {
                                     "type": "integer"
-                                },
-                                "domain_id": {
-                                    "type": "integer",
-                                    "nullable": true
-                                },
-                                "domainmenu_name": {
-                                    "type": "string"
-                                },
-                                "domainmenu_icon": {
-                                    "type": "string"
-                                },
-                                "domainmenu_index": {
-                                    "type": "integer",
-                                    "default": "0"
-                                },
-                                "api_id": {
-                                    "type": "integer",
-                                    "nullable": true
-                                },
-                                "api_function": {
-                                    "type": "string"
-                                },
-                                "node_type": {
-                                    "type": "string",
-                                    "nullable": true
-                                },
-                                "parent_id": {
-                                    "type": "string",
-                                    "nullable": true
-                                },
-                                "root_show_flag": {
-                                    "type": "string",
-                                    "default": "1"
-                                },
-                                "state": {
-                                    "type": "string",
-                                    "nullable": true,
-                                    "default": "1"
-                                },
-                                "version": {
-                                    "type": "integer"
-                                },
-                                "created_at": {
-                                    "type": "string",
-                                    "format": "date-time"
-                                },
-                                "updated_at": {
-                                    "type": "string",
-                                    "format": "date-time"
                                 }
                             }
                         }
+                    }
+                }
+            },
+            "OperatorControldeletePostBody": {
+                "type": "object",
+                "properties": {
+                    "user_id": {
+                        "type": "string",
+                        "maxLength": 50
                     }
                 }
             }

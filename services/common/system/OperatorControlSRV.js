@@ -32,7 +32,6 @@ exports.OperatorControlResource = (req, res) => {
 const initAct = async (req, res) => {
   try {
     let returnData = {}
-    let user = req.user
 
     groups = []
     await genUserGroup('0', 0)
@@ -47,7 +46,6 @@ const initAct = async (req, res) => {
 const searchAct = async (req, res) => {
   try {
     let doc = common.docValidate(req),
-      user = req.user,
       returnData = {}
 
     let queryStr =
@@ -206,7 +204,6 @@ const modifyAct = async (req, res) => {
 const deleteAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
 
     let deluser = await tb_user.findOne({
       where: {
