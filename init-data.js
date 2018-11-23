@@ -110,7 +110,7 @@ const tb_common_systemmenu = model.common_systemmenu
     api = await tb_common_api.create({
       api_name: '系统组权限维护',
       api_path: '/common/system/DomainGroupApiControl',
-      api_function: 'DomainGROUPAPICONTROL',
+      api_function: 'DOMAINGROUPAPICONTROL',
       auth_flag: '1',
       show_flag: '1',
       api_kind: '1'
