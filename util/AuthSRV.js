@@ -426,7 +426,7 @@ const iterationMenu = async (user, groups, parent_id) => {
           menu_name: m.systemmenu_name,
           menu_path: m.api_path,
           menu_icon: m.systemmenu_icon,
-          show_flag: m.show_flag,
+          show_flag: '1',
           sub_menu: sub_menu
         })
       }

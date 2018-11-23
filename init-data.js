@@ -41,6 +41,7 @@ const tb_common_systemmenu = model.common_systemmenu
     // common
     menu = await tb_common_systemmenu.create({
       systemmenu_name: 'common',
+      systemmenu_icon: 'fa-cogs',
       node_type: '00',
       parent_id: '0'
     })

@@ -1,5 +1,4 @@
 const db = require('../../util/db')
-const GLBConfig = require('../../util/GLBConfig')
 
 module.exports = db.defineModel('tbl_common_systemmenu', {
   systemmenu_id: {

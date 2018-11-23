@@ -1,7 +1,6 @@
 /* 用户表 */
 const CryptoJS = require('crypto-js')
 const db = require('../../util/db')
-const GLBConfig = require('../../util/GLBConfig')
 
 module.exports = db.defineModel('tbl_common_user', {
   user_id: {

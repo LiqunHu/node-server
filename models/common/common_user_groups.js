@@ -1,6 +1,5 @@
 /* 用户所属组 */
 const db = require('../../util/db')
-const GLBConfig = require('../../util/GLBConfig')
 
 module.exports = db.defineModel('tbl_common_user_groups', {
   user_groups_id: {
