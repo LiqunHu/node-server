@@ -68,7 +68,7 @@ const genMenu = async parentId => {
     where: {
       parent_id: parentId
     },
-    order: [['created_at', 'DESC']]
+    order: [['systemmenu_index']]
   })
   for (let m of menus) {
     let sub_menus = []
@@ -121,6 +121,7 @@ const addFolderAct = async (req, res) => {
 
     let folder = await tb_common_systemmenu.create({
       systemmenu_name: doc.systemmenu_name,
+      systemmenu_icon: doc.systemmenu_icon,
       node_type: '00', //NODETYPEINFO
       parent_id: doc.parent_id
     })
@@ -160,6 +161,7 @@ const modifyFolderAct = async (req, res) => {
 
     if (folder) {
       folder.systemmenu_name = doc.systemmenu_name
+      folder.systemmenu_icon = doc.systemmenu_icon
       await folder.save()
     } else {
       return common.sendError(res, 'common_api_02')

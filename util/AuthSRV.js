@@ -13,12 +13,8 @@ const sms = require('../util/SMSUtil.js')
 
 // table
 const sequelize = model.sequelize
-const tb_common_api = model.common_api
-const tb_common_domain = model.common_domain
 const tb_common_user = model.common_user
 const tb_user_groups = model.common_user_groups
-const tb_common_domainmenu = model.common_domainmenu
-const tb_common_usergroup = model.common_usergroup
 
 const loginInit = async (user, session_token, type) => {
   try {
@@ -30,21 +26,6 @@ const loginInit = async (user, session_token, type) => {
     returnData.phone = user.user_phone
     returnData.created_at = moment(user.created_at).format('MM[, ]YYYY')
     returnData.city = user.user_city
-    let domain
-    if (user.domain_id) {
-      domain = await tb_common_domain.findOne({
-        where: {
-          domain_id: user.domain_id
-        }
-      })
-      returnData.domain_id = user.domain_id
-      returnData.domain_name = domain.domain_name
-      returnData.domain_type = domain.domain_type
-    } else {
-      domain = null
-      returnData.domain_id = user.domain_id
-      returnData.domain_name = '未知'
-    }
 
     let groups = await tb_user_groups.findAll({
       where: {
@@ -57,42 +38,19 @@ const loginInit = async (user, session_token, type) => {
       groups.forEach((item, index) => {
         gids.push(item.usergroup_id)
       })
-      returnData.menulist = await iterationMenu(user, domain, gids, '0')
+      returnData.menulist = await iterationMenu(user, gids, '0')
 
       if (config.redisCache) {
         // prepare redis Cache
         let authApis = []
         if (user.user_type === GLBConfig.TYPE_ADMINISTRATOR) {
-          if (domain.domain_type === '0') {
-            authApis.push({
-              api_name: '系统菜单维护',
-              api_path: '/common/system/SystemApiControl',
-              api_function: 'SYSTEMAPICONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-            authApis.push({
-              api_name: '机构模板维护',
-              api_path: '/common/system/DomainTemplateControl',
-              api_function: 'DOMAINTEMPLATECONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-            authApis.push({
-              api_name: '机构维护',
-              api_path: '/common/system/DomainControl',
-              api_function: 'DOMAINCONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-            authApis.push({
-              api_name: '系统组权限维护',
-              api_path: '/common/system/DomainGroupApiControl',
-              api_function: 'DOMAINGROUPAPICONTROL',
-              auth_flag: '1',
-              show_flag: '1'
-            })
-          }
+          authApis.push({
+            api_name: '系统菜单维护',
+            api_path: '/common/system/SystemApiControl',
+            api_function: 'SYSTEMAPICONTROL',
+            auth_flag: '1',
+            show_flag: '1'
+          })
 
           authApis.push({
             api_name: '用户设置',
@@ -104,8 +62,8 @@ const loginInit = async (user, session_token, type) => {
 
           authApis.push({
             api_name: '角色组维护',
-            api_path: '/common/system/DomainGroupControl',
-            api_function: 'DOMAINGROUPCONTROL',
+            api_path: '/common/system/GroupControl',
+            api_function: 'GROUPCONTROL',
             auth_flag: '1',
             show_flag: '1'
           })
@@ -139,10 +97,7 @@ const loginInit = async (user, session_token, type) => {
           GLBConfig.REDISKEY.AUTH + type + user.user_id,
           {
             session_token: session_token,
-            user: Object.assign(
-              JSON.parse(JSON.stringify(user)),
-              JSON.parse(JSON.stringify(domain))
-            ),
+            user: user,
             authApis: authApis
           },
           expired
@@ -179,16 +134,6 @@ exports.AuthResource = async (req, res) => {
         return common.sendError(res, 'auth_04')
       }
 
-      // let replacements = []
-      // let userQueryStr =
-      //   'select * from tbl_common_user t where t.user_username=? and t.state=' + GLBConfig.ENABLE
-      // replacements.push(doc.username)
-      // user = await sequelize.query(userQueryStr, {
-      //   replacements: replacements,
-      //   type: sequelize.QueryTypes.SELECT
-      // })
-
-      // user = user[0]
       user = await tb_common_user.findOne({
         where: {
           user_username: doc.username,
@@ -385,8 +330,8 @@ const queryGroupApi = async groups => {
   try {
     // prepare redis Cache
     let queryStr = `select DISTINCT c.api_name, c.api_path, c.api_function, c.auth_flag, c.show_flag 
-          from tbl_common_usergroupmenu a, tbl_common_domainmenu b, tbl_common_api c
-          where a.domainmenu_id = b.domainmenu_id
+          from tbl_common_usergroupmenu a, tbl_common_systemmenu b, tbl_common_api c
+          where a.systemmenu_id = b.systemmenu_id
           and b.api_id = c.api_id
           and a.usergroup_id in (?)
           and b.state = '1'`
@@ -403,7 +348,7 @@ const queryGroupApi = async groups => {
   }
 }
 
-const iterationMenu = async (user, domain, groups, parent_id) => {
+const iterationMenu = async (user, groups, parent_id) => {
   if (user.user_type === GLBConfig.TYPE_ADMINISTRATOR) {
     let return_list = []
     return_list.push({
@@ -413,42 +358,20 @@ const iterationMenu = async (user, domain, groups, parent_id) => {
       show_flag: '1',
       sub_menu: []
     })
-    if (domain.domain_type === '0') {
-      return_list[0].sub_menu.push({
-        menu_type: GLBConfig.MTYPE_LEAF,
-        menu_name: '系统菜单维护',
-        show_flag: '1',
-        menu_path: '/common/system/SystemApiControl',
-        sub_menu: []
-      })
-      return_list[0].sub_menu.push({
-        menu_type: GLBConfig.MTYPE_LEAF,
-        menu_name: '机构模板维护',
-        show_flag: '1',
-        menu_path: '/common/system/DomainTemplateControl',
-        sub_menu: []
-      })
-      return_list[0].sub_menu.push({
-        menu_type: GLBConfig.MTYPE_LEAF,
-        menu_name: '机构维护',
-        show_flag: '1',
-        menu_path: '/common/system/DomainControl',
-        sub_menu: []
-      })
-      return_list[0].sub_menu.push({
-        menu_type: GLBConfig.MTYPE_LEAF,
-        menu_name: '系统组权限维护',
-        show_flag: '1',
-        menu_path: '/common/system/DomainGroupApiControl',
-        sub_menu: []
-      })
-    }
+
+    return_list[0].sub_menu.push({
+      menu_type: GLBConfig.MTYPE_LEAF,
+      menu_name: '系统菜单维护',
+      show_flag: '1',
+      menu_path: '/common/system/SystemApiControl',
+      sub_menu: []
+    })
 
     return_list[0].sub_menu.push({
       menu_type: GLBConfig.MTYPE_LEAF,
       menu_name: '角色组维护',
       show_flag: '1',
-      menu_path: '/common/system/DomainGroupControl',
+      menu_path: '/common/system/GroupControl',
       sub_menu: []
     })
 
@@ -463,13 +386,13 @@ const iterationMenu = async (user, domain, groups, parent_id) => {
     return return_list
   } else {
     let return_list = []
-    let queryStr = `select distinct b.domainmenu_id, b.node_type,b.domainmenu_name,b.domainmenu_icon, b.root_show_flag, c.show_flag, c.api_path
-        from tbl_common_usergroupmenu a, tbl_common_domainmenu b
+    let queryStr = `select distinct b.systemmenu_id, b.node_type,b.systemmenu_name,b.systemmenu_icon, c.show_flag, c.api_path
+        from tbl_common_usergroupmenu a, tbl_common_systemmenu b
           left join tbl_common_api c on b.api_id = c.api_id
-          where a.domainmenu_id = b.domainmenu_id
+          where a.systemmenu_id = b.systemmenu_id
           and a.usergroup_id in (?)
           and b.parent_id = ?
-          order by b.domainmenu_index`
+          order by b.systemmenu_index`
 
     let replacements = [groups, parent_id]
     let menus = await sequelize.query(queryStr, {
@@ -480,33 +403,29 @@ const iterationMenu = async (user, domain, groups, parent_id) => {
     for (let m of menus) {
       let sub_menu = []
 
-      if (m.node_type === GLBConfig.MTYPE_ROOT && m.root_show_flag === '1') {
-        sub_menu = await iterationMenu(user, domain, groups, m.domainmenu_id)
+      if (m.node_type === GLBConfig.MTYPE_ROOT) {
+        sub_menu = await iterationMenu(user, groups, m.systemmenu_id)
       }
 
       if (m.node_type === GLBConfig.MTYPE_LEAF) {
         return_list.push({
-          menu_id: m.domainmenu_id,
+          menu_id: m.systemmenu_id,
           menu_kind: m.api_kind,
           menu_type: m.node_type,
-          menu_name: m.domainmenu_name,
+          menu_name: m.systemmenu_name,
           menu_path: m.api_path,
-          menu_icon: m.domainmenu_icon,
+          menu_icon: m.systemmenu_icon,
           show_flag: m.show_flag,
           sub_menu: sub_menu
         })
-      } else if (
-        m.node_type === GLBConfig.MTYPE_ROOT &&
-        sub_menu.length > 0 &&
-        m.root_show_flag === '1'
-      ) {
+      } else if (m.node_type === GLBConfig.MTYPE_ROOT && sub_menu.length > 0) {
         return_list.push({
-          menu_id: m.domainmenu_id,
+          menu_id: m.systemmenu_id,
           menu_kind: m.api_kind,
           menu_type: m.node_type,
-          menu_name: m.domainmenu_name,
+          menu_name: m.systemmenu_name,
           menu_path: m.api_path,
-          menu_icon: m.domainmenu_icon,
+          menu_icon: m.systemmenu_icon,
           show_flag: m.show_flag,
           sub_menu: sub_menu
         })

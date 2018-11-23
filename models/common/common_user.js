@@ -8,10 +8,6 @@ module.exports = db.defineModel('tbl_common_user', {
     type: db.ID,
     primaryKey: true
   },
-  domain_id: {
-    type: db.IDNO,
-    allowNull: true
-  },
   user_username: {
     type: db.STRING(100),
     allowNull: false,

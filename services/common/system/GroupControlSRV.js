@@ -7,10 +7,10 @@ const model = require('../../../model')
 // tables
 const tb_common_usergroup = model.common_usergroup
 const tb_common_user = model.common_user
-const tb_common_domainmenu = model.common_domainmenu
+const tb_common_systemmenu = model.common_systemmenu
 const tb_common_usergroupmenu = model.common_usergroupmenu
 
-exports.DomainGroupControlResource = (req, res) => {
+exports.GroupControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
   if (method === 'init') {
     initAct(req, res)
@@ -36,7 +36,7 @@ const initAct = async (req, res) => {
 
     returnData.menuInfo = [
       {
-        domainmenu_id: 0,
+        systemmenu_id: 0,
         name: '根目录',
         isParent: true,
         node_type: GLBConfig.MTYPE_ROOT,
@@ -44,45 +44,41 @@ const initAct = async (req, res) => {
       }
     ]
 
-    returnData.menuInfo[0].children = JSON.parse(
-      JSON.stringify(await genDomainMenu(user.domain_id, '0'))
-    )
+    returnData.menuInfo[0].children = await genMenu('0')
     common.sendData(res, returnData)
   } catch (error) {
     common.sendFault(res, error)
   }
 }
 
-const genDomainMenu = async (domain_id, parentId) => {
+const genMenu = async parentId => {
   let return_list = []
-  let menus = await tb_common_domainmenu.findAll({
+  let menus = await tb_common_systemmenu.findAll({
     where: {
-      domain_id: domain_id,
       parent_id: parentId
     },
-    order: [['domainmenu_index']]
+    order: [['systemmenu_index']]
   })
   for (let m of menus) {
     let sub_menus = []
     if (m.node_type === GLBConfig.MTYPE_ROOT) {
-      sub_menus = await genDomainMenu(domain_id, m.domainmenu_id)
+      sub_menus = await genMenu(m.systemmenu_id)
       return_list.push({
-        domainmenu_id: m.domainmenu_id,
-        domainmenu_name: m.domainmenu_name,
-        domainmenu_icon: m.domainmenu_icon,
+        systemmenu_id: m.systemmenu_id,
+        systemmenu_name: m.systemmenu_name,
         node_type: m.node_type,
-        name: m.domainmenu_name,
+        name: m.systemmenu_name,
         isParent: true,
         parent_id: m.parent_id,
         children: sub_menus
       })
     } else {
       return_list.push({
-        domainmenu_id: m.domainmenu_id,
-        domainmenu_name: m.domainmenu_name,
+        systemmenu_id: m.systemmenu_id,
+        systemmenu_name: m.systemmenu_name,
         api_id: m.api_id,
         node_type: m.node_type,
-        name: m.domainmenu_name,
+        name: m.systemmenu_name + '->' + m.api_function,
         isParent: false,
         parent_id: m.parent_id
       })
@@ -103,18 +99,17 @@ const searchAct = async (req, res) => {
         children: []
       }
     ]
-    groups[0].children = JSON.parse(JSON.stringify(await genUserGroup(user.domain_id, '0')))
+    groups[0].children = JSON.parse(JSON.stringify(await genUserGroup('0')))
     common.sendData(res, groups)
   } catch (error) {
     common.sendFault(res, error)
   }
 }
 
-const genUserGroup = async (domain_id, parentId) => {
+const genUserGroup = async (parentId) => {
   let return_list = []
   let groups = await tb_common_usergroup.findAll({
     where: {
-      domain_id: domain_id,
       parent_id: parentId,
       usergroup_type: GLBConfig.TYPE_OPERATOR
     }
@@ -122,7 +117,7 @@ const genUserGroup = async (domain_id, parentId) => {
   for (let g of groups) {
     let sub_group = []
     if (g.node_type === GLBConfig.MTYPE_ROOT) {
-      sub_group = await genUserGroup(domain_id, g.usergroup_id)
+      sub_group = await genUserGroup(g.usergroup_id)
       return_list.push({
         usergroup_id: g.usergroup_id,
         node_type: g.node_type,
@@ -158,7 +153,7 @@ const getCheckAct = async (req, res) => {
       }
     })
     for (let item of groupmenus) {
-      returnData.groupMenu.push(item.domainmenu_id)
+      returnData.groupMenu.push(item.systemmenu_id)
     }
     common.sendData(res, returnData)
   } catch (error) {
@@ -183,7 +178,7 @@ const addAct = async (req, res) => {
       for (let m of doc.menus) {
         await tb_common_usergroupmenu.create({
           usergroup_id: usergroup.usergroup_id,
-          domainmenu_id: m.domainmenu_id
+          systemmenu_id: m.systemmenu_id
         })
       }
     }
@@ -217,7 +212,7 @@ const modifyAct = async (req, res) => {
         for (let m of doc.menus) {
           await tb_common_usergroupmenu.create({
             usergroup_id: usergroup.usergroup_id,
-            domainmenu_id: m.domainmenu_id
+            systemmenu_id: m.systemmenu_id
           })
         }
       }

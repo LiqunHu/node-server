@@ -11,6 +11,16 @@ module.exports = db.defineModel('tbl_common_systemmenu', {
     type: db.STRING(300),
     allowNull: false
   },
+  systemmenu_icon: {
+    type: db.STRING(100),
+    defaultValue: '',
+    allowNull: false
+  },
+  systemmenu_index: {
+    type: db.INTEGER,
+    defaultValue: '0',
+    allowNull: false
+  },
   api_id: {
     type: db.IDNO,
     allowNull: true

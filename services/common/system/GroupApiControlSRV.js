@@ -6,12 +6,11 @@ const model = require('../../../model')
 
 const tb_usergroup = model.common_usergroup
 const tb_common_usergroupmenu = model.common_usergroupmenu
-const tb_domain = model.common_domain
 const tb_common_domainmenu = model.common_domainmenu
 
 let groups = []
 
-exports.DomainGroupApiControlResource = (req, res) => {
+exports.GroupApiControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
   if (method === 'init') {
     initAct(req, res)
@@ -36,7 +35,7 @@ const initAct = async (req, res) => {
 
     returnData.menuInfo = [
       {
-        domainmenu_id: 0,
+        systemmenu_id: 0,
         name: '根目录',
         isParent: true,
         node_type: GLBConfig.MTYPE_ROOT,
@@ -45,7 +44,7 @@ const initAct = async (req, res) => {
     ]
 
     returnData.menuInfo[0].children = JSON.parse(
-      JSON.stringify(await genDomainMenu(user.domain_id, '0'))
+      JSON.stringify(await genMenu('0'))
     )
     common.sendData(res, returnData)
   } catch (error) {
@@ -54,35 +53,34 @@ const initAct = async (req, res) => {
   }
 }
 
-const genDomainMenu = async (domain_id, parentId) => {
+const genMenu = async parentId => {
   let return_list = []
-  let menus = await tb_common_domainmenu.findAll({
+  let menus = await tb_common_systemmenu.findAll({
     where: {
-      domain_id: domain_id,
       parent_id: parentId
-    }
+    },
+    order: [['systemmenu_index']]
   })
   for (let m of menus) {
     let sub_menus = []
     if (m.node_type === GLBConfig.MTYPE_ROOT) {
-      sub_menus = await genDomainMenu(domain_id, m.domainmenu_id)
+      sub_menus = await genMenu(m.systemmenu_id)
       return_list.push({
-        domainmenu_id: m.domainmenu_id,
-        domainmenu_name: m.domainmenu_name,
-        domainmenu_icon: m.domainmenu_icon,
+        systemmenu_id: m.systemmenu_id,
+        systemmenu_name: m.systemmenu_name,
         node_type: m.node_type,
-        name: m.domainmenu_name,
+        name: m.systemmenu_name,
         isParent: true,
         parent_id: m.parent_id,
         children: sub_menus
       })
     } else {
       return_list.push({
-        domainmenu_id: m.domainmenu_id,
-        domainmenu_name: m.domainmenu_name,
+        systemmenu_id: m.systemmenu_id,
+        systemmenu_name: m.systemmenu_name,
         api_id: m.api_id,
         node_type: m.node_type,
-        name: m.domainmenu_name,
+        name: m.systemmenu_name + '->' + m.api_function,
         isParent: false,
         parent_id: m.parent_id
       })

@@ -35,7 +35,7 @@ const initAct = async (req, res) => {
     let user = req.user
 
     groups = []
-    await genUserGroup(user.domain_id, '0', 0)
+    await genUserGroup('0', 0)
     returnData.groupInfo = groups
 
     common.sendData(res, returnData)
@@ -51,10 +51,10 @@ const searchAct = async (req, res) => {
       returnData = {}
 
     let queryStr =
-      'select * from tbl_common_user where domain_id = ? and state = "1" and user_type = "' +
-      GLBConfig.TYPE_DEFAULT +
+      'select * from tbl_common_user where state = "1" and user_type = "' +
+      GLBConfig.TYPE_OPERATOR +
       '"'
-    let replacements = [user.domain_id]
+    let replacements = []
 
     if (doc.search_text) {
       queryStr +=
@@ -96,8 +96,6 @@ const searchAct = async (req, res) => {
 const addAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
-
     let groupCheckFlag = true
 
     for (let gid of doc.user_groups) {
@@ -123,8 +121,7 @@ const addAct = async (req, res) => {
       }
       adduser = await tb_user.create({
         user_id: await Sequence.genUserID(),
-        user_type: GLBConfig.TYPE_DEFAULT,
-        domain_id: user.domain_id,
+        user_type: GLBConfig.TYPE_OPERATOR,
         user_username: doc.user_username,
         user_email: doc.user_email,
         user_phone: doc.user_phone,
@@ -142,9 +139,11 @@ const addAct = async (req, res) => {
         })
       }
 
-      adduser.user_groups = doc.user_groups
-      delete adduser.password
-      common.sendData(res, adduser)
+      let returnData = JSON.parse(JSON.stringify(adduser))
+      delete returnData.user_password
+      returnData.user_groups = doc.user_groups
+      
+      common.sendData(res, returnData)
     } else {
       common.sendError(res, 'operator_01')
       return
@@ -162,7 +161,6 @@ const modifyAct = async (req, res) => {
 
     let modiuser = await tb_user.findOne({
       where: {
-        domain_id: user.domain_id,
         user_id: doc.old.user_id,
         state: GLBConfig.ENABLE
       }
@@ -212,7 +210,6 @@ const deleteAct = async (req, res) => {
 
     let deluser = await tb_user.findOne({
       where: {
-        domain_id: user.domain_id,
         user_id: doc.user_id,
         state: GLBConfig.ENABLE
       }
@@ -232,10 +229,9 @@ const deleteAct = async (req, res) => {
   }
 }
 
-const genUserGroup = async (domain_id, parentId, lev) => {
+const genUserGroup = async (parentId, lev) => {
   let actgroups = await tb_usergroup.findAll({
     where: {
-      domain_id: domain_id,
       parent_id: parentId,
       usergroup_type: GLBConfig.TYPE_OPERATOR
     }
@@ -247,7 +243,7 @@ const genUserGroup = async (domain_id, parentId, lev) => {
         text: '--'.repeat(lev) + g.usergroup_name,
         disabled: true
       })
-      await genUserGroup(domain_id, g.usergroup_id, lev + 1)
+      await genUserGroup(g.usergroup_id, lev + 1)
     } else {
       groups.push({
         id: g.usergroup_id,

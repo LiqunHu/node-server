@@ -4,7 +4,6 @@ const GLBConfig = require('./util/GLBConfig')
 const logger = require('./util/Logger').createLogger('init-data')
 const model = require('./model.js')
 
-const tb_common_domain = model.common_domain
 const tb_common_user = model.common_user
 const tb_user_groups = model.common_user_groups
 const tb_common_usergroup = model.common_usergroup
@@ -19,15 +18,7 @@ const tb_common_systemmenu = model.common_systemmenu
     let api = null
     let usergroup = null
 
-    let domain = await tb_common_domain.create({
-      domain: 'admin',
-      domain_type: GLBConfig.DOMAIN_ADMINISTRATOR,
-      domain_name: 'administratorGroup',
-      domain_description: 'admin'
-    })
-
     usergroup = await tb_common_usergroup.create({
-      domain_id: domain.domain_id,
       usergroup_name: 'administrator',
       usergroup_type: GLBConfig.TYPE_ADMINISTRATOR,
       node_type: '01',
@@ -36,7 +27,6 @@ const tb_common_systemmenu = model.common_systemmenu
 
     let user = await tb_common_user.create({
       user_id: await Sequence.genUserID(),
-      domain_id: domain.domain_id,
       user_type: GLBConfig.TYPE_ADMINISTRATOR,
       user_username: 'admin',
       user_name: 'admin',
@@ -55,65 +45,6 @@ const tb_common_systemmenu = model.common_systemmenu
       parent_id: '0'
     })
     fmenuID1 = menu.systemmenu_id
-
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: 'components',
-      node_type: '00',
-      parent_id: fmenuID1
-    })
-    fmenuID2 = menu.systemmenu_id
-    api = await tb_common_api.create({
-      api_name: '机构选择组件',
-      api_path: '/common/components/DomainSelectDialogControl',
-      api_function: 'DOMAINSELECTDIALOGCONTROL',
-      auth_flag: '0',
-      show_flag: '0',
-      api_kind: '1'
-    })
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: api.api_name,
-      api_id: api.api_id,
-      api_function: api.api_function,
-      node_type: '01',
-      parent_id: fmenuID2
-    })
-    api = await tb_common_api.create({
-      api_name: '操作员选择组件',
-      api_path: '/common/components/userSelectDialogControl',
-      api_function: 'USERSELECTDIALOGCONTROL',
-      auth_flag: '0',
-      show_flag: '0',
-      api_kind: '1'
-    })
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: api.api_name,
-      api_id: api.api_id,
-      api_function: api.api_function,
-      node_type: '01',
-      parent_id: fmenuID2
-    })
-
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: 'baseconfig',
-      node_type: '00',
-      parent_id: fmenuID1
-    })
-    fmenuID2 = menu.systemmenu_id
-    api = await tb_common_api.create({
-      api_name: '关注审核',
-      api_path: '/common/baseconfig/FollowerControl',
-      api_function: 'FOLLOWERCONTROL',
-      auth_flag: '1',
-      show_flag: '1',
-      api_kind: '1'
-    })
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: api.api_name,
-      api_id: api.api_id,
-      api_function: api.api_function,
-      node_type: '01',
-      parent_id: fmenuID2
-    })
 
     menu = await tb_common_systemmenu.create({
       systemmenu_name: 'system',
@@ -136,51 +67,23 @@ const tb_common_systemmenu = model.common_systemmenu
       node_type: '01',
       parent_id: fmenuID2
     })
-    api = await tb_common_api.create({
-      api_name: '机构模板维护',
-      api_path: '/common/system/DomainTemplateControl',
-      api_function: 'DOMAINTEMPLATECONTROL',
-      auth_flag: '1',
-      show_flag: '1',
-      api_kind: '1'
-    })
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: api.api_name,
-      api_id: api.api_id,
-      api_function: api.api_function,
-      node_type: '01',
-      parent_id: fmenuID2
-    })
-    api = await tb_common_api.create({
-      api_name: '机构维护',
-      api_path: '/common/system/DomainControl',
-      api_function: 'DOMAINCONTROL',
-      auth_flag: '1',
-      show_flag: '1',
-      api_kind: '1'
-    })
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: api.api_name,
-      api_id: api.api_id,
-      api_function: api.api_function,
-      node_type: '01',
-      parent_id: fmenuID2
-    })
-    api = await tb_common_api.create({
-      api_name: '系统组权限维护',
-      api_path: '/common/system/DomainGroupApiControl',
-      api_function: 'DomainGROUPAPICONTROL',
-      auth_flag: '1',
-      show_flag: '1',
-      api_kind: '1'
-    })
-    menu = await tb_common_systemmenu.create({
-      systemmenu_name: api.api_name,
-      api_id: api.api_id,
-      api_function: api.api_function,
-      node_type: '01',
-      parent_id: fmenuID2
-    })
+
+
+    // api = await tb_common_api.create({
+    //   api_name: '系统组权限维护',
+    //   api_path: '/common/system/DomainGroupApiControl',
+    //   api_function: 'DomainGROUPAPICONTROL',
+    //   auth_flag: '1',
+    //   show_flag: '1',
+    //   api_kind: '1'
+    // })
+    // menu = await tb_common_systemmenu.create({
+    //   systemmenu_name: api.api_name,
+    //   api_id: api.api_id,
+    //   api_function: api.api_function,
+    //   node_type: '01',
+    //   parent_id: fmenuID2
+    // })
     api = await tb_common_api.create({
       api_name: '用户设置',
       api_path: '/common/system/UserSetting',
@@ -198,8 +101,8 @@ const tb_common_systemmenu = model.common_systemmenu
     })
     api = await tb_common_api.create({
       api_name: '角色设置',
-      api_path: '/common/system/DomainGroupControl',
-      api_function: 'DOMAINGROUPCONTROL',
+      api_path: '/common/system/GroupControl',
+      api_function: 'GROUPCONTROL',
       auth_flag: '1',
       show_flag: '1',
       api_kind: '1'

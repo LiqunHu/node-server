@@ -6,10 +6,6 @@ module.exports = db.defineModel('tbl_common_usergroup', {
     autoIncrement: true,
     primaryKey: true
   },
-  domain_id: {
-    type: db.IDNO,
-    allowNull: false
-  },
   usergroup_type: {
     type: db.STRING(3),
     allowNull: true
