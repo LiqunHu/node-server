@@ -1,4 +1,3 @@
-const fs = require('fs')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
 const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
@@ -102,23 +101,6 @@ const genMenu = async parentId => {
 const addFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
-
-    let afolder = await tb_common_systemmenu.findOne({
-      where: {
-        systemmenu_name: doc.systemmenu_name
-      }
-    })
-
-    let aapi = await tb_common_api.findOne({
-      where: {
-        api_name: doc.systemmenu_name
-      }
-    })
-
-    if (afolder || aapi) {
-      return common.sendError(res, 'common_api_01')
-    }
 
     let folder = await tb_common_systemmenu.create({
       systemmenu_name: doc.systemmenu_name,

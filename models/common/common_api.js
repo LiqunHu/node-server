@@ -25,7 +25,8 @@ module.exports = db.defineModel('tbl_common_api', {
   },
   api_function: {
     type: db.STRING(100),
-    unique: true
+    unique: 'functionIndex',
+    allowNull: false
   },
   auth_flag: {
     type: db.STRING(2),
