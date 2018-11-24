@@ -37,7 +37,7 @@ const ImageCropperSave = req => {
             reject(err)
           }
           if (files.cropper_file) {
-            let filename = uuid.v4() + '.jpg'
+            let filename = uuid.v1() + '.jpg'
             let cropper_data = JSON.parse(fields.cropper_data[0])
             if (config.mongoFileFlag) {
               MongoCli.getBucket().then(bucket => {
@@ -98,7 +98,7 @@ const fileSave = req => {
           }
           if (files.file) {
             let ext = path.extname(files.file[0].path)
-            let filename = uuid.v4() + ext
+            let filename = uuid.v1() + ext
             if (config.mongoFileFlag) {
               MongoCli.getBucket().then(bucket => {
                 let uploadStream = bucket.openUploadStream(filename)
@@ -216,7 +216,7 @@ const fileMove = url => {
       let ext = path.extname(url)
       let tempName = path.basename(url)
       let tempfile = path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + tempName)
-      let filename = uuid.v4() + ext
+      let filename = uuid.v1() + ext
       if (config.mongoFileFlag) {
         MongoCli.getBucket().then(bucket => {
           let uploadStream = bucket.openUploadStream(filename)

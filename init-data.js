@@ -1,5 +1,4 @@
 const common = require('./util/CommonUtil')
-const Sequence = require('./util/Sequence')
 const GLBConfig = require('./util/GLBConfig')
 const logger = require('./util/Logger').createLogger('init-data')
 const model = require('./model.js')
@@ -26,7 +25,6 @@ const tb_common_systemmenu = model.common_systemmenu
     })
 
     let user = await tb_common_user.create({
-      user_id: await Sequence.genUserID(),
       user_type: GLBConfig.TYPE_ADMINISTRATOR,
       user_username: 'admin',
       user_name: 'admin',

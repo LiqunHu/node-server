@@ -4,7 +4,8 @@ const db = require('../../util/db')
 
 module.exports = db.defineModel('tbl_common_user', {
   user_id: {
-    type: db.ID,
+    type: db.UUID,
+    defaultValue: db.UUIDV1,
     primaryKey: true
   },
   user_username: {

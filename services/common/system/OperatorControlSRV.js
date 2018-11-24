@@ -1,6 +1,5 @@
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
-const Sequence = require('../../../util/Sequence')
 const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
 const model = require('../../../model')
 const RedisClient = require('../../../util/RedisClient')
@@ -118,7 +117,6 @@ const addAct = async (req, res) => {
         return common.sendError(res, 'operator_02')
       }
       adduser = await tb_user.create({
-        user_id: await Sequence.genUserID(),
         user_type: GLBConfig.TYPE_OPERATOR,
         user_username: doc.user_username,
         user_email: doc.user_email,

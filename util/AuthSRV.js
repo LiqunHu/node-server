@@ -235,7 +235,7 @@ exports.SignOutResource = async (req, res) => {
   try {
     let token_str = req.get('Authorization')
     if (token_str) {
-      let tokensplit = token_str.split('-')
+      let tokensplit = token_str.split('_')
 
       let type = tokensplit[0],
         uid = tokensplit[1],

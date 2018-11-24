@@ -17,7 +17,7 @@ exports.token2user = async req => {
       return -1
     }
 
-    let tokensplit = token_str.split('-')
+    let tokensplit = token_str.split('_')
     if (tokensplit.length != 5) {
       return -1
     }
@@ -52,9 +52,9 @@ exports.token2user = async req => {
       let s = ''
       if (type === 'WEB' || type === 'MOBILE') {
         let idf = aesEncryptModeCFB(user.user_username, user.user_password, magicNo)
-        s = [type, uid, idf, expires, config.SECRET_KEY].join('-')
+        s = [type, uid, idf, expires, config.SECRET_KEY].join('_')
       } else if (type === 'WEIXIN') {
-        s = [type, uid, user.user_wx_openid, expires, config.SECRET_KEY].join('-')
+        s = [type, uid, user.user_wx_openid, expires, config.SECRET_KEY].join('_')
       }
 
       if (sha1 != CryptoJS.SHA1(s).toString()) {
@@ -148,9 +148,9 @@ exports.user2token = (type, user, identifyCode, magicNo) => {
       expires = Date.now() + config.TOKEN_AGE
     }
 
-    let s = [type, user.user_id, identifyCode, expires.toString(), config.SECRET_KEY].join('-')
+    let s = [type, user.user_id, identifyCode, expires.toString(), config.SECRET_KEY].join('_')
     let L = [type, user.user_id, magicNo, expires.toString(), CryptoJS.SHA1(s).toString()]
-    return L.join('-')
+    return L.join('_')
   } catch (error) {
     logger.error(error)
     return null

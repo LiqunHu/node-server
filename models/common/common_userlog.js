@@ -7,7 +7,7 @@ module.exports = db.defineModel('tbl_common_userlog', {
     primaryKey: true
   },
   user_id: {
-    type: db.ID
+    type: db.UUID
   },
   api_function: {
     type: db.STRING(100)

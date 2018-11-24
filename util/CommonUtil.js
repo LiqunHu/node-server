@@ -6,7 +6,6 @@ const ejs = require('ejs')
 const wkhtmltopdf = require('wkhtmltopdf')
 const wkhtmltoimage = require('wkhtmltoimage')
 const ejsExcel = require('ejsexcel')
-const format = require('util').format
 const Joi = require('joi')
 const WebSocket = require('ws')
 
@@ -162,17 +161,6 @@ const generateNonceString = length => {
 const getUploadTempPath = uploadurl => {
   let fileName = path.basename(uploadurl)
   return path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName)
-}
-
-const getUUIDByTime = offset => {
-  let uuidStand = uuid.v1()
-  let uuidArr = uuidStand.split('-')
-  let uuidResult = ''
-
-  for (let i = 0; i < uuidArr.length; i++) {
-    uuidResult += uuidArr[i]
-  }
-  return uuidResult.substring(0, offset)
 }
 
 const ejs2File = (templateFile, renderData, options, outputType, res) => {
@@ -339,7 +327,6 @@ module.exports = {
   buildXML: buildXML,
   parseXML: parseXML,
   generateNonceString: generateNonceString,
-  getUUIDByTime: getUUIDByTime,
   ejs2File: ejs2File,
   ejs2xlsx: ejs2xlsx,
   getWSClients: getWSClients,

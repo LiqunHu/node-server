@@ -202,7 +202,7 @@ const defineModel = (name, attributes, params) => {
   )
 }
 
-const TYPES = ['STRING', 'INTEGER', 'BIGINT', 'TEXT', 'DOUBLE', 'DATEONLY', 'DATE', 'BOOLEAN']
+const TYPES = ['STRING', 'INTEGER', 'BIGINT', 'TEXT', 'DOUBLE', 'DATEONLY', 'DATE', 'BOOLEAN', 'UUID', 'UUIDV1']
 
 let exp = {
   defineModel: defineModel,
