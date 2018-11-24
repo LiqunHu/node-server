@@ -1,5 +1,4 @@
 const CryptoJS = require('crypto-js')
-const common = require('../util/CommonUtil.js')
 const logger = require('./Logger').createLogger('Security.js')
 
 const RedisClient = require('../util/RedisClient')
@@ -14,7 +13,7 @@ exports.token2user = async req => {
   try {
     let token_str = req.get('authorization')
     if (!token_str) {
-      logger.info('no token')
+      logger.debug('no token')
       return -1
     }
 
