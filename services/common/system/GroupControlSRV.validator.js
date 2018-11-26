@@ -44,7 +44,12 @@ module.exports = {
             .empty('')
             .max(50),
           node_type: Joi.string().max(2),
-          parent_id: Joi.number().integer()
+          parent_id: Joi.number().integer(),
+          menus: Joi.array().items(
+            Joi.object().keys({
+              systemmenu_id: Joi.number().integer()
+            })
+          )
         })
       }
     },
