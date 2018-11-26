@@ -6,7 +6,6 @@ const model = require('../../../model')
 
 const tb_usergroup = model.common_usergroup
 const tb_common_usergroupmenu = model.common_usergroupmenu
-const tb_common_domainmenu = model.common_domainmenu
 
 let groups = []
 
