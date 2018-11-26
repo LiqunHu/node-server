@@ -185,9 +185,10 @@ const modifyAct = async (req, res) => {
         })
       }
 
-      modiuser.user_groups = doc.new.user_groups
-      delete modiuser.user_password
-      common.sendData(res, modiuser)
+      let returnData = JSON.parse(JSON.stringify(modiuser))
+      delete returnData.user_password
+      returnData.user_groups = doc.new.user_groups
+      common.sendData(res, returnData)
       return
     } else {
       common.sendError(res, 'operator_03')

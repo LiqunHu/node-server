@@ -23,7 +23,12 @@ module.exports = {
         body: Joi.object().keys({
           search_text: Joi.string()
             .empty('')
-            .max(50)
+            .max(50),
+          order: Joi.string()
+            .empty('')
+            .max(50),
+          limit: Joi.number().integer(),
+          offset: Joi.number().integer()
         })
       }
     },
@@ -63,12 +68,12 @@ module.exports = {
       JoiSchema: {
         body: Joi.object().keys({
           new: Joi.object().keys(
-            _.extend(model.model2Schema(model.common_user), {
+            _.extend(_.omit(model.model2Schema(model.common_user), 'user_password'), {
               user_groups: Joi.array().items(Joi.number().integer())
             })
           ),
           old: Joi.object().keys(
-            _.extend(model.model2Schema(model.common_user), {
+            _.extend(_.omit(model.model2Schema(model.common_user), 'user_password'), {
               user_groups: Joi.array().items(Joi.number().integer())
             })
           )
@@ -83,7 +88,7 @@ module.exports = {
       type: 'post',
       JoiSchema: {
         body: Joi.object().keys({
-          user_id:Joi.string().max(50)
+          user_id: Joi.string().max(50)
         })
       }
     }
