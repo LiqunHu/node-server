@@ -27,7 +27,7 @@ const config = {
   },
   // for mongo
   mongoFileFlag: true,
-  mongoSyncFlag: true,
+  mongoSyncFlag: false,
   mongo: {
     connect: 'mongodb://127.0.0.1:27017',
     dbName: 'mvnndata',
@@ -57,11 +57,22 @@ const config = {
           filename: '../log/app.log',
           pattern: '-yyyy-MM-dd',
           compress: true
+        },
+        logstash: {
+          category: 'imcc',
+          type: 'log4js-logstash-tcp',
+          host: '127.0.0.1',
+          port: 5050,
+          fields: {
+            instance: 'imccAuth',
+            source: 'imccAuth',
+            environment: 'development'
+          }
         }
       },
       categories: {
         default: {
-          appenders: ['out', 'everything'],
+          appenders: ['out', 'everything', 'logstash'],
           level: 'debug'
         }
       }
@@ -70,7 +81,7 @@ const config = {
   // schedule Flag
   scheduleFlag: false,
   rpcservers: {
-    'pooltest': {
+    pooltest: {
       host: '127.0.0.1',
       port: 9090,
       config: {

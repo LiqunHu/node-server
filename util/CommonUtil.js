@@ -88,8 +88,8 @@ const sendError = (res, errno, msg = '错误未配置') => {
 const sendFault = (res, msg) => {
   let msgres = arguments[1] ? arguments[1] : 'Internal Error'
   let sendData = {}
-  logger.error(msg)
-
+  logger.error(msg.stack)
+  
   if ('WebSocket' in res) {
     res.errno = -1
     res.msg = msgres.message

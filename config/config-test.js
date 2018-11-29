@@ -1,5 +1,5 @@
 const config = {
-  // for sequelize`
+  // for sequelize Write`
   sequelize: {
     dialect: 'mysql',
     database: 'mvnndata',
@@ -27,7 +27,7 @@ const config = {
   },
   // for mongo
   mongoFileFlag: true,
-  mongoSyncFlag: true,
+  mongoSyncFlag: false,
   mongo: {
     connect: 'mongodb://127.0.0.1:27017',
     dbName: 'mvnndata',
@@ -57,11 +57,22 @@ const config = {
           filename: '../log/app.log',
           pattern: '-yyyy-MM-dd',
           compress: true
+        },
+        logstash: {
+          category: 'imcc',
+          type: 'log4js-logstash-tcp',
+          host: '127.0.0.1',
+          port: 5050,
+          fields: {
+            instance: 'imccAuth',
+            source: 'imccAuth',
+            environment: 'development'
+          }
         }
       },
       categories: {
         default: {
-          appenders: ['out', 'everything'],
+          appenders: ['out', 'everything', 'logstash'],
           level: 'debug'
         }
       }
@@ -69,15 +80,27 @@ const config = {
   },
   // schedule Flag
   scheduleFlag: false,
+  rpcservers: {
+    pooltest: {
+      host: '127.0.0.1',
+      port: 9090,
+      config: {
+        max: 10, // maximum size of the pool
+        min: 3 // minimum size of the pool
+      },
+      desc: '内部连接池测试'
+    }
+  },
   weixin: {
     appid: 'wx1bf0976923162a6b',
     app_secret: 'f03e63ca1aca1c007b5915b54b6ec8c7'
   },
   syslogFlag: true,
   uploadOptions: {
+    autoFields: true,
+    autoFiles: true,
     uploadDir: '../public/temp',
-    maxFileSize: 2 * 1024 * 1024,
-    keepExtensions: true
+    maxFileSize: 2 * 1024 * 1024
   },
   tempDir: '../public/temp',
   filesDir: '../public/files',
