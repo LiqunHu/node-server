@@ -20,13 +20,20 @@
 [node-schedule]: https://github.com/node-schedule/node-schedule#readme
 [joi]: https://github.com/hapijs/joi
 
-
-
-## 安装说明
-系统最好有docker环境,脚本将直接初始化以来数据库以及三方程序
-
-You should have a docker environment. Then everything will be done. :)
-got docker from https://www.docker.com
+## IDE环境
+统一使用VS CODE  https://code.visualstudio.com/
+setting中增加   
+```
+"vetur.format.defaultFormatterOptions": {
+    "prettyhtml": {
+      "printWidth": 200, // No line exceeds 100 characters
+      "singleQuote": false // Prefer double quotes over single quotes
+    }
+  },
+```
+必须插件:  
+vetur vue代码美化以及格式化插件
+Prettier vscode formatter
 
 ## 使用
 
