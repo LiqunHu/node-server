@@ -1,10 +1,19 @@
 const common = require('../util/CommonUtil.js')
 const logger = require('./Logger').createLogger('RedisClient.js')
 const config = require('../config')
-const redis = require('redis')
+const redis = require('redis-connection-pool')
 let client = undefined
 if (!client) {
-  client = redis.createClient(config.redis.port, config.redis.host, config.redis.opts)
+  client = redis('myRedisPool', {
+    host: config.redis.host, // default
+    port: config.redis.port, //default
+    // optionally specify full redis url, overrides host + port properties
+    // url: "redis://username:password@host:port"
+    max_clients: 30, // defalut
+    perform_checks: false, // checks for needed push/pop functionality
+    database: 0, // database number to use
+    options: config.redis.opts
+  })
 }
 
 /**
@@ -15,21 +24,21 @@ if (!client) {
  */
 exports.setItem = async (key, value, expired) => {
   return new Promise((resolve, reject) => {
-    if (expired) {
-      client.set(key, JSON.stringify(value), 'EX', expired, function(err, res) {
-        if (err) {
-          reject(err)
-        }
+    client.set(key, JSON.stringify(value), err => {
+      if (err) {
+        reject(err)
+      }
+      if (expired) {
+        client.expire(key, expired, err => {
+          if (err) {
+            reject(err)
+          }
+          resolve()
+        })
+      } else {
         resolve()
-      })
-    } else {
-      client.set(key, JSON.stringify(value), function(err, res) {
-        if (err) {
-          reject(err)
-        }
-        resolve()
-      })
-    }
+      }
+    })
   })
 }
 
@@ -44,21 +53,6 @@ exports.getItem = async key => {
         reject(err)
       }
       resolve(JSON.parse(reply))
-    })
-  })
-}
-
-/**
- * 获取缓存
- * @param key 缓存key
- */
-exports.getLiveTime = key => {
-  return new Promise((resolve, reject) => {
-    client.ttl(key, (err, data) => {
-      if (err) {
-        reject(err)
-      }
-      resolve(data)
     })
   })
 }

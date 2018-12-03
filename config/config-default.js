@@ -57,22 +57,11 @@ const config = {
           filename: '../log/app.log',
           pattern: '-yyyy-MM-dd',
           compress: true
-        },
-        logstash: {
-          category: 'imcc',
-          type: 'log4js-logstash-tcp',
-          host: '127.0.0.1',
-          port: 5050,
-          fields: {
-            instance: 'imccAuth',
-            source: 'imccAuth',
-            environment: 'development'
-          }
         }
       },
       categories: {
         default: {
-          appenders: ['out', 'everything', 'logstash'],
+          appenders: ['out', 'everything'],
           level: 'debug'
         }
       }

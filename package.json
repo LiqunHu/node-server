@@ -30,7 +30,7 @@
     "moment": "^2.22.2",
     "mongodb": "^3.1.4",
     "mysql2": "^1.5.3",
-    "redis": "^2.8.0",
+    "redis-connection-pool": "^1.7.2",
     "qr-image": "^3.2.0",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
