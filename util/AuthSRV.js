@@ -363,24 +363,21 @@ const iterationMenu = async (user, groups, parent_id) => {
       menu_type: GLBConfig.MTYPE_LEAF,
       menu_name: '系统菜单维护',
       show_flag: '1',
-      menu_path: '/common/system/SystemApiControl',
-      sub_menu: []
+      menu_path: '/common/system/SystemApiControl'
     })
 
     return_list[0].sub_menu.push({
       menu_type: GLBConfig.MTYPE_LEAF,
       menu_name: '角色组维护',
       show_flag: '1',
-      menu_path: '/common/system/GroupControl',
-      sub_menu: []
+      menu_path: '/common/system/GroupControl'
     })
 
     return_list[0].sub_menu.push({
       menu_type: GLBConfig.MTYPE_LEAF,
       menu_name: '员工维护',
       show_flag: '1',
-      menu_path: '/common/system/OperatorControl',
-      sub_menu: []
+      menu_path: '/common/system/OperatorControl'
     })
 
     return return_list
@@ -415,8 +412,7 @@ const iterationMenu = async (user, groups, parent_id) => {
           menu_name: m.systemmenu_name,
           menu_path: m.api_path,
           menu_icon: m.systemmenu_icon,
-          show_flag: m.show_flag,
-          sub_menu: sub_menu
+          show_flag: m.show_flag
         })
       } else if (m.node_type === GLBConfig.MTYPE_ROOT && sub_menu.length > 0) {
         return_list.push({
