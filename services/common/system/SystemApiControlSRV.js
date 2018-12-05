@@ -50,6 +50,8 @@ const searchAct = async (req, res) => {
         systemmenu_id: 0,
         name: '根目录',
         isParent: true,
+        title: '根目录',
+        expand: true,
         node_type: GLBConfig.MTYPE_ROOT,
         children: []
       }
@@ -80,6 +82,8 @@ const genMenu = async parentId => {
         node_type: m.node_type,
         name: m.systemmenu_name,
         isParent: true,
+        title: m.systemmenu_name,
+        expand: true,
         parent_id: m.parent_id,
         children: sub_menus
       })
@@ -90,6 +94,7 @@ const genMenu = async parentId => {
         api_id: m.api_id,
         node_type: m.node_type,
         name: m.systemmenu_name + '->' + m.api_function,
+        title: m.systemmenu_name + '->' + m.api_function,
         isParent: false,
         parent_id: m.parent_id
       })
