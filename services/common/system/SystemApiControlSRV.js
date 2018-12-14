@@ -65,12 +65,19 @@ const searchAct = async (req, res) => {
 
 const genMenu = async parentId => {
   let return_list = []
-  let menus = await tb_common_systemmenu.findAll({
-    where: {
-      parent_id: parentId
-    },
-    order: [['systemmenu_index']]
-  })
+
+  let queryStr = `SELECT
+                    a.*, b.api_path,
+                    b.auth_flag,
+                    b.show_flag
+                  FROM
+                    tbl_common_systemmenu a
+                  LEFT JOIN tbl_common_api b ON a.api_id = b.api_id
+                  WHERE a.parent_id = ?
+                  ORDER BY
+                    a.systemmenu_index`
+  let menus = await model.simpleSelect(queryStr, [parentId])
+
   for (let m of menus) {
     let sub_menus = []
     if (m.node_type === GLBConfig.MTYPE_ROOT) {
@@ -92,6 +99,9 @@ const genMenu = async parentId => {
         systemmenu_id: m.systemmenu_id,
         systemmenu_name: m.systemmenu_name,
         api_id: m.api_id,
+        api_path: m.api_path,
+        auth_flag: m.auth_flag,
+        show_flag: m.show_flag,
         node_type: m.node_type,
         name: m.systemmenu_name + '->' + m.api_function,
         title: m.systemmenu_name + '->' + m.api_function,

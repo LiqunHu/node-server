@@ -39,6 +39,8 @@ const initAct = async (req, res) => {
         systemmenu_id: 0,
         name: '根目录',
         isParent: true,
+        title: '根目录',
+        expand: true,
         node_type: GLBConfig.MTYPE_ROOT,
         children: []
       }
@@ -69,6 +71,8 @@ const genMenu = async parentId => {
         node_type: m.node_type,
         name: m.systemmenu_name,
         isParent: true,
+        title: m.systemmenu_name,
+        expand: true,
         parent_id: m.parent_id,
         children: sub_menus
       })
@@ -80,6 +84,7 @@ const genMenu = async parentId => {
         node_type: m.node_type,
         name: m.systemmenu_name + '->' + m.api_function,
         isParent: false,
+        title: m.systemmenu_name + '->' + m.api_function,
         parent_id: m.parent_id
       })
     }
@@ -93,8 +98,10 @@ const searchAct = async (req, res) => {
     let groups = [
       {
         usergroup_id: 0,
-        name: '总机构',
+        name: '根目录',
         isParent: true,
+        title: '根目录',
+        expand: true,
         node_type: GLBConfig.MTYPE_ROOT,
         children: []
       }
@@ -124,6 +131,8 @@ const genUserGroup = async (parentId) => {
         usergroup_type: g.usergroup_type,
         name: g.usergroup_name,
         isParent: true,
+        title: g.usergroup_name,
+        expand: true,
         parent_id: g.parent_id,
         children: sub_group
       })
@@ -134,6 +143,7 @@ const genUserGroup = async (parentId) => {
         usergroup_type: g.usergroup_type,
         name: g.usergroup_name,
         isParent: false,
+        title: g.usergroup_name,
         parent_id: g.parent_id
       })
     }
