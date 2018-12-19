@@ -1,5 +1,4 @@
 const Joi = require('joi')
-const model = require('../../../model')
 
 module.exports = {
   name: 'GroupControl Services',

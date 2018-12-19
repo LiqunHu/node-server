@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
     .sync({
       force: true
     })
-    .then(result => {
+    .then(() => {
       console.info('success')
       process.exit(0)
     })

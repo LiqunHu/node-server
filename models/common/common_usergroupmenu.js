@@ -1,4 +1,4 @@
-const db = require('../../util/db')
+const db = require('../../app/db')
 
 module.exports = db.defineModel('tbl_common_usergroupmenu', {
   usergroup_id: {
@@ -7,6 +7,6 @@ module.exports = db.defineModel('tbl_common_usergroupmenu', {
   },
   systemmenu_id: {
     type: db.IDNO,
-    allowNull: true
+    allowNull: false
   }
 })

@@ -1,4 +1,4 @@
-const db = require('../../util/db')
+const db = require('../../app/db')
 
 module.exports = db.defineModel('tbl_common_systemmenu', {
   systemmenu_id: {
@@ -32,10 +32,12 @@ module.exports = db.defineModel('tbl_common_systemmenu', {
   node_type: {
     // NODETYPEINFO
     type: db.STRING(2),
-    allowNull: true
+    defaultValue: '',
+    allowNull: false
   },
   parent_id: {
     type: db.ID,
-    allowNull: true
+    defaultValue: '',
+    allowNull: false
   }
 })

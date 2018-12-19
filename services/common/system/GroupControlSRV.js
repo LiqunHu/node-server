@@ -1,8 +1,7 @@
-const fs = require('fs')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
-const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
-const model = require('../../../model')
+const logger = require('../../../app/logger').createLogger(__filename)
+const model = require('../../../app/model')
 
 // tables
 const tb_common_usergroup = model.common_usergroup
@@ -12,6 +11,7 @@ const tb_common_usergroupmenu = model.common_usergroupmenu
 
 exports.GroupControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
+  logger.debug(method)
   if (method === 'init') {
     initAct(req, res)
   } else if (method === 'search') {
@@ -31,8 +31,7 @@ exports.GroupControlResource = (req, res) => {
 
 const initAct = async (req, res) => {
   try {
-    let user = req.user,
-      returnData = {}
+    let returnData = {}
 
     returnData.menuInfo = [
       {
@@ -83,8 +82,8 @@ const genMenu = async parentId => {
         api_id: m.api_id,
         node_type: m.node_type,
         name: m.systemmenu_name + '->' + m.api_function,
-        isParent: false,
         title: m.systemmenu_name + '->' + m.api_function,
+        isParent: false,
         parent_id: m.parent_id
       })
     }
@@ -94,11 +93,10 @@ const genMenu = async parentId => {
 
 const searchAct = async (req, res) => {
   try {
-    let user = req.user
     let groups = [
       {
         usergroup_id: 0,
-        name: '根目录',
+        name: '总机构',
         isParent: true,
         title: '根目录',
         expand: true,
@@ -142,8 +140,8 @@ const genUserGroup = async (parentId) => {
         node_type: g.node_type,
         usergroup_type: g.usergroup_type,
         name: g.usergroup_name,
-        isParent: false,
         title: g.usergroup_name,
+        isParent: false,
         parent_id: g.parent_id
       })
     }
@@ -174,7 +172,6 @@ const getCheckAct = async (req, res) => {
 const addAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
 
     let usergroup = await tb_common_usergroup.create({
       usergroup_name: doc.usergroup_name,
@@ -201,7 +198,6 @@ const addAct = async (req, res) => {
 const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
     let usergroup = await tb_common_usergroup.findOne({
       where: {
         usergroup_id: doc.usergroup_id
@@ -237,7 +233,6 @@ const modifyAct = async (req, res) => {
 const deleteAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
     let usergroup = await tb_common_usergroup.findOne({
       where: {
         usergroup_id: doc.usergroup_id

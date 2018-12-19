@@ -1,5 +1,5 @@
 /* 用户所属组 */
-const db = require('../../util/db')
+const db = require('../../app/db')
 
 module.exports = db.defineModel('tbl_common_user_groups', {
   user_groups_id: {

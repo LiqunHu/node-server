@@ -1,16 +1,17 @@
-const fs = require('fs')
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
-const logger = require('../../../util/Logger').createLogger('SysGroupApiControl')
-const model = require('../../../model')
+const logger = require('../../../app/logger').createLogger(__filename)
+const model = require('../../../app/model')
 
 const tb_usergroup = model.common_usergroup
 const tb_common_usergroupmenu = model.common_usergroupmenu
+const tb_common_systemmenu = model.tb_common_systemmenu
 
 let groups = []
 
 exports.GroupApiControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
+  logger.debug(method)
   if (method === 'init') {
     initAct(req, res)
   } else if (method === 'search') {

@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const Joi = require('joi')
-const model = require('../../../model')
+const model = require('../../../app/model')
 
 module.exports = {
   name: 'OperatorControl Services',

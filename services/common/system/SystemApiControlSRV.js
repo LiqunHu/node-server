@@ -1,7 +1,7 @@
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
-const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
-const model = require('../../../model')
+const logger = require('../../../app/logger').createLogger(__filename)
+const model = require('../../../app/model')
 
 // tables
 const tb_common_systemmenu = model.common_systemmenu
@@ -9,6 +9,7 @@ const tb_common_api = model.common_api
 
 exports.SystemApiControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
+  logger.debug(method)
   if (method === 'init') {
     initAct(req, res)
   } else if (method === 'search') {
@@ -21,8 +22,6 @@ exports.SystemApiControlResource = (req, res) => {
     addMenuAct(req, res)
   } else if (method === 'modifyMenu') {
     modifyMenuAct(req, res)
-  } else if (method === 'getApi') {
-    getApiAct(req, res)
   } else {
     common.sendError(res, 'common_01')
   }
@@ -30,11 +29,10 @@ exports.SystemApiControlResource = (req, res) => {
 
 const initAct = async (req, res) => {
   try {
-    let user = req.user,
-      returnData = {
-        authInfo: GLBConfig.AUTHINFO,
-        tfInfo: GLBConfig.TFINFO
-      }
+    let returnData = {
+      authInfo: GLBConfig.AUTHINFO,
+      tfInfo: GLBConfig.TFINFO
+    }
 
     common.sendData(res, returnData)
   } catch (error) {
@@ -44,7 +42,6 @@ const initAct = async (req, res) => {
 
 const searchAct = async (req, res) => {
   try {
-    let user = req.user
     let menus = [
       {
         systemmenu_id: 0,
@@ -65,7 +62,6 @@ const searchAct = async (req, res) => {
 
 const genMenu = async parentId => {
   let return_list = []
-
   let queryStr = `SELECT
                     a.*, b.api_path,
                     b.auth_flag,
@@ -77,7 +73,6 @@ const genMenu = async parentId => {
                   ORDER BY
                     a.systemmenu_index`
   let menus = await model.simpleSelect(queryStr, [parentId])
-
   for (let m of menus) {
     let sub_menus = []
     if (m.node_type === GLBConfig.MTYPE_ROOT) {
@@ -116,8 +111,7 @@ const genMenu = async parentId => {
 const addFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-
-    let folder = await tb_common_systemmenu.create({
+    await tb_common_systemmenu.create({
       systemmenu_name: doc.systemmenu_name,
       systemmenu_icon: doc.systemmenu_icon,
       node_type: '00', //NODETYPEINFO
@@ -133,7 +127,6 @@ const addFolderAct = async (req, res) => {
 const modifyFolderAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
 
     let folder = await tb_common_systemmenu.findOne({
       where: {
@@ -168,7 +161,6 @@ const getApiName = path => {
 const addMenuAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
 
     let afolder = await tb_common_systemmenu.findOne({
       where: {
@@ -198,7 +190,7 @@ const addMenuAct = async (req, res) => {
         show_flag: doc.show_flag
       })
 
-      let folder = await tb_common_systemmenu.create({
+      await tb_common_systemmenu.create({
         systemmenu_name: doc.systemmenu_name,
         api_id: api.api_id,
         api_function: api.api_function,
@@ -216,7 +208,6 @@ const addMenuAct = async (req, res) => {
 const modifyMenuAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
 
     let menum = await tb_common_systemmenu.findOne({
       where: {
@@ -277,23 +268,6 @@ const modifyMenuAct = async (req, res) => {
     }
 
     common.sendData(res)
-  } catch (error) {
-    common.sendFault(res, error)
-  }
-}
-
-const getApiAct = async (req, res) => {
-  try {
-    let doc = common.docValidate(req)
-    let user = req.user
-
-    let api = await tb_common_api.findOne({
-      where: {
-        api_id: doc.api_id
-      }
-    })
-
-    common.sendData(res, api)
   } catch (error) {
     common.sendFault(res, error)
   }

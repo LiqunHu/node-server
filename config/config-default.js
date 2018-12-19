@@ -1,25 +1,21 @@
 const config = {
-  // for sequelize Write`
-  sequelize: {
-    dialect: 'mysql',
-    database: 'mvnndata',
-    username: 'root',
-    password: '123456',
-    host: 'localhost',
-    port: 33306
-  },
-  RWSeperateFlag: false, // 读写分离标识
-  // for sequelize Query`
-  sequelizeQuery: {
-    dialect: 'mysql',
-    database: 'mvnndata',
-    username: 'root',
-    password: '123456',
-    host: 'localhost',
-    port: 33306
+  mysql: {
+    normal: {
+      database: 'mvnndata',
+      username: 'root',
+      password: '123456',
+      host: 'localhost',
+      port: 33306
+    },
+    readonly: {
+      database: 'mvnndata',
+      username: 'root',
+      password: '123456',
+      host: 'localhost',
+      port: 33306
+    }
   },
   // for redis
-  redisCache: true,
   redis: {
     host: 'localhost',
     port: 16379,
@@ -29,20 +25,36 @@ const config = {
   mongoFileFlag: true,
   mongoSyncFlag: false,
   mongo: {
-    connect: 'mongodb://127.0.0.1:27017',
+    url: 'mongodb://127.0.0.1:27017',
+    options: {},
     dbName: 'mvnndata',
     bucketName: 'gridfsmvnn'
   },
   // for elasticsearch
-  elasticsearchFlag: false,
   elasticsearch: {
     index: 'mvnn',
-    host: 'localhost:9200',
+    host: '127.0.0.1:9200',
     log: {
       type: 'file',
       level: 'error',
       path: '../log/elasticsearch.log'
     }
+  },
+  // for rabbitmqClinet
+  rabbitmq: {
+    connectOptions: {
+      protocol: 'amqp',
+      hostname: 'localhost',
+      port: 5672
+    },
+    publisherQueue: {
+      config: {
+        max: 2, // maximum size of the pool
+        min: 1 // minimum size of the pool
+      },
+      queues: ['test']
+    },
+    consumerQueue: ['test']
   },
   // for logger
   loggerConfig: {
@@ -67,9 +79,7 @@ const config = {
       }
     }
   },
-  // schedule Flag
-  scheduleFlag: false,
-  rpcservers: {
+  wsservers: {
     pooltest: {
       host: '127.0.0.1',
       port: 9090,
@@ -80,11 +90,13 @@ const config = {
       desc: '内部连接池测试'
     }
   },
-  weixin: {
-    appid: 'wx1bf0976923162a6b',
-    app_secret: 'f03e63ca1aca1c007b5915b54b6ec8c7'
+  // schedule job
+  scheduleJobs: [],
+  sms: {
+    appid: '',
+    appkey: '',
+    signtype: '' /*可选参数normal,md5,sha1*/
   },
-  syslogFlag: true,
   uploadOptions: {
     autoFields: true,
     autoFiles: true,
@@ -97,7 +109,7 @@ const config = {
   fileUrlBase: '/files/',
   fsUrlBase: '/filesys/',
   // SECRET_KEY
-  SECRET_KEY: 'zc7#_66#g%u2n$j_)j$-r(swt63d(2l%wc2y=wqt_m8kpy%04*',
+  SECRET_KEY: 'zc7#_66#g%u2n$j_)j$-r(swt74d(2l%wc2y=wqt_m8kpy%04*',
   TOKEN_AGE: 43200000, // 12 * 60 * 60 * 10000
   MOBILE_TOKEN_AGE: 31536000000 // 365 * 24 * 60 * 60 * 1000
 }

@@ -1,13 +1,14 @@
 const common = require('../../../util/CommonUtil')
-const FileSRV = require('../../../util/FileSRV')
+const FileSRV = require('../../FileSRV')
 const GLBConfig = require('../../../util/GLBConfig')
-const logger = require('../../../util/Logger').createLogger('UserSettingSRV')
-const model = require('../../../model')
+const logger = require('../../../app/logger').createLogger(__filename)
+const model = require('../../../app/model')
 
 const tb_user = model.common_user
 
 exports.UserSettingResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
+  logger.debug(method)
   if (method === 'setpwd') {
     setpwdAct(req, res)
   } else if (method === 'modify') {
@@ -25,8 +26,7 @@ const setpwdAct = async (req, res) => {
     let user = req.user
 
     if (user.password != doc.oldPwd) {
-      common.sendError(res, 'usersetting_01')
-      return
+      return common.sendError(res, 'usersetting_01')
     }
 
     let modiuser = await tb_user.findOne({
@@ -73,8 +73,7 @@ const modifyAct = async (req, res) => {
       return
     }
   } catch (error) {
-    common.sendFault(res, error)
-    return null
+    return common.sendFault(res, error)
   }
 }
 
@@ -85,7 +84,6 @@ const uploadAct = async (req, res) => {
       uploadurl: uploadurl
     })
   } catch (error) {
-    common.sendFault(res, error)
-    return
+    return common.sendFault(res, error)
   }
 }

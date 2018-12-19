@@ -1,4 +1,4 @@
-const db = require('../../util/db')
+const db = require('../../app/db')
 const GLBConfig = require('../../util/GLBConfig')
 
 module.exports = db.defineModel('tbl_common_api', {

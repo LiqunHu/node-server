@@ -1,8 +1,9 @@
+const RedisClient = require('server-utils').RedisClient
+
 const common = require('../../../util/CommonUtil')
 const GLBConfig = require('../../../util/GLBConfig')
-const logger = require('../../../util/Logger').createLogger('GroupControlSRV')
-const model = require('../../../model')
-const RedisClient = require('../../../util/RedisClient')
+const logger = require('../../../app/logger').createLogger(__filename)
+const model = require('../../../app/model')
 const Op = model.Op
 
 const tb_usergroup = model.common_usergroup
@@ -13,6 +14,7 @@ let groups = []
 
 exports.OperatorControlResource = (req, res) => {
   let method = common.reqTrans(req, __filename)
+  logger.debug(method)
   if (method === 'init') {
     initAct(req, res)
   } else if (method === 'search') {
@@ -47,15 +49,11 @@ const searchAct = async (req, res) => {
     let doc = common.docValidate(req),
       returnData = {}
 
-    let queryStr =
-      'select * from tbl_common_user where state = "1" and user_type = "' +
-      GLBConfig.TYPE_OPERATOR +
-      '"'
+    let queryStr = 'select * from tbl_common_user where state = "1" and user_type = "' + GLBConfig.TYPE_OPERATOR + '"'
     let replacements = []
 
     if (doc.search_text) {
-      queryStr +=
-        ' and (user_username like ? or user_email like ? or user_phone like ? or user_name like ? or user_address like ?)'
+      queryStr += ' and (user_username like ? or user_email like ? or user_phone like ? or user_name like ? or user_address like ?)'
       let search_text = '%' + doc.search_text + '%'
       replacements.push(search_text)
       replacements.push(search_text)
@@ -64,7 +62,7 @@ const searchAct = async (req, res) => {
       replacements.push(search_text)
     }
 
-    let result = await model.queryWithCount(req, queryStr, replacements)
+    let result = await model.queryWithCount(doc, queryStr, replacements)
 
     returnData.total = result.count
     returnData.rows = []
@@ -138,7 +136,7 @@ const addAct = async (req, res) => {
       let returnData = JSON.parse(JSON.stringify(adduser))
       delete returnData.user_password
       returnData.user_groups = doc.user_groups
-      
+
       common.sendData(res, returnData)
     } else {
       common.sendError(res, 'operator_01')
@@ -153,7 +151,6 @@ const addAct = async (req, res) => {
 const modifyAct = async (req, res) => {
   try {
     let doc = common.docValidate(req)
-    let user = req.user
 
     let modiuser = await tb_user.findOne({
       where: {
@@ -214,8 +211,8 @@ const deleteAct = async (req, res) => {
     if (deluser) {
       deluser.state = GLBConfig.DISABLE
       await deluser.save()
-      RedisClient.removeItem(GLBConfig.REDISKEY.AUTH + 'WEB' + doc.user_id)
-      RedisClient.removeItem(GLBConfig.REDISKEY.AUTH + 'MOBILE' + doc.user_id)
+      RedisClient.removeItem(['REDISKEYAUTH', 'WEB', doc.user_id].join('_'))
+      RedisClient.removeItem(['REDISKEYAUTH', 'MOBILE', doc.user_id].join('_'))
       common.sendData(res)
     } else {
       return common.sendError(res, 'operator_03')

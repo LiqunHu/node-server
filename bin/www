@@ -1,14 +1,26 @@
 #!/usr/bin/env node
+const _ = require('lodash')
 const debug = require('debug')('demo:server')
 const http = require('http')
-const url = require('url')
-const _ = require('lodash')
-const WebSocket = require('ws') 
+const WebSocket = require('ws')
+const serverUtils = require('server-utils')
+// 设置logger
+serverUtils.setLogger(require('../app/logger'))
 
 const app = require('../app')
+const config = require('../app/config')
+const rpcrouter = require('../RPCRoutes')
+
+// 计划任务
 const schedule = require('../schedule')
-const config = require('../config')
-const wsrouter = require('../wsroutes')
+const scheduleJob = serverUtils.scheduleJob
+// RPC Websocket 连接池
+const websocketUtil = serverUtils.websocketUtil
+// rabbitmq
+const rabbitmqClinet = serverUtils.rabbitmqClinet
+// sms
+const smsClient = serverUtils.smsClient
+
 let port = 9090
 
 /**
@@ -47,56 +59,12 @@ global.wss = new WebSocket.Server({
   server
 })
 
-function noop() {}
-
-function heartbeat() {
-  this.isAlive = true
-}
-
 wss.on('connection', (ws, req) => {
-  ws.isAlive = true
-
-  const location = url.parse(req.url, true)
-  // You might use location.query.access_token to authenticate or share sessions
-  // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
-  ws.authorization = location.query.authorization
-
-  ws.on('message', async message => {
-    let req = {
-        WebSocket: true,
-        params: {
-          method: ''
-        },
-        body: {}
-      },
-      res = {
-        WebSocket: true,
-        errno: 0,
-        msg: 'ok',
-        info: {}
-      }
-    let request = JSON.parse(message)
-    req.params.method = _.last(_.split(request.url, '/'))
-    req.body = request.message
-    let url = request.url.substring(0, request.url.length - req.params.method.length - 1)
-    if (url in wsrouter) {
-      await wsrouter[url](req, res)
-    } else {
-      res.errno = -1
-      res.msg = 'url is not in router list'
-    }
-    ws.send(JSON.stringify(res))
-  })
-
-  ws.on('pong', heartbeat)
-
-  ws.on('error', err => {
-    // Ignore network errors like `ECONNRESET`, `EPIPE`, etc.
-    if (err.errno) return
-    throw err
-  })
+  websocketUtil.initWSServer(ws, req, rpcrouter)
   // ws.send('something');
 })
+
+const noop = () => {}
 
 const interval = setInterval(() => {
   wss.clients.forEach(ws => {
@@ -148,11 +116,21 @@ const onListening = () => {
  * Listen on provided port, on all network interfaces.
  */
 server.listen(port, () => {
-  if (config.scheduleFlag) {
-    console.log('App started, gathering monitors')
-    let jobs = schedule.scheduleJob()
-    console.log('Timed task has been turned on!')
-  }
+  // for schedule job
+  console.log('Init schedule')
+  scheduleJob.initSchedule(config, schedule)
+
+  // RPC Websocket 连接池
+  console.log('Init connection pools')
+  websocketUtil.genConnectionPools(config.wsservers)
+
+  // RPC rabbitmq 连接池
+  console.log('Init rabbitmq')
+  rabbitmqClinet.initRabbitmqClient(config.rabbitmq, rpcrouter)
+
+  // 短信平台
+  console.log('Init sms')
+  smsClient.initSms(config.sms)
 })
 server.on('error', onError)
 server.on('listening', onListening)
