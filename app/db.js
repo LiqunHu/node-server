@@ -1,10 +1,10 @@
 const _ = require('lodash')
 const Sequelize = require('sequelize')
+const mongoClient = require('server-utils').mongoClient
+const elasticsearchClient = require('server-utils').elasticsearchClient
 
 const config = require('./config')
 const logger = require('./logger').createLogger(__filename)
-const elaClient = require('./elasticsearchClient.js')
-const MongoCli = require('./mongoClient')
 
 logger.debug('init sequelize...')
 
@@ -100,8 +100,9 @@ const defineModel = (name, attributes, params) => {
               if (obj.constructor.tableName === 'tbl_common_user') {
                 delete jsonObj.password
               }
-              if (!_.isNull(elaClient)) {
-                elaClient
+              let elk = elasticsearchClient.getClient()
+              if (!_.isNull(elk)) {
+                elk
                   .create({
                     index: config.elasticsearch.index + '-' + obj.constructor.tableName,
                     type: 'table',
@@ -117,7 +118,7 @@ const defineModel = (name, attributes, params) => {
               }
 
               if (config.mongoSyncFlag) {
-                let db = await MongoCli.getDb()
+                let db = mongoClient.getDb()
                 let collection = db.collection(obj.constructor.tableName)
                 await collection.insertOne(jsonObj)
               }
@@ -131,8 +132,9 @@ const defineModel = (name, attributes, params) => {
               if (obj.constructor.tableName === 'tbl_common_user') {
                 delete jsonObj.password
               }
-              if (!_.isNull(elaClient)) {
-                elaClient
+              let elk = elasticsearchClient.getClient()
+              if (!_.isNull(elk)) {
+                elk
                   .index({
                     index: config.elasticsearch.index + '-' + obj.constructor.tableName,
                     type: 'table',
@@ -148,7 +150,7 @@ const defineModel = (name, attributes, params) => {
               }
 
               if (config.mongoSyncFlag) {
-                let db = await MongoCli.getDb()
+                let db = mongoClient.getDb()
                 let collection = db.collection(obj.constructor.tableName)
                 let key = obj.constructor.primaryKeyField
                 let queryCondition = {}

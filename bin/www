@@ -18,8 +18,14 @@ const scheduleJob = serverUtils.scheduleJob
 const websocketUtil = serverUtils.websocketUtil
 // rabbitmq
 const rabbitmqClinet = serverUtils.rabbitmqClinet
+// mongo
+const mongoClient = serverUtils.mongoClient
+// elasticsearch
+const elasticsearchClient = serverUtils.elasticsearchClient
 // sms
 const smsClient = serverUtils.smsClient
+// file
+const fileUtil = serverUtils.fileUtil
 
 let port = 9090
 
@@ -128,9 +134,19 @@ server.listen(port, () => {
   console.log('Init rabbitmq')
   rabbitmqClinet.initRabbitmqClient(config.rabbitmq, rpcrouter)
 
+  // mongoClient
+  mongoClient.initMongo(config.mongo)
+
+  // elasticsearchClient
+  elasticsearchClient.initElasticsearch(config.elasticsearch)
+
   // 短信平台
   console.log('Init sms')
   smsClient.initSms(config.sms)
+
+  // qiniu
+  console.log('Init qiniu')
+  fileUtil.initQiniu(config.qiniu)
 })
 server.on('error', onError)
 server.on('listening', onListening)

@@ -1,19 +1,215 @@
 const _ = require('lodash')
+const uuid = require('uuid')
 const moment = require('moment')
 const rp = require('request-promise')
-const RedisClient = require('server-utils').redisClient
+const svgCaptcha = require('svg-captcha')
+const redisClient = require('server-utils').redisClient
 const authority = require('server-utils').authority
+const smsClient = require('server-utils').smsClient
 
-const common = require('../util/CommonUtil.js')
-const logger = require('../app/logger').createLogger(__filename)
-const model = require('../app/model')
-const config = require('../app/config')
-const GLBConfig = require('../util/GLBConfig')
+const common = require('../../util/CommonUtil.js')
+const logger = require('../../app/logger').createLogger(__filename)
+const model = require('../../app/model')
+const config = require('../../app/config')
+const GLBConfig = require('../../util/GLBConfig')
 
 // table
 const sequelize = model.sequelize
 const tb_common_user = model.common_user
 const tb_user_groups = model.common_user_groups
+
+exports.signinAct = async req => {
+  let doc = common.docValidate(req)
+  let user
+
+  if (doc.login_type === 'WEB' || doc.login_type === 'MOBILE') {
+    user = await tb_common_user.findOne({
+      where: {
+        user_username: doc.username,
+        state: GLBConfig.ENABLE
+      }
+    })
+
+    if (_.isEmpty(user)) {
+      return common.error('auth_05')
+    }
+
+    let decrypted = authority.aesDecryptModeCFB(doc.identify_code, user.user_password, doc.magic_no)
+
+    if (!(decrypted == user.user_username)) {
+      return common.error('auth_05')
+    } else {
+      let session_token = authority.user2token(doc.login_type, user, doc.magic_no)
+      delete user.user_password
+      let loginData = await loginInit(user, session_token, doc.login_type)
+
+      if (loginData) {
+        loginData.Authorization = session_token
+        return common.success(loginData)
+      } else {
+        return common.error('auth_05')
+      }
+    }
+  } else {
+    return common.error('auth_19')
+  }
+}
+
+exports.signinBySmsAct = async req => {
+  let doc = common.docValidate(req)
+  let user
+
+  if (doc.login_type === 'WEB' || doc.login_type === 'MOBILE') {
+    user = await tb_common_user.findOne({
+      where: {
+        user_phone: doc.user_phone,
+        state: GLBConfig.ENABLE
+      }
+    })
+
+    if (_.isEmpty(user)) {
+      return common.error('auth_05')
+    }
+
+    let key = [config.redis.redisKey.SMS, user.user_phone].join('_')
+    let rdsData = await redisClient.getItem(key)
+    redisClient.removeItem(key)
+
+    if (_.isNull(rdsData)) {
+      return common.error('auth_09')
+    } else if (doc.code !== rdsData.code) {
+      return common.error('auth_09')
+    } else {
+      let session_token = authority.user2token(doc.login_type, user, doc.code)
+      delete user.user_password
+      let loginData = await loginInit(user, session_token, doc.login_type)
+
+      if (loginData) {
+        loginData.Authorization = session_token
+        return common.success(loginData)
+      } else {
+        return common.error('auth_05')
+      }
+    }
+  } else {
+    return common.error('auth_19')
+  }
+}
+
+exports.signinByWxAct = async req => {
+  let doc = common.docValidate(req)
+
+  let url =
+    'https://api.weixin.qq.com/sns/jscode2session?appid=' +
+    config.weixin.appid +
+    '&secret=' +
+    config.weixin.app_secret +
+    '&js_code=' +
+    doc.wx_code +
+    '&grant_type=authorization_code'
+  let wxAuth = await rp(url)
+  logger.debug(wxAuth)
+  let wxAuthjs = JSON.parse(wxAuth)
+
+  if (wxAuthjs.openid) {
+    let user = await tb_common_user.findOne({
+      where: {
+        user_wx_openid: wxAuthjs.openid,
+        state: GLBConfig.ENABLE
+      }
+    })
+    if (!user) {
+      return common.error('auth_22')
+    }
+    let session_token = authority.user2token('WEIXIN', user, common.generateRandomAlphaNum(6))
+    user.session_key = wxAuthjs.session_key
+    let loginData = await loginInit(user, session_token, doc.loginType)
+    if (loginData) {
+      loginData.Authorization = session_token
+      return common.success(loginData)
+    } else {
+      return common.error('auth_05')
+    }
+  } else {
+    return common.error('auth_21')
+  }
+}
+
+exports.signoutAct = async req => {
+  let token_str = req.get('Authorization')
+  if (token_str) {
+    let tokensplit = token_str.split('_')
+
+    let type = tokensplit[0],
+      uid = tokensplit[1]
+    let error = await redisClient.removeItem(config.redis.redisKey.AUTH + type + uid)
+    if (error) {
+      logger.error(error)
+    }
+  }
+  return common.success()
+}
+
+exports.smsAct = async req => {
+  let doc = common.docValidate(req)
+
+  let user = await tb_common_user.findOne({
+    where: {
+      user_phone: doc.user_phone
+    }
+  })
+
+  if (!user) {
+    return common.error('auth_22')
+  } else {
+    let code = common.generateRandomAlphaNum(6)
+    let smsExpiredTime = parseInt(config.SMS_TOKEN_AGE / 1000)
+    let key = [config.redis.redisKey.SMS, user.user_phone].join('_')
+
+    let liveTime = await redisClient.getLiveTime(key)
+    logger.debug(liveTime)
+    logger.debug(code)
+    if (liveTime > 0) {
+      if (smsExpiredTime - liveTime < 70) {
+        return common.error('auth_23')
+      }
+    }
+
+    smsClient.sendMessageByTemplate(user.user_phone, '2HnuU1', {
+      code: code
+    })
+
+    await redisClient.setItem(
+      key,
+      {
+        code: code
+      },
+      smsExpiredTime
+    )
+
+    return common.success()
+  }
+}
+
+exports.captchaAct = async () => {
+  let captcha = svgCaptcha.create({
+    size: 6,
+    ignoreChars: '0o1i',
+    noise: 2,
+    color: true
+  })
+
+  let key = config.redis.redisKey.CAPTCHA + uuid.v1().replace(/-/g, '')
+  await redisClient.setItem(
+    key,
+    {
+      code: captcha.text
+    },
+    parseInt(config.CAPTCHA_TOKEN_AGE / 1000)
+  )
+
+  return common.success({ key: key, captcha: captcha.data })
+}
 
 const loginInit = async (user, session_token, type) => {
   try {
@@ -67,7 +263,7 @@ const loginInit = async (user, session_token, type) => {
         })
 
         authApis.push({
-          api_name: '员工维护',
+          api_name: '用户维护',
           api_path: '/common/system/OperatorControl',
           api_function: 'OPERATORCONTROL',
           auth_flag: '1',
@@ -91,8 +287,8 @@ const loginInit = async (user, session_token, type) => {
       } else {
         expired = parseInt(config.TOKEN_AGE / 1000)
       }
-      let error = await RedisClient.setItem(
-        ['REDISKEYAUTH', type, user.user_id].join('_'),
+      let error = await redisClient.setItem(
+        [config.redis.redisKey.AUTH, type, user.user_id].join('_'),
         {
           session_token: session_token,
           user: user,
@@ -103,7 +299,7 @@ const loginInit = async (user, session_token, type) => {
       if (error) {
         return null
       }
-      
+
       return returnData
     } else {
       return null
@@ -111,124 +307,6 @@ const loginInit = async (user, session_token, type) => {
   } catch (error) {
     logger.error(error)
     return null
-  }
-}
-
-exports.AuthResource = async (req, res) => {
-  try {
-    common.reqTrans(req, __filename)
-    let doc = common.docValidate(req)
-    let user
-
-    if (doc.login_type === 'WEB' || doc.login_type === 'MOBILE') {
-      if (!('username' in doc)) {
-        return common.sendError(res, 'auth_02')
-      }
-      if (!('identify_code' in doc)) {
-        return common.sendError(res, 'auth_03')
-      }
-      if (!('magic_no' in doc)) {
-        return common.sendError(res, 'auth_04')
-      }
-
-      user = await tb_common_user.findOne({
-        where: {
-          user_username: doc.username,
-          state: GLBConfig.ENABLE
-        }
-      })
-
-      if (_.isEmpty(user)) {
-        return common.sendError(res, 'auth_05')
-      }
-
-      let decrypted = authority.aesDecryptModeCFB(doc.identify_code, user.user_password, doc.magic_no)
-
-      if (!(decrypted == user.user_username)) {
-        return common.sendError(res, 'auth_05')
-      } else {
-        let session_token = authority.user2token(doc.login_type, user, doc.identify_code, doc.magic_no)
-        res.append('Authorization', session_token)
-        delete user.user_password
-        let loginData = await loginInit(user, session_token, doc.login_type)
-
-        if (loginData) {
-          loginData.Authorization = session_token
-          return common.sendData(res, loginData)
-        } else {
-          return common.sendError(res, 'auth_05')
-        }
-      }
-    } else if (doc.loginType === 'WEIXIN') {
-      if (!('wxCode' in doc)) {
-        return common.sendError(res, 'auth_20')
-      }
-
-      let wxAuthjs
-      if (!('wxAuthjs' in doc)) {
-        let url =
-          'https://api.weixin.qq.com/sns/jscode2session?appid=' +
-          config.weixin.appid +
-          '&secret=' +
-          config.weixin.app_secret +
-          '&js_code=' +
-          doc.wxCode +
-          '&grant_type=authorization_code'
-        let wxAuth = await rp(url)
-        logger.info(wxAuth)
-        wxAuthjs = JSON.parse(wxAuth)
-      } else {
-        wxAuthjs = doc.wxAuthjs
-      }
-
-      if (wxAuthjs.openid) {
-        user = await tb_common_user.findOne({
-          where: {
-            user_wx_openid: wxAuthjs.openid,
-            state: GLBConfig.ENABLE
-          }
-        })
-        if (!user) {
-          return common.sendError(res, 'auth_22')
-        }
-        let session_token = authority.user2token(doc.loginType, user, user.user_wx_openid, user.user_username)
-        user.session_key = wxAuthjs.session_key
-        res.append('Authorization', session_token)
-        let loginData = await loginInit(user, session_token, doc.loginType)
-        if (loginData) {
-          loginData.Authorization = session_token
-          return common.sendData(res, loginData)
-        } else {
-          return common.sendError(res, 'auth_05')
-        }
-      } else {
-        return common.sendError(res, 'auth_21')
-      }
-    } else {
-      return common.sendError(res, 'auth_19')
-    }
-  } catch (error) {
-    logger.error(error)
-    common.sendFault(res, error)
-    return
-  }
-}
-
-exports.SignOutResource = async (req, res) => {
-  try {
-    let token_str = req.get('Authorization')
-    if (token_str) {
-      let tokensplit = token_str.split('_')
-
-      let type = tokensplit[0],
-        uid = tokensplit[1]
-      let error = await RedisClient.removeItem(GLBConfig.REDISKEY.AUTH + type + uid)
-      if (error) logger.error(error)
-    }
-    return common.sendData(res)
-  } catch (error) {
-    logger.error(error)
-    return common.sendData(res)
   }
 }
 
@@ -281,7 +359,7 @@ const iterationMenu = async (user, groups, parent_id) => {
 
     return_list[0].sub_menu.push({
       menu_type: GLBConfig.MTYPE_LEAF,
-      menu_name: '员工维护',
+      menu_name: '用户维护',
       show_flag: '1',
       menu_path: '/common/system/OperatorControl'
     })

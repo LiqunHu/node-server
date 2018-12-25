@@ -19,16 +19,19 @@ const config = {
   redis: {
     host: 'localhost',
     port: 16379,
-    opts: {}
+    opts: {},
+    redisKey: {
+      AUTH: 'AUTH',
+      SMS: 'SMS',
+      CAPTCHA: 'CAP'
+    }
   },
   // for mongo
-  mongoFileFlag: true,
   mongoSyncFlag: false,
   mongo: {
     url: 'mongodb://127.0.0.1:27017',
     options: {},
-    dbName: 'mvnndata',
-    bucketName: 'gridfsmvnn'
+    dbName: 'mvnndata'
   },
   // for elasticsearch
   elasticsearch: {
@@ -93,25 +96,34 @@ const config = {
   // schedule job
   scheduleJobs: [],
   sms: {
-    appid: '',
-    appkey: '',
-    signtype: '' /*可选参数normal,md5,sha1*/
+    appid: '26763',
+    appkey: '0d7e27433af7744451809fb2136ae834',
+    signtype: 'normal' /*可选参数normal,md5,sha1*/
   },
-  uploadOptions: {
-    autoFields: true,
-    autoFiles: true,
-    uploadDir: '../public/temp',
-    maxFileSize: 2 * 1024 * 1024
+  qiniu: {
+    accessKey: 'n7O-3elJh6lKYOaAywJ5MlmwvGxa6MgMPf1vLAmB',
+    secretKey: 'ntcyQ9co6mMJTN-raHVbz8FabnLMxuLORmXMG7Qq'
   },
-  tempDir: '../public/temp',
-  filesDir: '../public/files',
-  tmpUrlBase: '/temp/',
-  fileUrlBase: '/files/',
-  fsUrlBase: '/filesys/',
+  weixin: { // 小程序授权相关
+    appid: 'wx1bf0976923162a6b',
+    app_secret: 'f03e63ca1aca1c007b5915b54b6ec8c7'
+  },
+  fileSys: {
+    type: 'qiniu' /* 可选 local qiniu */,
+    filesDir: '../public/temp/' /* 本地目录对于非本地存储是临时文件目录 */,
+    bucket: {
+      /* for qiniu */
+      test: {
+        domain: 'http://testqiniu.goooku.com/'
+      }
+    }
+  },
   // SECRET_KEY
   SECRET_KEY: 'zc7#_66#g%u2n$j_)j$-r(swt74d(2l%wc2y=wqt_m8kpy%04*',
   TOKEN_AGE: 43200000, // 12 * 60 * 60 * 10000
-  MOBILE_TOKEN_AGE: 31536000000 // 365 * 24 * 60 * 60 * 1000
+  MOBILE_TOKEN_AGE: 31536000000, // 365 * 24 * 60 * 60 * 1000
+  SMS_TOKEN_AGE: 300000, // 5* 60 * 1000
+  CAPTCHA_TOKEN_AGE: 60000 // 60 * 1000
 }
 
 module.exports = config

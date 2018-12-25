@@ -3,8 +3,8 @@ const services = require('./service')
 const router = express.Router()
 
 // system
-router.post('/system/SystemApiControl/:method', services.SystemApiControlSRV.SystemApiControlResource)
-router.post('/system/GroupControl/:method', services.GroupControlSRV.GroupControlResource)
-router.post('/system/OperatorControl/:method', services.OperatorControlSRV.OperatorControlResource)
-router.post('/system/UserSetting/:method', services.UserSettingSRV.UserSettingResource)
+router.post('/system/SystemApiControl/:method', services.SystemApiControl)
+router.post('/system/GroupControl/:method', services.GroupControl)
+router.post('/system/OperatorControl/:method', services.OperatorControl)
+router.post('/system/UserSetting/:method', services.UserSettingControl)
 module.exports = router

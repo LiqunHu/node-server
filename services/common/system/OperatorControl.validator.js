@@ -14,7 +14,7 @@ module.exports = {
       JoiSchema: {}
     },
     search: {
-      name: '用户查询查询',
+      name: '用户查询',
       enname: 'OperatorControlsearch',
       tags: ['OperatorControl'],
       path: '/api/common/system/OperatorControl/search',

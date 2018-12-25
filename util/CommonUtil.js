@@ -1,6 +1,9 @@
+const _ = require('lodash')
 const path = require('path')
 const fs = require('fs')
 const Joi = require('joi')
+const fileUtil = require('server-utils').fileUtil
+const moment = require('moment')
 
 const config = require('../app/config')
 const Error = require('./Error')
@@ -9,27 +12,22 @@ const logger = require('../app/logger').createLogger(__filename)
 // common response
 const docValidate = req => {
   let doc = req.body
-  if (req.JoiSchema) {
-    let result = Joi.validate(doc, req.JoiSchema)
-    if (result.error === null) {
-      return doc
-    } else {
-      throw result.error
-    }
-  } else {
-    return doc
-  }
+  return doc
 }
 
 const reqTrans = (req, callFile) => {
   let method = req.params.method
+  let doc = req.body
   let validatorFile = callFile.substring(0, callFile.length - 3) + '.validator.js'
   if (fs.existsSync(validatorFile)) {
     let validator = require(validatorFile)
     if (validator.apiList[method]) {
       let reqJoiSchema = validator.apiList[method].JoiSchema
       if (reqJoiSchema.body) {
-        req.JoiSchema = reqJoiSchema.body
+        let result = Joi.validate(doc, reqJoiSchema.body)
+        if (result.error) {
+          throw result.error
+        }
       }
     }
   }
@@ -38,41 +36,56 @@ const reqTrans = (req, callFile) => {
 }
 
 // common response
-const sendData = (res, data) => {
-  if ('WebSocket' in res || 'rabbitmq' in res) {
-    res.info = data
+const success = data => {
+  if (data) {
+    return data
   } else {
-    let sendData = {
-      errno: 0,
-      msg: 'ok',
-      info: data
-    }
-    res.send(sendData)
+    return {}
   }
 }
 
-const sendError = (res, errno) => {
-  if ('WebSocket' in res || 'rabbitmq' in res) {
-    res.errno = errno
-    if (errno in Error) {
-      res.msg = Error[errno]
+const error = errcode => {
+  if (_.isString(errcode)) {
+    return errcode
+  } else {
+    return 'common_02'
+  }
+}
+
+const sendData = (res, data) => {
+  if (_.isString(data)) {
+    if ('WebSocket' in res || 'rabbitmq' in res) {
+      res.errno = data
+      if (data in Error) {
+        res.msg = Error[data]
+      } else {
+        res.msg = '错误未配置'
+      }
     } else {
-      res.msg = '错误未配置'
+      let sendData
+      if (data in Error) {
+        sendData = {
+          errno: data,
+          msg: Error[data]
+        }
+      } else {
+        sendData = {
+          errno: data,
+          msg: '错误未配置'
+        }
+      }
+      res.status(700).send(sendData)
     }
   } else {
-    let sendData
-    if (errno in Error) {
-      sendData = {
-        errno: errno,
-        msg: Error[errno]
-      }
+    if ('WebSocket' in res || 'rabbitmq' in res) {
+      res.info = data
     } else {
-      sendData = {
-        errno: errno,
-        msg: '错误未配置'
-      }
+      res.send({
+        errno: '0',
+        msg: 'ok',
+        info: data
+      })
     }
-    res.status(700).send(sendData)
   }
 }
 
@@ -134,14 +147,39 @@ const getUploadTempPath = uploadurl => {
   return path.join(__dirname, '../' + config.uploadOptions.uploadDir + '/' + fileName)
 }
 
+const fileSave = async (req, bucket) => {
+  if (config.fileSys.type === 'local') {
+    let relPath = 'upload/' + moment().format('YYYY/MM/DD/')
+    let svPath = path.join(process.cwd(), config.fileSys.filesDir, relPath)
+    let fileInfo = await fileUtil.fileSaveLocal(req, svPath, config.fileSys.urlBaseu + relPath)
+    return fileInfo
+  } else if (config.fileSys.type === 'qiniu') {
+    if (config.fileSys.bucket[bucket]) {
+      let fileInfo = await fileUtil.fileSaveQiniu(req, config.fileSys.filesDir, bucket, config.fileSys.bucket[bucket].domain)
+      return fileInfo
+    } else {
+      throw new Error('bucket do not exist')
+    }
+  } else if (config.fileSys.type === 'mongo') {
+    if (config.fileSys.bucket[bucket]) {
+      let fileInfo = await fileUtil.fileSaveMongo(req, config.fileSys.filesDir, bucket, config.fileSys.bucket[bucket].baseUrl)
+      return fileInfo
+    } else {
+      throw new Error('bucket do not exist')
+    }
+  }
+}
+
 module.exports = {
   docValidate: docValidate,
   reqTrans: reqTrans,
   sendData: sendData,
-  sendError: sendError,
   sendFault: sendFault,
+  success: success,
+  error: error,
   getUploadTempPath: getUploadTempPath,
   generateRandomAlphaNum: generateRandomAlphaNum,
   getApiName: getApiName,
-  generateNonceString: generateNonceString
+  generateNonceString: generateNonceString,
+  fileSave: fileSave
 }

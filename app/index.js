@@ -9,7 +9,6 @@ const authority = require('server-utils').authority
 
 const model = require('./model')
 const config = require('./config')
-const AuthSRV = require('../services/AuthSRV')
 const FileSRV = require('../services/FileSRV')
 const routers = require('../routes')
 
@@ -17,9 +16,8 @@ app.use(cors())
 
 app.use(express.static(path.join(__dirname, '../public')))
 app.use('/temp', express.static(path.join(__dirname, '../../public/temp')))
-if (config.mongoFileFlag === false) {
-  app.use('/files', express.static(path.join(__dirname, '../../public/files')))
-}
+app.use('/files', express.static(path.join(__dirname, '../../public/files')))
+app.get('/filesys/:bucket/:filetag', FileSRV.FileResource)
 app.use(
   log4js.connectLogger(log4js.getLogger('http'), {
     level: 'auto',
@@ -56,17 +54,13 @@ app.get('/', (req, res) => {
   res.redirect('index.html')
 })
 
-if (config.mongoFileFlag) {
-  app.get('/filesys/:filetag', FileSRV.FileResource)
-}
-
 //test
 app.use('/api/test', routers.test)
 
 //common
 app.use('/api/common', routers.common)
 
-app.post('/api/auth', AuthSRV.AuthResource)
-app.post('/api/signout', AuthSRV.SignOutResource)
+//auth 
+app.use('/api/auth', routers.auth)
 
 module.exports = app

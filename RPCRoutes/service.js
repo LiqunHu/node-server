@@ -10,7 +10,7 @@ function readDirSync(dir) {
     if (info.isDirectory()) {
       readDirSync(path.join(dir, ele))
     } else {
-      if (ele.endsWith('.js')) {
+      if (ele.endsWith('Control.js')) {
         files.push(path.join(dir, ele))
       }
     }

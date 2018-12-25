@@ -114,7 +114,7 @@ const tb_common_systemmenu = model.common_systemmenu
       parent_id: fmenuID2
     })
     api = await tb_common_api.create({
-      api_name: '员工维护',
+      api_name: '用户维护',
       api_path: '/common/system/OperatorControl',
       api_function: 'OPERATORCONTROL',
       auth_flag: '1',

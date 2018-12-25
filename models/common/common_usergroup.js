@@ -11,6 +11,11 @@ module.exports = db.defineModel('tbl_common_usergroup', {
     defaultValue: '',
     allowNull: false
   },
+  usergroup_code: { // 唯一标示用户组
+    type: db.STRING(20),
+    defaultValue: '',
+    allowNull: false
+  },
   usergroup_name: {
     type: db.STRING(50),
     defaultValue: '',
