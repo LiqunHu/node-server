@@ -7,6 +7,7 @@ const app = express()
 const cors = require('cors')
 const authority = require('server-utils').authority
 
+const systemTrace = require('./systemtrace')
 const model = require('./model')
 const config = require('./config')
 const FileSRV = require('../services/FileSRV')
@@ -43,7 +44,7 @@ app.use(bodyParser.raw())
 app.use(cookieParser())
 
 authority.initMiddleware(model, config)
-app.use('/api', authority.AuthMiddleware)
+app.use('/api', authority.AuthMiddleware, systemTrace)
 
 //处理webpack服务请求
 app.get('/__webpack_hmr', function(req, res) {
